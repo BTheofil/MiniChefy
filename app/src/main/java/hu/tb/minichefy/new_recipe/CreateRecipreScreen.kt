@@ -112,7 +112,7 @@ fun RecipeStepContent(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(if (localOrientation == Configuration.ORIENTATION_LANDSCAPE) 16.dp else 32.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
