@@ -1,7 +1,9 @@
 package hu.tb.minichefy.new_recipe
 
 import android.content.res.Configuration
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +34,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -49,8 +54,10 @@ fun CreateRecipe(
     val uiState by viewModel.state.collectAsState()
 
     val listState = rememberLazyListState()
-    LaunchedEffect(key1 = uiState.testList) {
-        listState.animateScrollToItem(uiState.testList.lastIndex)
+    LaunchedEffect(key1 = uiState.recipeSteps) {
+        if (uiState.recipeSteps.isNotEmpty()) {
+            listState.animateScrollToItem(uiState.recipeSteps.lastIndex)
+        }
     }
 
     RecipeStepContent(
@@ -64,18 +71,17 @@ fun CreateRecipe(
         },
         onAddItemIconClick = {
             viewModel.addRecipeStep(uiState.activeField)
-        }
+        },
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecipeStepContent(
     uiState: CreateRecipeViewModel.UiState,
     listState: LazyListState = rememberLazyListState(),
     onItemCloseClick: (Int) -> Unit,
     onStepTextFieldValueChange: (String) -> Unit,
-    onAddItemIconClick: () -> Unit
+    onAddItemIconClick: () -> Unit,
 ) {
     val localOrientation = LocalConfiguration.current.orientation
 
@@ -101,15 +107,28 @@ fun RecipeStepContent(
             state = listState
         ) {
             itemsIndexed(
-                items = uiState.testList,
+                items = uiState.recipeSteps,
                 key = { _, item -> item.id }
             ) { index, item ->
-                RecipeStepItem(
-                    modifier = Modifier.animateItemPlacement(),
-                    index = index,
-                    item = item.step,
-                    onItemCloseClick = onItemCloseClick
-                )
+                var isVisible by remember {
+                    mutableStateOf(false)
+                }
+
+                LaunchedEffect(key1 = uiState.recipeSteps.size){
+                    isVisible = true
+                }
+
+                AnimatedVisibility(
+                    visible = isVisible,
+                    enter = fadeIn(animationSpec = tween(delayMillis = 200))
+                ) {
+                    RecipeStepItem(
+                        modifier = Modifier,
+                        index = index,
+                        item = item.step,
+                        onItemCloseClick = onItemCloseClick
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(if (localOrientation == Configuration.ORIENTATION_LANDSCAPE) 16.dp else 32.dp))
@@ -140,7 +159,9 @@ fun RecipeStepContent(
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            IconButton(onClick = onAddItemIconClick) {
+            IconButton(onClick = {
+                onAddItemIconClick()
+            }) {
                 Icon(
                     Icons.Outlined.AddCircle,
                     contentDescription = "Add recipe step",

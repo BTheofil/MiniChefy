@@ -9,7 +9,7 @@ class CreateRecipeViewModel : ViewModel() {
 
     data class UiState(
         val activeField: String = "",
-        val testList: List<RecipeStep> = listOf(RecipeStep(0, "elso"))
+        val recipeSteps: List<RecipeStep> = emptyList(),
     )
 
     private val _state = MutableStateFlow(UiState())
@@ -22,22 +22,22 @@ class CreateRecipeViewModel : ViewModel() {
     }
 
     fun addRecipeStep(stepDescription: String) {
-        val updatedList = _state.value.testList.toMutableList().apply {
-            add(RecipeStep(state.value.testList.size, stepDescription))
+        val updatedList = _state.value.recipeSteps.toMutableList().apply {
+            add(RecipeStep(state.value.recipeSteps.size, stepDescription))
         }
-        _state.value = state.value.copy(testList = updatedList)
         _state.value = state.value.copy(
-            activeField = ""
+            recipeSteps = updatedList,
+            activeField = "",
         )
     }
 
     fun removeRecipeStep(index: Int) {
-        val updatedList = _state.value.testList.toMutableList().apply {
+        val updatedList = _state.value.recipeSteps.toMutableList().apply {
             removeAt(index)
         }
 
         _state.value = state.value.copy(
-            testList = updatedList
+            recipeSteps = updatedList
         )
     }
 }
