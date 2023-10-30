@@ -32,10 +32,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,14 +43,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.tb.minichefy.new_recipe.components.RecipeStepItem
 
 @Composable
 fun CreateRecipe(
-    viewModel: CreateRecipeViewModel = viewModel()
+    viewModel: CreateRecipeViewModel = viewModel(),
+    onNextButtonClick: () -> Unit
 ) {
-    val uiState by viewModel.state.collectAsState()
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     val listState = rememberLazyListState()
     LaunchedEffect(key1 = uiState.recipeSteps) {
@@ -72,6 +73,7 @@ fun CreateRecipe(
         onAddItemIconClick = {
             viewModel.addRecipeStep(uiState.activeField)
         },
+        onNextButtonClick = onNextButtonClick
     )
 }
 
@@ -82,6 +84,7 @@ fun RecipeStepContent(
     onItemCloseClick: (Int) -> Unit,
     onStepTextFieldValueChange: (String) -> Unit,
     onAddItemIconClick: () -> Unit,
+    onNextButtonClick: () -> Unit
 ) {
     val localOrientation = LocalConfiguration.current.orientation
 
@@ -110,7 +113,7 @@ fun RecipeStepContent(
                 items = uiState.recipeSteps,
                 key = { _, item -> item.id }
             ) { index, item ->
-                var isVisible by remember {
+                var isVisible by rememberSaveable {
                     mutableStateOf(false)
                 }
 
@@ -174,9 +177,7 @@ fun RecipeStepContent(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            Button(onClick = {
-
-            }) {
+            Button(onClick = onNextButtonClick) {
                 Text(text = "Next")
             }
         }
@@ -186,5 +187,5 @@ fun RecipeStepContent(
 @Preview
 @Composable
 fun CreateRecipePreview() {
-    CreateRecipe()
+    CreateRecipe(){}
 }
