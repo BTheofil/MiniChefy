@@ -1,15 +1,20 @@
 package hu.tb.minichefy.new_recipe.components
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,18 +27,40 @@ fun AddRemoveRow(
     displayContent: Int = 0
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
-        IconButton(onClick = onAddButtonClick) {
-            Icon(painter = painterResource(id = R.drawable.baseline_add_24), contentDescription = "Add item")
-        }
-        Box(
-            modifier = Modifier.border(1.dp, MaterialTheme.colorScheme.primaryContainer)
+        IconButton(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .background(color = MaterialTheme.colorScheme.secondary),
+            onClick = onRemoveButtonClick
         ) {
-            Text(text = displayContent.toString())
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_remove_24),
+                contentDescription = "Remove item",
+                tint = MaterialTheme.colorScheme.onSecondary
+            )
         }
-        IconButton(onClick = onRemoveButtonClick) {
-            Icon(painter = painterResource(id = R.drawable.baseline_remove_24), contentDescription = "Remove item")
+        Spacer(modifier = Modifier.width(64.dp))
+        Text(
+            text = displayContent.toString(),
+            style = MaterialTheme.typography.displayMedium,
+            color = MaterialTheme.colorScheme.tertiary
+        )
+        Spacer(modifier = Modifier.width(64.dp))
+        IconButton(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .background(color = MaterialTheme.colorScheme.primary),
+            onClick = onAddButtonClick
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_add_24),
+                contentDescription = "Add item",
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
         }
     }
 }

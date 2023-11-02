@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import hu.tb.minichefy.new_recipe.components.AddRemoveRow
 
 @Composable
 fun BasicInformationPage() {
@@ -21,7 +22,7 @@ fun BasicInformationPage() {
             },
         )
         Text(text = "How many times can eat?")
-
+        AddRemoveRow(onAddButtonClick = { /*TODO*/ }, onRemoveButtonClick = { /*TODO*/ })
     }
 }
 

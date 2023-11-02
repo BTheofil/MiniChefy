@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import hu.tb.minichefy.new_recipe.navigation.CREATE_RECIPE_ROUTE
 import hu.tb.minichefy.new_recipe.navigation.createRecipeNavigation
+import hu.tb.minichefy.new_recipe.navigation.navigateToCreateRecipe
 import hu.tb.minichefy.recipe_list.navigation.navigateToRecipeList
 import hu.tb.minichefy.recipe_list.navigation.recipeListNavigation
 
@@ -16,6 +17,8 @@ fun MainNavigation() {
             onNextButtonClick = navController::navigateToRecipeList
         )
 
-        recipeListNavigation()
+        recipeListNavigation(
+            navigateToCreateRecipe = navController::navigateToCreateRecipe
+        )
     }
 }

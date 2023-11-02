@@ -17,13 +17,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun RecipeListScreen(
-    viewModel: RecipeListViewModel = viewModel()
+    viewModel: RecipeListViewModel = viewModel(),
+    onFloatingButtonClick: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { /*TODO*/ }) {
+            FloatingActionButton(onClick = onFloatingButtonClick) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "create new recipe")
             }
         },
