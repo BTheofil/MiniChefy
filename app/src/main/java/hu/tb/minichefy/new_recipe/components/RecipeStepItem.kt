@@ -23,7 +23,7 @@ fun RecipeStepItem(
     modifier: Modifier = Modifier,
     index: Int,
     item: String,
-    onItemCloseClick: (Int) -> Unit
+    onDeleteItemClick: (Int) -> Unit
 ) {
     ElevatedCard(
         modifier = modifier
@@ -50,7 +50,7 @@ fun RecipeStepItem(
             IconButton(
                 modifier = Modifier,
                 onClick = {
-                    onItemCloseClick(index)
+                    onDeleteItemClick(index)
 
                 }) {
                 Icon(

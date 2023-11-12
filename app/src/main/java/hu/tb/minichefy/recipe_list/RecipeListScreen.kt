@@ -35,7 +35,7 @@ fun RecipeListScreen(
                 items(
                     items = uiState.recipeList
                 ) { recipe ->
-                    Text(text = recipe.recipeStep.step)
+
                 }
             }
         })

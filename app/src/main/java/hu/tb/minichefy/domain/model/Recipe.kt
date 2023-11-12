@@ -2,5 +2,7 @@ package hu.tb.minichefy.domain.model
 
 data class Recipe(
     val id: Int,
-    val recipeStep: RecipeStep
+    val name: String,
+    val quantity: Int,
+    val howToSteps: List<RecipeStep>
 )

@@ -14,11 +14,16 @@ fun MainNavigation() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = CREATE_RECIPE_ROUTE){
         createRecipeNavigation(
-            onNextButtonClick = navController::navigateToRecipeList
+            onFinishButtonClick = navController::navigateToRecipeList
         )
 
         recipeListNavigation(
-            navigateToCreateRecipe = navController::navigateToCreateRecipe
+            navigateToCreateRecipe = navController::navigateToCreateRecipe,
+            navigateToRecipeDetails = navController::navigateToRecipeDetails
+        )
+
+        recipeDetailsNavigation(
+            navigateToRecipeList = navController::navigateToRecipeList
         )
     }
 }

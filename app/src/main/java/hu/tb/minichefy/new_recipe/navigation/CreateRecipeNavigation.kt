@@ -12,11 +12,11 @@ fun NavController.navigateToCreateRecipe() {
 }
 
 fun NavGraphBuilder.createRecipeNavigation(
-    onNextButtonClick: () -> Unit
+    onFinishButtonClick: () -> Unit
 ){
     composable(route = CREATE_RECIPE_ROUTE){
         CreateRecipe(
-            onNextButtonClick = onNextButtonClick,
+            onFinishRecipeButtonClick = onFinishButtonClick,
         )
     }
 }
