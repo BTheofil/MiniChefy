@@ -11,7 +11,10 @@ fun NavController.navigateToRecipeList() {
     this.navigate(RECIPE_LIST_ROUTE)
 }
 
-fun NavGraphBuilder.recipeListNavigation(navigateToCreateRecipe: () -> Unit) {
+fun NavGraphBuilder.recipeListNavigation(
+    navigateToCreateRecipe: () -> Unit,
+    navigateToRecipeDetails: () -> Unit,
+) {
     composable(route = RECIPE_LIST_ROUTE) {
         RecipeListScreen(
             onFloatingButtonClick = navigateToCreateRecipe

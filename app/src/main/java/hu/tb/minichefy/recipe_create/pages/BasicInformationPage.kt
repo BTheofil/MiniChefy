@@ -1,4 +1,4 @@
-package hu.tb.minichefy.new_recipe.pages
+package hu.tb.minichefy.recipe_create.pages
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,11 +8,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import hu.tb.minichefy.new_recipe.components.AddRemoveRow
+import hu.tb.minichefy.recipe_create.components.AddRemoveRow
 
 @Composable
 fun BasicInformationPage(
     recipeName: String,
+    counterDisplayContent: Int = 0,
     onGiveTitleValueChange: (String) -> Unit,
     onRemoveQuantityClick: () -> Unit,
     onAddQuantityClick: () -> Unit,
@@ -31,7 +32,8 @@ fun BasicInformationPage(
         Text(text = "How many times can eat?")
         AddRemoveRow(
             onAddButtonClick = onAddQuantityClick,
-            onRemoveButtonClick = onRemoveQuantityClick
+            onRemoveButtonClick = onRemoveQuantityClick,
+            displayContent = counterDisplayContent
         )
         OutlinedButton(onClick = onNextPageClick) {
             Text(text = "Next page")
@@ -42,5 +44,5 @@ fun BasicInformationPage(
 @Preview
 @Composable
 fun BasicInformationPagePreview() {
-    BasicInformationPage("test name", {}, {}, {}, {})
+    BasicInformationPage("test name", 0, {}, {}, {}, {})
 }

@@ -1,4 +1,4 @@
-package hu.tb.minichefy.new_recipe.pages
+package hu.tb.minichefy.recipe_create.pages
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -42,8 +42,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import hu.tb.minichefy.new_recipe.CreateRecipeViewModel
-import hu.tb.minichefy.new_recipe.components.RecipeStepItem
+import hu.tb.minichefy.recipe_create.CreateRecipeViewModel
+import hu.tb.minichefy.recipe_create.components.RecipeStepItem
 
 @Composable
 fun StepsPage(

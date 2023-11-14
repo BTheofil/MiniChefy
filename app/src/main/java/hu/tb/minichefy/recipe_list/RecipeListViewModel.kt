@@ -18,9 +18,10 @@ class RecipeListViewModel: ViewModel() {
     init {
         _state.value = _state.value.copy(
             recipeList = listOf(
-                Recipe(0, RecipeStep(0, "alma")),
-                Recipe(1, RecipeStep(1, "banan")),
-                Recipe(2, RecipeStep(2, "cekla"))
+                Recipe(0, "alma", 2, listOf(RecipeStep(0, "one"), RecipeStep(1, "two"))),
+                Recipe(1, "banan", 5, listOf(RecipeStep(0, "one"))),
+                Recipe(2, "citrom", 3, listOf(RecipeStep(0, "one"))),
+                Recipe(3, "dio", 1, listOf(RecipeStep(0, "one")))
             )
         )
     }

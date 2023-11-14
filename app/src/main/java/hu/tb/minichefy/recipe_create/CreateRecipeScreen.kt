@@ -1,5 +1,6 @@
-package hu.tb.minichefy.new_recipe
+package hu.tb.minichefy.recipe_create
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
@@ -9,9 +10,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import hu.tb.minichefy.new_recipe.pages.BasicInformationPage
-import hu.tb.minichefy.new_recipe.pages.StepsPage
-import kotlinx.coroutines.coroutineScope
+import hu.tb.minichefy.recipe_create.pages.BasicInformationPage
+import hu.tb.minichefy.recipe_create.pages.StepsPage
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -21,6 +21,19 @@ fun CreateRecipe(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val stepsPageState by viewModel.stepsPageState.collectAsStateWithLifecycle()
+    val basicPageState by viewModel.basicPageState.collectAsStateWithLifecycle()
+
+    val pager = rememberPagerState {
+        uiState.pages.size
+    }
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                CreateRecipeViewModel.UiEvent.OnNextPageClick -> pager.animateScrollToPage(uiState.targetPageIndex)
+                CreateRecipeViewModel.UiEvent.OnPreviousPage -> pager.animateScrollToPage(uiState.targetPageIndex)
+            }
+        }
+    }
 
     val listState = rememberLazyListState()
     LaunchedEffect(key1 = stepsPageState.recipeSteps) {
@@ -29,33 +42,30 @@ fun CreateRecipe(
         }
     }
 
-    val pager = rememberPagerState {
-        uiState.pages.size
+    BackHandler(
+        enabled = uiState.targetPageIndex != 0
+    ) {
+        viewModel.onPreviousPageBack()
     }
 
     HorizontalPager(state = pager) { pageIndex ->
         when (uiState.pages[pageIndex]) {
             is CreateRecipeViewModel.Pages.BasicInformationPage ->
-
                 BasicInformationPage(
-                    recipeName = stepsPageState.typeField,
+                    recipeName = basicPageState.recipeName,
+                    counterDisplayContent = basicPageState.quantityCounter,
                     onAddQuantityClick = { viewModel.onQuantityChange(1) },
                     onRemoveQuantityClick = { viewModel.onQuantityChange(-1) },
-                    onGiveTitleValueChange = {},
-                    onNextPageClick = { pager.scrollToPage(1) }
+                    onGiveTitleValueChange = {  },
+                    onNextPageClick = { viewModel.onNextPageClick() }
                 )
+
             is CreateRecipeViewModel.Pages.StepsPage ->
                 StepsPage(
                     uiState = stepsPageState,
-                    onDeleteItemClick = {
-                        viewModel.removeRecipeStep(it)
-                    },
-                    onStepTextFieldValueChange = {
-                        viewModel.onFieldChange(it)
-                    },
-                    onAddItemIconClick = {
-                        viewModel.addRecipeStep(stepsPageState.typeField)
-                    },
+                    onDeleteItemClick = { viewModel.removeRecipeStep(it) },
+                    onStepTextFieldValueChange = { viewModel.onFieldChange(it) },
+                    onAddItemIconClick = { viewModel.addRecipeStep(stepsPageState.typeField) },
                     onNextButtonClick = onFinishRecipeButtonClick
                 )
         }

@@ -1,4 +1,4 @@
-package hu.tb.minichefy.new_recipe.components
+package hu.tb.minichefy.recipe_create.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

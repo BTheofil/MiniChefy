@@ -1,18 +1,48 @@
-package hu.tb.minichefy.new_recipe
+package hu.tb.minichefy.recipe_create
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import hu.tb.minichefy.domain.model.RecipeStep
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 class CreateRecipeViewModel : ViewModel() {
 
     data class UiState(
         val pages: List<Pages> = listOf(Pages.BasicInformationPage(), Pages.StepsPage()),
+        val targetPageIndex: Int = 0
     )
-
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
+
+    sealed class UiEvent {
+        data object OnNextPageClick : UiEvent()
+        data object OnPreviousPage : UiEvent()
+    }
+
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
+
+    fun onNextPageClick() {
+        _uiState.value = uiState.value.copy(
+            targetPageIndex = uiState.value.targetPageIndex + 1
+        )
+        viewModelScope.launch {
+            _uiEvent.send(UiEvent.OnNextPageClick)
+        }
+    }
+
+    fun onPreviousPageBack(){
+        _uiState.value = uiState.value.copy(
+            targetPageIndex = uiState.value.targetPageIndex - 1
+        )
+        viewModelScope.launch {
+            _uiEvent.send(UiEvent.OnPreviousPage)
+        }
+    }
 
     sealed class Pages {
         data class BasicInformationPage(
@@ -29,7 +59,7 @@ class CreateRecipeViewModel : ViewModel() {
     private val _basicPageState = MutableStateFlow(Pages.BasicInformationPage())
     val basicPageState = _basicPageState.asStateFlow()
 
-    fun onQuantityChange(value: Int){
+    fun onQuantityChange(value: Int) {
         _basicPageState.value = basicPageState.value.copy(
             quantityCounter = basicPageState.value.quantityCounter + value
         )
