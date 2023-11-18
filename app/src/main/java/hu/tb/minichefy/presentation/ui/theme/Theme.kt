@@ -1,4 +1,4 @@
-package hu.tb.minichefy.ui.theme
+package hu.tb.minichefy.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build

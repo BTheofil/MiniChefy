@@ -1,4 +1,4 @@
-package hu.tb.minichefy.recipe_create
+package hu.tb.minichefy.presentation.screens.recipe_create
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -10,8 +10,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import hu.tb.minichefy.recipe_create.pages.BasicInformationPage
-import hu.tb.minichefy.recipe_create.pages.StepsPage
+import hu.tb.minichefy.presentation.screens.recipe_create.pages.BasicInformationPage
+import hu.tb.minichefy.presentation.screens.recipe_create.pages.StepsPage
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

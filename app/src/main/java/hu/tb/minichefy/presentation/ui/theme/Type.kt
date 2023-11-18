@@ -1,4 +1,4 @@
-package hu.tb.minichefy.ui.theme
+package hu.tb.minichefy.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

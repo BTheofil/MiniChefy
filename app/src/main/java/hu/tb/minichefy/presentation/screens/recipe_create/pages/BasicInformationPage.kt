@@ -1,4 +1,4 @@
-package hu.tb.minichefy.recipe_create.pages
+package hu.tb.minichefy.presentation.screens.recipe_create.pages
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,7 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import hu.tb.minichefy.recipe_create.components.AddRemoveRow
+import hu.tb.minichefy.presentation.screens.recipe_create.components.AddRemoveRow
 
 @Composable
 fun BasicInformationPage(
