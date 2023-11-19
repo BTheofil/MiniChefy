@@ -1,0 +1,32 @@
+package hu.tb.minichefy.presentation.screens.recipe_details
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import hu.tb.minichefy.data.repository.RecipeRepositoryImpl
+import hu.tb.minichefy.domain.model.Recipe
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
+
+@HiltViewModel
+class RecipeDetailsViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    recipeRepository: RecipeRepositoryImpl
+) : ViewModel() {
+
+    data class UiState(
+        val recipe: Recipe? = null
+    )
+
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState = _uiState.asStateFlow()
+
+    init {
+        val recipeId: String = checkNotNull(savedStateHandle["recipeId"])
+        val recipe = recipeRepository.getRecipeById(recipeId.toInt())
+        _uiState.value = uiState.value.copy(
+            recipe = recipe
+        )
+    }
+}

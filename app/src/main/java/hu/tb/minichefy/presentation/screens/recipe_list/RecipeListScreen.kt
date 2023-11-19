@@ -17,13 +17,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.tb.minichefy.presentation.screens.recipe_list.components.RecipeItem
 
 @Composable
 fun RecipeListScreen(
-    viewModel: RecipeListViewModel = viewModel(),
+    viewModel: RecipeListViewModel = hiltViewModel(),
     onFloatingButtonClick: () -> Unit,
     onItemClick: (Int) -> Unit
 ) {

@@ -14,8 +14,7 @@ fun NavController.navigateToRecipeDetails(recipeId: Int) {
 fun NavGraphBuilder.recipeDetailsNavigation(navigateToRecipeList: () -> Unit) {
     composable(route = "$RECIPE_DETAILS_ROUTE/{recipeId}") {
         RecipeDetailsScreen(
-            navigateToRecipeList = navigateToRecipeList,
-            recipeId = it.arguments?.getString("recipeId")?.toInt()
+            navigateToRecipeList = navigateToRecipeList
         )
     }
 }

@@ -8,15 +8,15 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.tb.minichefy.presentation.screens.recipe_create.pages.BasicInformationPage
 import hu.tb.minichefy.presentation.screens.recipe_create.pages.StepsPage
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CreateRecipe(
-    viewModel: CreateRecipeViewModel = viewModel(),
+    viewModel: CreateRecipeViewModel = hiltViewModel(),
     onFinishRecipeButtonClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
