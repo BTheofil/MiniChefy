@@ -52,7 +52,8 @@ class CreateRecipeViewModel : ViewModel() {
 
         data class StepsPage(
             val typeField: String = "",
-            val recipeSteps: List<RecipeStep> = emptyList()
+            val recipeSteps: List<RecipeStep> = emptyList(),
+            val recipeStepsVisible: List<Boolean> = emptyList()
         ) : Pages()
     }
 
@@ -78,9 +79,14 @@ class CreateRecipeViewModel : ViewModel() {
         val updatedList = _stepsPageState.value.recipeSteps.toMutableList().apply {
             add(RecipeStep(stepsPageState.value.recipeSteps.size, stepDescription))
         }
+
+        val updatedList2 = _stepsPageState.value.recipeStepsVisible.toMutableList().apply {
+            add(true)
+        }
         _stepsPageState.value = stepsPageState.value.copy(
             recipeSteps = updatedList,
             typeField = "",
+            recipeStepsVisible = updatedList2
         )
     }
 

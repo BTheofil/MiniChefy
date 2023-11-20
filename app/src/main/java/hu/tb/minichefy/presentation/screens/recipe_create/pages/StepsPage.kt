@@ -2,8 +2,12 @@ package hu.tb.minichefy.presentation.screens.recipe_create.pages
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,20 +35,23 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import hu.tb.minichefy.domain.model.RecipeStep
 import hu.tb.minichefy.presentation.screens.recipe_create.CreateRecipeViewModel
 import hu.tb.minichefy.presentation.screens.recipe_create.components.RecipeStepItem
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StepsPage(
     uiState: CreateRecipeViewModel.Pages.StepsPage,
@@ -56,6 +63,7 @@ fun StepsPage(
 ) {
     val localOrientation = LocalConfiguration.current.orientation
 
+    val coroutineScope = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .padding(24.dp)
@@ -81,23 +89,29 @@ fun StepsPage(
                 items = uiState.recipeSteps,
                 key = { _, item -> item.id }
             ) { index, item ->
-                var isVisible by rememberSaveable {
-                    mutableStateOf(false)
-                }
-
-                LaunchedEffect(key1 = uiState.recipeSteps.size){
-                    isVisible = true
+                val visibleState = remember {
+                    MutableTransitionState(false).apply {
+                        targetState = true
+                    }
                 }
 
                 AnimatedVisibility(
-                    visible = isVisible,
-                    enter = fadeIn(animationSpec = tween(delayMillis = 200))
+                    visibleState = visibleState,
+                    enter = scaleIn(animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)),
+                    exit = scaleOut()
                 ) {
                     RecipeStepItem(
-                        modifier = Modifier,
+                        modifier = Modifier
+                            .animateItemPlacement(),
                         index = index,
                         item = item.step,
-                        onDeleteItemClick = onDeleteItemClick
+                        onDeleteItemClick = {
+                            coroutineScope.launch {
+                                visibleState.targetState = false
+                                delay(500.milliseconds)
+                                onDeleteItemClick(it)
+                            }
+                        }
                     )
                 }
             }
@@ -150,4 +164,18 @@ fun StepsPage(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun StepsPagePreview() {
+    StepsPage(
+        CreateRecipeViewModel.Pages.StepsPage(
+            recipeSteps = listOf(RecipeStep(0, "first"))
+        ),
+        onNextButtonClick = {},
+        onAddItemIconClick = {},
+        onStepTextFieldValueChange = {},
+        onDeleteItemClick = {}
+    )
 }
