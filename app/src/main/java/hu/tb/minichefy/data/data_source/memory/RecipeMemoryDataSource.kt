@@ -1,4 +1,4 @@
-package hu.tb.minichefy.data.data_source
+package hu.tb.minichefy.data.data_source.memory
 
 import hu.tb.minichefy.domain.model.Recipe
 import hu.tb.minichefy.domain.model.RecipeStep

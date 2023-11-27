@@ -3,7 +3,7 @@ package hu.tb.minichefy.presentation.screens.recipe_details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.tb.minichefy.data.repository.RecipeRepositoryImpl
+import hu.tb.minichefy.data.repository.RecipeMemoryRepositoryImpl
 import hu.tb.minichefy.domain.model.Recipe
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RecipeDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    recipeRepository: RecipeRepositoryImpl
+    recipeRepository: RecipeMemoryRepositoryImpl
 ) : ViewModel() {
 
     data class UiState(
