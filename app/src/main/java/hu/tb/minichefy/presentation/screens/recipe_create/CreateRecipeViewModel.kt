@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CreateRecipeViewModel : ViewModel() {
@@ -15,6 +16,7 @@ class CreateRecipeViewModel : ViewModel() {
         val pages: List<Pages> = listOf(Pages.BasicInformationPage(), Pages.StepsPage()),
         val targetPageIndex: Int = 0
     )
+
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
 
@@ -27,15 +29,15 @@ class CreateRecipeViewModel : ViewModel() {
     val uiEvent = _uiEvent.receiveAsFlow()
 
     fun onNextPageClick() {
-        _uiState.value = uiState.value.copy(
-            targetPageIndex = uiState.value.targetPageIndex + 1
-        )
+        _uiState.update {
+            it.copy(targetPageIndex = it.targetPageIndex + 1)
+        }
         viewModelScope.launch {
             _uiEvent.send(UiEvent.OnNextPageClick)
         }
     }
 
-    fun onPreviousPageBack(){
+    fun onPreviousPageBack() {
         _uiState.value = uiState.value.copy(
             targetPageIndex = uiState.value.targetPageIndex - 1
         )
@@ -92,5 +94,9 @@ class CreateRecipeViewModel : ViewModel() {
         _stepsPageState.value = stepsPageState.value.copy(
             recipeSteps = updatedList
         )
+    }
+
+    fun saveRecipe(){
+
     }
 }
