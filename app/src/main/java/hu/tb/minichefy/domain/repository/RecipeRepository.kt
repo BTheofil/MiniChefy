@@ -7,4 +7,6 @@ interface RecipeRepository {
     fun getAllRecipe(): List<Recipe>
 
     fun getRecipeById(id: Int): Recipe
+
+    suspend fun saveRecipe(recipe: Recipe): Long
 }

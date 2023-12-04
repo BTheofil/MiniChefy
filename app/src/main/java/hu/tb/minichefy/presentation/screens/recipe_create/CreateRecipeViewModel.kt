@@ -1,7 +1,11 @@
 package hu.tb.minichefy.presentation.screens.recipe_create
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
+import hu.tb.minichefy.domain.model.Recipe
 import hu.tb.minichefy.domain.model.RecipeStep
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,8 +13,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CreateRecipeViewModel : ViewModel() {
+@HiltViewModel
+class CreateRecipeViewModel @Inject constructor(
+    private val repository: RecipeDatabaseRepositoryImpl
+) : ViewModel() {
 
     data class UiState(
         val pages: List<Pages> = listOf(Pages.BasicInformationPage(), Pages.StepsPage()),
@@ -23,6 +31,7 @@ class CreateRecipeViewModel : ViewModel() {
     sealed class UiEvent {
         data object OnNextPageClick : UiEvent()
         data object OnPreviousPage : UiEvent()
+        data object OnRecipeCreateFinish : UiEvent()
     }
 
     private val _uiEvent = Channel<UiEvent>()
@@ -46,6 +55,20 @@ class CreateRecipeViewModel : ViewModel() {
         }
     }
 
+    fun onRecipeSave() {
+        viewModelScope.launch {
+            val createdRecipe = Recipe(
+                id = 0,
+                name = _basicPageState.value.recipeName,
+                quantity = _basicPageState.value.quantityCounter,
+                howToSteps = _stepsPageState.value.recipeSteps
+            )
+            val result = repository.saveRecipe(createdRecipe)
+            Log.d("MYTAG", result.toString())
+            _uiEvent.send(UiEvent.OnRecipeCreateFinish)
+        }
+    }
+
     sealed class Pages {
         data class BasicInformationPage(
             val recipeName: String = "",
@@ -65,6 +88,12 @@ class CreateRecipeViewModel : ViewModel() {
         _basicPageState.value = basicPageState.value.copy(
             quantityCounter = basicPageState.value.quantityCounter + value
         )
+    }
+
+    fun onRecipeTitleChange(text: String){
+        _basicPageState.update {
+            it.copy(recipeName = text)
+        }
     }
 
     private val _stepsPageState = MutableStateFlow(Pages.StepsPage())
@@ -94,9 +123,5 @@ class CreateRecipeViewModel : ViewModel() {
         _stepsPageState.value = stepsPageState.value.copy(
             recipeSteps = updatedList
         )
-    }
-
-    fun saveRecipe(){
-
     }
 }

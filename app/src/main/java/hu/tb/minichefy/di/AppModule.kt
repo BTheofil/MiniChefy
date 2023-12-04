@@ -6,13 +6,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import hu.tb.minichefy.data.data_source.db.RecipeDAO
 import hu.tb.minichefy.data.data_source.db.RecipeDatabase
 import hu.tb.minichefy.data.data_source.memory.RecipeDataSource
 import hu.tb.minichefy.data.data_source.memory.RecipeMemoryDataSource
 import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
 import hu.tb.minichefy.data.repository.RecipeMemoryRepositoryImpl
-import hu.tb.minichefy.domain.repository.RecipeRepository
 import javax.inject.Singleton
 
 @Module
@@ -31,15 +29,16 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTaskDatabase(app: Application): RecipeDatabase = Room.databaseBuilder(
-        app,
-        RecipeDatabase::class.java,
-        RecipeDatabase.DATABASE_NAME
-    )
-        .build()
+    fun provideTaskDatabase(app: Application): RecipeDatabase =
+        Room.databaseBuilder(
+            app,
+            RecipeDatabase::class.java,
+            RecipeDatabase.DATABASE_NAME
+        )
+            .build()
 
     @Provides
     @Singleton
-    fun provideRecipeDatabaseRepository(dao: RecipeDAO): RecipeRepository =
-        RecipeDatabaseRepositoryImpl(dao)
+    fun provideRecipeDatabaseRepository(database: RecipeDatabase): RecipeDatabaseRepositoryImpl =
+        RecipeDatabaseRepositoryImpl(database.recipeDao)
 }

@@ -31,6 +31,7 @@ fun CreateRecipe(
             when (event) {
                 CreateRecipeViewModel.UiEvent.OnNextPageClick -> pager.animateScrollToPage(uiState.targetPageIndex)
                 CreateRecipeViewModel.UiEvent.OnPreviousPage -> pager.animateScrollToPage(uiState.targetPageIndex)
+                CreateRecipeViewModel.UiEvent.OnRecipeCreateFinish -> onFinishRecipeButtonClick()
             }
         }
     }
@@ -56,17 +57,17 @@ fun CreateRecipe(
                     counterDisplayContent = basicPageState.quantityCounter,
                     onAddQuantityClick = { viewModel.onQuantityChange(1) },
                     onRemoveQuantityClick = { viewModel.onQuantityChange(-1) },
-                    onGiveTitleValueChange = {  },
-                    onNextPageClick = { viewModel.onNextPageClick() }
+                    onGiveTitleValueChange = viewModel::onRecipeTitleChange,
+                    onNextPageClick = viewModel::onNextPageClick
                 )
 
             is CreateRecipeViewModel.Pages.StepsPage ->
                 StepsPage(
                     uiState = stepsPageState,
-                    onDeleteItemClick = { viewModel.removeRecipeStep(it) },
-                    onStepTextFieldValueChange = { viewModel.onFieldChange(it) },
+                    onDeleteItemClick = viewModel::removeRecipeStep,
+                    onStepTextFieldValueChange = viewModel::onFieldChange,
                     onAddItemIconClick = { viewModel.addRecipeStep(stepsPageState.typeField) },
-                    onNextButtonClick = onFinishRecipeButtonClick
+                    onNextButtonClick = viewModel::onRecipeSave
                 )
         }
     }

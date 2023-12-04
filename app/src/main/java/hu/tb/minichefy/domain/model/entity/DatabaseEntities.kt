@@ -8,7 +8,7 @@ import androidx.room.Relation
 @Entity
 data class RecipeEntity(
     @PrimaryKey(autoGenerate = true)
-    val recipeId: Int,
+    val recipeId: Int?,
     val title: String,
     val quantity: Int,
 )

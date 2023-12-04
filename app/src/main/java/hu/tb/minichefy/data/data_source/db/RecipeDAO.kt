@@ -25,7 +25,7 @@ interface RecipeDAO {
     fun getRecipeStepsListById(recipeId: Int): List<RecipeHowToCreateList>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRecipe(recipeEntity: RecipeEntity)
+    suspend fun insertRecipe(recipeEntity: RecipeEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStep(stepEntity: RecipeStepEntity)
