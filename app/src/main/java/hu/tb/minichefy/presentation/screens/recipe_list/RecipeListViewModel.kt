@@ -1,7 +1,10 @@
 package hu.tb.minichefy.presentation.screens.recipe_list
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
 import hu.tb.minichefy.domain.model.Recipe
 import hu.tb.minichefy.domain.model.RecipeStep
 import kotlinx.coroutines.channels.Channel
@@ -9,8 +12,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RecipeListViewModel: ViewModel() {
+@HiltViewModel
+class RecipeListViewModel @Inject constructor(
+    private val repository: RecipeDatabaseRepositoryImpl
+) : ViewModel() {
 
     data class State(
         val recipeList: List<Recipe> = emptyList()
@@ -27,17 +34,22 @@ class RecipeListViewModel: ViewModel() {
     val uiEvent = _uiEvent.receiveAsFlow()
 
     init {
-        _state.value = _state.value.copy(
-            recipeList = listOf(
-                Recipe(0, "alma", 2, listOf(RecipeStep(0, "one"), RecipeStep(1, "two"))),
-                Recipe(1, "banan", 5, listOf(RecipeStep(0, "one"))),
-                Recipe(2, "citrom", 3, listOf(RecipeStep(0, "one"))),
-                Recipe(3, "dio", 1, listOf(RecipeStep(0, "one")))
-            )
-        )
+        viewModelScope.launch {
+            repository.getAllRecipe().collect { data ->
+                _state.value = _state.value.copy(
+                    recipeList = data
+                )
+                data.forEach {
+                    it.howToSteps.forEach {
+                        Log.d("MYTAG",it.step)
+
+                    }
+                }
+            }
+        }
     }
 
-    fun onItemClick(recipeId: Int){
+    fun onItemClick(recipeId: Int) {
         viewModelScope.launch {
             _uiEvent.send(UiEvent.OnItemClick(recipeId))
         }

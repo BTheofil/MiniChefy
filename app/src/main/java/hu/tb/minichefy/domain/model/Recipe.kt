@@ -3,7 +3,7 @@ package hu.tb.minichefy.domain.model
 import hu.tb.minichefy.domain.model.entity.RecipeEntity
 
 data class Recipe(
-    val id: Int,
+    val id: Int? = null,
     val name: String,
     val quantity: Int,
     val howToSteps: List<RecipeStep>

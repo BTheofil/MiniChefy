@@ -58,13 +58,14 @@ class CreateRecipeViewModel @Inject constructor(
     fun onRecipeSave() {
         viewModelScope.launch {
             val createdRecipe = Recipe(
-                id = 0,
                 name = _basicPageState.value.recipeName,
                 quantity = _basicPageState.value.quantityCounter,
-                howToSteps = _stepsPageState.value.recipeSteps
+                howToSteps = emptyList()
             )
-            val result = repository.saveRecipe(createdRecipe)
-            Log.d("MYTAG", result.toString())
+            val resultId = repository.saveRecipe(createdRecipe)
+            _stepsPageState.value.recipeSteps.forEach {
+                repository.saveStep(it, resultId.toInt())
+            }
             _uiEvent.send(UiEvent.OnRecipeCreateFinish)
         }
     }
@@ -90,7 +91,7 @@ class CreateRecipeViewModel @Inject constructor(
         )
     }
 
-    fun onRecipeTitleChange(text: String){
+    fun onRecipeTitleChange(text: String) {
         _basicPageState.update {
             it.copy(recipeName = text)
         }

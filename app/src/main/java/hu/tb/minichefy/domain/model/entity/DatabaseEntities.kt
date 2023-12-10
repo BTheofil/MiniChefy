@@ -16,7 +16,7 @@ data class RecipeEntity(
 @Entity
 data class RecipeStepEntity(
     @PrimaryKey(autoGenerate = true)
-    val recipeStepId: Int,
+    val recipeStepId: Int?,
     val recipeEntityId: Int,
     val step: String
 )

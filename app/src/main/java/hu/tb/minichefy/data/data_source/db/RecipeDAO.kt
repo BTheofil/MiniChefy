@@ -20,15 +20,18 @@ interface RecipeDAO {
     @Query("SELECT * FROM RecipeEntity WHERE recipeId = :id")
     suspend fun getRecipeById(id: Int): RecipeEntity?
 
+    @Query("SELECT * FROM RecipeEntity")
+    fun getAllRecipe(): Flow<List<RecipeHowToCreateList>>
+
     @Transaction
     @Query("SELECT * FROM RecipeEntity WHERE recipeId = :recipeId")
-    fun getRecipeStepsListById(recipeId: Int): List<RecipeHowToCreateList>
+    fun getRecipeStepsListById(recipeId: Int): Flow<List<RecipeHowToCreateList>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRecipe(recipeEntity: RecipeEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertStep(stepEntity: RecipeStepEntity)
+    suspend fun insertStep(stepEntity: RecipeStepEntity): Long
 
     @Delete
     suspend fun deleteRecipe(recipeEntity: RecipeEntity)

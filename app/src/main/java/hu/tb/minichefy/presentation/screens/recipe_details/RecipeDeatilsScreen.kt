@@ -73,7 +73,7 @@ fun RecipeDetailsContent(
         LazyColumn {
             itemsIndexed(
                 items = uiState.recipe.howToSteps,
-                key = { _, item -> item.id }
+                key = { _, item -> item.id!! }
             ) { index, recipe ->
                 RecipeStepItem(index = index, item = recipe.step, onDeleteItemClick = {})
             }

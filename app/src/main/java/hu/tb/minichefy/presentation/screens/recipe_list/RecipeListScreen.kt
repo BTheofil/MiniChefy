@@ -53,11 +53,11 @@ fun RecipeListScreen(
             ) {
                 this.items(
                     items = uiState.recipeList,
-                    key = { item -> item.id }
+                    key = { item -> item.id!! }
                 ) { recipe ->
                     RecipeItem(
                         title = recipe.name,
-                        onItemClick = { viewModel.onItemClick(recipe.id) }
+                        onItemClick = { viewModel.onItemClick(recipe.id!!) }
                     )
                 }
             }
