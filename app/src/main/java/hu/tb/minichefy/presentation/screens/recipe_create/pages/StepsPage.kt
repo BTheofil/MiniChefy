@@ -86,8 +86,7 @@ fun StepsPage(
             state = listState
         ) {
             itemsIndexed(
-                items = uiState.recipeSteps,
-                key = { _, item -> item.id!! }
+                items = uiState.recipeSteps
             ) { index, item ->
                 val visibleState = remember {
                     MutableTransitionState(false).apply {

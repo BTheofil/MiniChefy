@@ -12,6 +12,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.presentation.screens.recipe_create.pages.BasicInformationPage
 import hu.tb.minichefy.presentation.screens.recipe_create.pages.StepsPage
+import hu.tb.minichefy.presentation.screens.recipe_create.CreateRecipeViewModel.UiEvent
+import hu.tb.minichefy.presentation.screens.recipe_create.CreateRecipeViewModel.OnEvent
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -29,9 +31,9 @@ fun CreateRecipe(
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                CreateRecipeViewModel.UiEvent.OnNextPageClick -> pager.animateScrollToPage(uiState.targetPageIndex)
-                CreateRecipeViewModel.UiEvent.OnPreviousPage -> pager.animateScrollToPage(uiState.targetPageIndex)
-                CreateRecipeViewModel.UiEvent.OnRecipeCreateFinish -> onFinishRecipeButtonClick()
+                UiEvent.OnNextPageClick -> pager.animateScrollToPage(uiState.targetPageIndex)
+                UiEvent.OnPreviousPage -> pager.animateScrollToPage(uiState.targetPageIndex)
+                UiEvent.OnRecipeCreateFinish -> onFinishRecipeButtonClick()
             }
         }
     }
@@ -46,7 +48,7 @@ fun CreateRecipe(
     BackHandler(
         enabled = uiState.targetPageIndex != 0
     ) {
-        viewModel.onPreviousPageBack()
+        viewModel.onEvent(OnEvent.OnPreviousPageBack)
     }
 
     HorizontalPager(state = pager) { pageIndex ->
@@ -55,19 +57,19 @@ fun CreateRecipe(
                 BasicInformationPage(
                     recipeName = basicPageState.recipeName,
                     counterDisplayContent = basicPageState.quantityCounter,
-                    onAddQuantityClick = { viewModel.onQuantityChange(1) },
-                    onRemoveQuantityClick = { viewModel.onQuantityChange(-1) },
-                    onGiveTitleValueChange = viewModel::onRecipeTitleChange,
-                    onNextPageClick = viewModel::onNextPageClick
+                    onAddQuantityClick = { viewModel.onEvent(OnEvent.OnQuantityChange(+1)) },
+                    onRemoveQuantityClick = { viewModel.onEvent(OnEvent.OnQuantityChange(-1)) },
+                    onGiveTitleValueChange = { viewModel.onEvent(OnEvent.OnRecipeTitleChange(it)) },
+                    onNextPageClick = { viewModel.onEvent(OnEvent.OnNextPageClick) }
                 )
 
             is CreateRecipeViewModel.Pages.StepsPage ->
                 StepsPage(
                     uiState = stepsPageState,
-                    onDeleteItemClick = viewModel::removeRecipeStep,
-                    onStepTextFieldValueChange = viewModel::onFieldChange,
-                    onAddItemIconClick = { viewModel.addRecipeStep(stepsPageState.typeField) },
-                    onNextButtonClick = viewModel::onRecipeSave
+                    onDeleteItemClick = { viewModel.onEvent(OnEvent.OnDeleteRecipeStep(it)) },
+                    onStepTextFieldValueChange = { viewModel.onEvent(OnEvent.OnStepsFieldChange(it)) },
+                    onAddItemIconClick = { viewModel.onEvent(OnEvent.OnAddRecipeStep(stepsPageState.typeField)) },
+                    onNextButtonClick = { viewModel.onEvent(OnEvent.OnRecipeSave) }
                 )
         }
     }

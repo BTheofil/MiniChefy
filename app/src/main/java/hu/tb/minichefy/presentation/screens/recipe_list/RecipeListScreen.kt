@@ -57,7 +57,13 @@ fun RecipeListScreen(
                 ) { recipe ->
                     RecipeItem(
                         title = recipe.name,
-                        onItemClick = { viewModel.onItemClick(recipe.id!!) }
+                        onItemClick = {
+                            viewModel.onEvent(
+                                RecipeListViewModel.OnEvent.OnItemClick(
+                                    recipe.id!!
+                                )
+                            )
+                        }
                     )
                 }
             }

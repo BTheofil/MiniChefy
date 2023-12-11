@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.recipe_create
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,56 +19,19 @@ class CreateRecipeViewModel @Inject constructor(
     private val repository: RecipeDatabaseRepositoryImpl
 ) : ViewModel() {
 
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState = _uiState.asStateFlow()
+
     data class UiState(
         val pages: List<Pages> = listOf(Pages.BasicInformationPage(), Pages.StepsPage()),
         val targetPageIndex: Int = 0
     )
 
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState = _uiState.asStateFlow()
+    private val _basicPageState = MutableStateFlow(Pages.BasicInformationPage())
+    val basicPageState = _basicPageState.asStateFlow()
 
-    sealed class UiEvent {
-        data object OnNextPageClick : UiEvent()
-        data object OnPreviousPage : UiEvent()
-        data object OnRecipeCreateFinish : UiEvent()
-    }
-
-    private val _uiEvent = Channel<UiEvent>()
-    val uiEvent = _uiEvent.receiveAsFlow()
-
-    fun onNextPageClick() {
-        _uiState.update {
-            it.copy(targetPageIndex = it.targetPageIndex + 1)
-        }
-        viewModelScope.launch {
-            _uiEvent.send(UiEvent.OnNextPageClick)
-        }
-    }
-
-    fun onPreviousPageBack() {
-        _uiState.value = uiState.value.copy(
-            targetPageIndex = uiState.value.targetPageIndex - 1
-        )
-        viewModelScope.launch {
-            _uiEvent.send(UiEvent.OnPreviousPage)
-        }
-    }
-
-    fun onRecipeSave() {
-        viewModelScope.launch {
-            val createdRecipe = Recipe(
-                name = _basicPageState.value.recipeName,
-                quantity = _basicPageState.value.quantityCounter,
-                howToSteps = emptyList()
-            )
-            val resultId = repository.saveRecipe(createdRecipe)
-            _stepsPageState.value.recipeSteps.forEach {
-                val res = repository.saveStep(it, resultId)
-                Log.d("MYTAG", res.toString())
-            }
-            _uiEvent.send(UiEvent.OnRecipeCreateFinish)
-        }
-    }
+    private val _stepsPageState = MutableStateFlow(Pages.StepsPage())
+    val stepsPageState = _stepsPageState.asStateFlow()
 
     sealed class Pages {
         data class BasicInformationPage(
@@ -83,47 +45,95 @@ class CreateRecipeViewModel @Inject constructor(
         ) : Pages()
     }
 
-    private val _basicPageState = MutableStateFlow(Pages.BasicInformationPage())
-    val basicPageState = _basicPageState.asStateFlow()
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
-    fun onQuantityChange(value: Int) {
-        _basicPageState.value = basicPageState.value.copy(
-            quantityCounter = basicPageState.value.quantityCounter + value
-        )
+    sealed class UiEvent {
+        data object OnNextPageClick : UiEvent()
+        data object OnPreviousPage : UiEvent()
+        data object OnRecipeCreateFinish : UiEvent()
     }
 
-    fun onRecipeTitleChange(text: String) {
-        _basicPageState.update {
-            it.copy(recipeName = text)
+    sealed class OnEvent {
+        //all pages event
+        data object OnNextPageClick : OnEvent()
+        data object OnPreviousPageBack : OnEvent()
+
+        //basic page
+        data class OnQuantityChange(val value: Int) : OnEvent()
+        data class OnRecipeTitleChange(val text: String) : OnEvent()
+        data class OnStepsFieldChange(val text: String) : OnEvent()
+
+        //steps page
+        data class OnAddRecipeStep(val stepDescription: String) : OnEvent()
+        data class OnDeleteRecipeStep(val index: Int) : OnEvent()
+        data object OnRecipeSave : OnEvent()
+    }
+
+    fun onEvent(event: OnEvent) {
+        when (event) {
+            //all pages event
+            OnEvent.OnNextPageClick -> viewModelScope.launch {
+                _uiState.update {
+                    it.copy(targetPageIndex = it.targetPageIndex + 1)
+                }
+                _uiEvent.send(UiEvent.OnNextPageClick)
+            }
+
+            OnEvent.OnPreviousPageBack -> viewModelScope.launch {
+                _uiState.value = uiState.value.copy(
+                    targetPageIndex = uiState.value.targetPageIndex - 1
+                )
+                _uiEvent.send(UiEvent.OnPreviousPage)
+            }
+
+            //basic page
+            is OnEvent.OnQuantityChange -> _basicPageState.update {
+                it.copy(quantityCounter = it.quantityCounter + event.value)
+            }
+
+            is OnEvent.OnRecipeTitleChange -> _basicPageState.update {
+                it.copy(recipeName = event.text)
+            }
+
+            is OnEvent.OnStepsFieldChange -> _stepsPageState.update {
+                it.copy(typeField = event.text)
+            }
+
+            //steps page
+            is OnEvent.OnAddRecipeStep -> {
+                val updatedList = _stepsPageState.value.recipeSteps.toMutableList().apply {
+                    add(RecipeStep(step = event.stepDescription))
+                }
+                _stepsPageState.update {
+                    it.copy(
+                        recipeSteps = updatedList,
+                        typeField = ""
+                    )
+                }
+            }
+
+            is OnEvent.OnDeleteRecipeStep -> {
+                val updatedList = _stepsPageState.value.recipeSteps.toMutableList().apply {
+                    removeAt(event.index)
+                }
+                _stepsPageState.update {
+                    it.copy(recipeSteps = updatedList)
+                }
+            }
+
+            OnEvent.OnRecipeSave -> viewModelScope.launch {
+                val createdRecipe = Recipe(
+                    name = _basicPageState.value.recipeName,
+                    quantity = _basicPageState.value.quantityCounter,
+                    howToSteps = emptyList()
+                )
+                val resultId = repository.saveRecipe(createdRecipe)
+                _stepsPageState.value.recipeSteps.forEach {
+                    repository.saveStep(it, resultId)
+                }
+                _uiEvent.send(UiEvent.OnRecipeCreateFinish)
+            }
         }
-    }
-
-    private val _stepsPageState = MutableStateFlow(Pages.StepsPage())
-    val stepsPageState = _stepsPageState.asStateFlow()
-
-    fun onFieldChange(text: String) {
-        _stepsPageState.value = _stepsPageState.value.copy(
-            typeField = text
-        )
-    }
-
-    fun addRecipeStep(stepDescription: String) {
-        val updatedList = _stepsPageState.value.recipeSteps.toMutableList().apply {
-            add(RecipeStep(stepsPageState.value.recipeSteps.size.toLong(), stepDescription))
-        }
-        _stepsPageState.value = stepsPageState.value.copy(
-            recipeSteps = updatedList,
-            typeField = ""
-        )
-    }
-
-    fun removeRecipeStep(index: Int) {
-        val updatedList = _stepsPageState.value.recipeSteps.toMutableList().apply {
-            removeAt(index)
-        }
-
-        _stepsPageState.value = stepsPageState.value.copy(
-            recipeSteps = updatedList
-        )
     }
 }
