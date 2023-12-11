@@ -59,7 +59,7 @@ fun CreateRecipe(
                     counterDisplayContent = basicPageState.quantityCounter,
                     onAddQuantityClick = { viewModel.onEvent(OnEvent.OnQuantityChange(+1)) },
                     onRemoveQuantityClick = { viewModel.onEvent(OnEvent.OnQuantityChange(-1)) },
-                    onGiveTitleValueChange = { viewModel.onEvent(OnEvent.OnRecipeTitleChange(it)) },
+                    onTitleValueChange = { viewModel.onEvent(OnEvent.OnRecipeTitleChange(it)) },
                     onNextPageClick = { viewModel.onEvent(OnEvent.OnNextPageClick) }
                 )
 
