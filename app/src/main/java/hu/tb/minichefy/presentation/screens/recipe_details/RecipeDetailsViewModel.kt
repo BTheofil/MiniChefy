@@ -24,7 +24,7 @@ class RecipeDetailsViewModel @Inject constructor(
 
     init {
         val recipeId: String = checkNotNull(savedStateHandle["recipeId"])
-        val recipe = recipeRepository.getRecipeById(recipeId.toInt())
+        val recipe = recipeRepository.getRecipeById(recipeId.toLong())
         _uiState.value = uiState.value.copy(
             recipe = recipe
         )

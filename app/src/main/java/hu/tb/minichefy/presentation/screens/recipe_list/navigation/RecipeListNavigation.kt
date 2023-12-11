@@ -13,7 +13,7 @@ fun NavController.navigateToRecipeList() {
 
 fun NavGraphBuilder.recipeListNavigation(
     navigateToCreateRecipe: () -> Unit,
-    navigateToRecipeDetails: (Int) -> Unit,
+    navigateToRecipeDetails: (Long) -> Unit,
 ) {
     composable(route = RECIPE_LIST_ROUTE) {
         RecipeListScreen(

@@ -17,14 +17,14 @@ class RecipeMemoryRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getRecipeById(id: Int): Recipe =
+    override fun getRecipeById(id: Long): Recipe =
         dataSource.getRecipeById(id)
 
     override suspend fun saveRecipe(recipe: Recipe): Long {
         TODO("Not yet implemented")
     }
 
-    override suspend fun saveStep(step: RecipeStep, recipeEntityId: Int): Long {
+    override suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long {
         TODO("Not yet implemented")
     }
 

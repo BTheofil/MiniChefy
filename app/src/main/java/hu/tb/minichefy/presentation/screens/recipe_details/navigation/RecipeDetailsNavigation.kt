@@ -7,7 +7,7 @@ import hu.tb.minichefy.presentation.screens.recipe_details.RecipeDetailsScreen
 
 const val RECIPE_DETAILS_ROUTE = "recipe_details_route"
 
-fun NavController.navigateToRecipeDetails(recipeId: Int) {
+fun NavController.navigateToRecipeDetails(recipeId: Long) {
     this.navigate(RECIPE_DETAILS_ROUTE + "/${recipeId}")
 }
 

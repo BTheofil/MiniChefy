@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
 import hu.tb.minichefy.domain.model.Recipe
-import hu.tb.minichefy.domain.model.RecipeStep
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +26,7 @@ class RecipeListViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     sealed class UiEvent {
-        data class OnItemClick(val recipeId: Int) : UiEvent()
+        data class OnItemClick(val recipeId: Long) : UiEvent()
     }
 
     private val _uiEvent = Channel<UiEvent>()
@@ -42,14 +41,13 @@ class RecipeListViewModel @Inject constructor(
                 data.forEach {
                     it.howToSteps.forEach {
                         Log.d("MYTAG",it.step)
-
                     }
                 }
             }
         }
     }
 
-    fun onItemClick(recipeId: Int) {
+    fun onItemClick(recipeId: Long) {
         viewModelScope.launch {
             _uiEvent.send(UiEvent.OnItemClick(recipeId))
         }

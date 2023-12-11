@@ -6,5 +6,5 @@ interface RecipeDataSource {
 
     fun getAllRecipe(): List<Recipe>
 
-    fun getRecipeById(id: Int): Recipe
+    fun getRecipeById(id: Long): Recipe
 }

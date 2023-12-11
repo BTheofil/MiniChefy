@@ -16,7 +16,7 @@ class RecipeMemoryDataSource : RecipeDataSource {
         mockDataSouce
 
 
-    override fun getRecipeById(id: Int): Recipe =
+    override fun getRecipeById(id: Long): Recipe =
         mockDataSouce.find { recipe -> recipe.id == id }!!
 
 }

@@ -64,7 +64,8 @@ class CreateRecipeViewModel @Inject constructor(
             )
             val resultId = repository.saveRecipe(createdRecipe)
             _stepsPageState.value.recipeSteps.forEach {
-                repository.saveStep(it, resultId.toInt())
+                val res = repository.saveStep(it, resultId)
+                Log.d("MYTAG", res.toString())
             }
             _uiEvent.send(UiEvent.OnRecipeCreateFinish)
         }
@@ -108,7 +109,7 @@ class CreateRecipeViewModel @Inject constructor(
 
     fun addRecipeStep(stepDescription: String) {
         val updatedList = _stepsPageState.value.recipeSteps.toMutableList().apply {
-            add(RecipeStep(stepsPageState.value.recipeSteps.size, stepDescription))
+            add(RecipeStep(stepsPageState.value.recipeSteps.size.toLong(), stepDescription))
         }
         _stepsPageState.value = stepsPageState.value.copy(
             recipeSteps = updatedList,

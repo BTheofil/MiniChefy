@@ -25,7 +25,7 @@ import hu.tb.minichefy.presentation.screens.recipe_list.components.RecipeItem
 fun RecipeListScreen(
     viewModel: RecipeListViewModel = hiltViewModel(),
     onFloatingButtonClick: () -> Unit,
-    onItemClick: (Int) -> Unit
+    onItemClick: (Long) -> Unit
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 

@@ -34,13 +34,13 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
 
 
 
-    override fun getRecipeById(id: Int): Recipe {
+    override fun getRecipeById(id: Long): Recipe {
         TODO("Not yet implemented")
     }
 
     override suspend fun saveRecipe(recipe: Recipe): Long =
         dao.insertRecipe(recipe.toRecipeEntity())
 
-    override suspend fun saveStep(step: RecipeStep, recipeEntityId: Int): Long =
+    override suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long =
         dao.insertStep(step.toRecipeStepEntity(recipeEntityId))
 }

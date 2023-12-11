@@ -8,7 +8,7 @@ import androidx.room.Relation
 @Entity
 data class RecipeEntity(
     @PrimaryKey(autoGenerate = true)
-    val recipeId: Int?,
+    val recipeId: Long?,
     val title: String,
     val quantity: Int,
 )
@@ -16,8 +16,8 @@ data class RecipeEntity(
 @Entity
 data class RecipeStepEntity(
     @PrimaryKey(autoGenerate = true)
-    val recipeStepId: Int?,
-    val recipeEntityId: Int,
+    val recipeStepId: Long?,
+    val recipeEntityId: Long,
     val step: String
 )
 
@@ -25,7 +25,7 @@ data class RecipeHowToCreateList(
     @Embedded val recipeEntity: RecipeEntity,
     @Relation(
         parentColumn = "recipeId",
-        entityColumn = "recipeStepId"
+        entityColumn = "recipeEntityId"
     )
     val howToStepsList: List<RecipeStepEntity>
 )
