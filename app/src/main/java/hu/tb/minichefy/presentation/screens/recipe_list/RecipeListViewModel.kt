@@ -18,12 +18,12 @@ class RecipeListViewModel @Inject constructor(
     private val repository: RecipeDatabaseRepositoryImpl
 ) : ViewModel() {
 
-    data class State(
+    data class UiState(
         val recipeList: List<Recipe> = emptyList()
     )
 
-    private val _state = MutableStateFlow(State())
-    val state = _state.asStateFlow()
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState = _uiState.asStateFlow()
 
     sealed class UiEvent {
         data class OnItemClick(val recipeId: Long) : UiEvent()
@@ -39,7 +39,7 @@ class RecipeListViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             repository.getAllRecipe().collect { data ->
-                _state.update {
+                _uiState.update {
                     it.copy(recipeList = data)
                 }
             }

@@ -27,7 +27,7 @@ fun RecipeListScreen(
     onFloatingButtonClick: () -> Unit,
     onItemClick: (Long) -> Unit
 ) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->

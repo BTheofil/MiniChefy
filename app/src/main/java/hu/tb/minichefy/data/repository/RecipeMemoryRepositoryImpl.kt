@@ -17,8 +17,9 @@ class RecipeMemoryRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getRecipeById(id: Long): Recipe =
+    override suspend fun getRecipeById(id: Long): Flow<Recipe> = flow {
         dataSource.getRecipeById(id)
+    }
 
     override suspend fun saveRecipe(recipe: Recipe): Long {
         TODO("Not yet implemented")

@@ -14,8 +14,8 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
     private val dao: RecipeDAO
 ) : RecipeRepository {
 
-    override fun getAllRecipe(): Flow<List<Recipe>> {
-        return dao.getAllRecipe().map { recipeHowToCreateLists ->
+    override fun getAllRecipe(): Flow<List<Recipe>> =
+        dao.getAllRecipe().map { recipeHowToCreateLists ->
             recipeHowToCreateLists.map { recipeHowToCreateList ->
                 Recipe(
                     recipeHowToCreateList.recipeEntity.recipeId,
@@ -30,13 +30,21 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
                 )
             }
         }
-    }
 
-
-
-    override fun getRecipeById(id: Long): Recipe {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getRecipeById(id: Long): Flow<Recipe> =
+        dao.getRecipeById(id).map { recipeHowToCreateList ->
+            Recipe(
+                id = recipeHowToCreateList.recipeEntity.recipeId,
+                name = recipeHowToCreateList.recipeEntity.title,
+                howToSteps = recipeHowToCreateList.howToStepsList.map {
+                    RecipeStep(
+                        it.recipeStepId,
+                        it.step
+                    )
+                },
+                quantity = recipeHowToCreateList.recipeEntity.quantity
+            )
+        }
 
     override suspend fun saveRecipe(recipe: Recipe): Long =
         dao.insertRecipe(recipe.toRecipeEntity())

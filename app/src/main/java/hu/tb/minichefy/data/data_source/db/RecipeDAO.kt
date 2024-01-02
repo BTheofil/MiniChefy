@@ -14,18 +14,18 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface RecipeDAO {
 
-    @Query("SELECT * FROM RecipeEntity")
-    fun getRecipes(): Flow<List<RecipeEntity>>
-
-    @Query("SELECT * FROM RecipeEntity WHERE recipeId = :id")
-    suspend fun getRecipeById(id: Int): RecipeEntity?
+    //@Query("SELECT * FROM RecipeEntity WHERE recipeId = :id")
+    //suspend fun getRecipeById(id: Long): RecipeEntity
 
     @Query("SELECT * FROM RecipeEntity")
     fun getAllRecipe(): Flow<List<RecipeHowToCreateList>>
 
-    @Transaction
     @Query("SELECT * FROM RecipeEntity WHERE recipeId = :recipeId")
-    fun getRecipeStepsListById(recipeId: Int): Flow<List<RecipeHowToCreateList>>
+    fun getRecipeById(recipeId: Long): Flow<RecipeHowToCreateList>
+
+    @Transaction
+    @Query("SELECT * FROM RecipeStepEntity WHERE recipeEntityId = :recipeId")
+    fun getRecipeStepsListById(recipeId: Long): Flow<List<RecipeStepEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRecipe(recipeEntity: RecipeEntity): Long

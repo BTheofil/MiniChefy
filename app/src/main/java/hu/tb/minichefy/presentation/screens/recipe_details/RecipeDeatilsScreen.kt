@@ -43,39 +43,41 @@ fun RecipeDetailsScreen(
 fun RecipeDetailsContent(
     uiState: RecipeDetailsViewModel.UiState
 ) {
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 22.dp)
-    ) {
-        Box(
+    uiState.recipe?.let {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.tertiary),
-            contentAlignment = Alignment.Center
+                .padding(horizontal = 22.dp)
         ) {
-            Image(
+            Box(
                 modifier = Modifier
-                    .padding(16.dp),
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = "recipe image"
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.tertiary),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "recipe image"
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = uiState.recipe.name,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
             )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = uiState.recipe!!.name,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        LazyColumn {
-            itemsIndexed(
-                items = uiState.recipe.howToSteps,
-                key = { _, item -> item.id!! }
-            ) { index, recipe ->
-                RecipeStepItem(index = index, item = recipe.step, onDeleteItemClick = {})
+            Spacer(modifier = Modifier.height(16.dp))
+            LazyColumn {
+                itemsIndexed(
+                    items = uiState.recipe.howToSteps,
+                    key = { _, item -> item.id!! }
+                ) { index, recipe ->
+                    RecipeStepItem(index = index, item = recipe.step, onDeleteItemClick = {})
+                }
             }
         }
     }
