@@ -60,7 +60,8 @@ fun CreateRecipe(
                     onAddQuantityClick = { viewModel.onEvent(OnEvent.OnQuantityChange(+1)) },
                     onRemoveQuantityClick = { viewModel.onEvent(OnEvent.OnQuantityChange(-1)) },
                     onTitleValueChange = { viewModel.onEvent(OnEvent.OnRecipeTitleChange(it)) },
-                    onNextPageClick = { viewModel.onEvent(OnEvent.OnNextPageClick) }
+                    onNextPageClick = { viewModel.onEvent(OnEvent.OnNextPageClick) },
+                    isQuantityHasError = basicPageState.isQuantityHasError
                 )
 
             is CreateRecipeViewModel.Pages.StepsPage ->

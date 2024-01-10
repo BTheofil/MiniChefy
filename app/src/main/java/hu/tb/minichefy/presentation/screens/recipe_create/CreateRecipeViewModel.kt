@@ -6,6 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
 import hu.tb.minichefy.domain.model.Recipe
 import hu.tb.minichefy.domain.model.RecipeStep
+import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
+import hu.tb.minichefy.domain.use_case.ValidationResult
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateRecipeViewModel @Inject constructor(
-    private val repository: RecipeDatabaseRepositoryImpl
+    private val repository: RecipeDatabaseRepositoryImpl,
+    private val validateQuantityNumber: ValidateQuantityNumber
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -36,7 +39,8 @@ class CreateRecipeViewModel @Inject constructor(
     sealed class Pages {
         data class BasicInformationPage(
             val recipeName: String = "",
-            val quantityCounter: Int = 0
+            val quantityCounter: Int = 1,
+            val isQuantityHasError: Boolean = false
         ) : Pages()
 
         data class StepsPage(
@@ -88,8 +92,19 @@ class CreateRecipeViewModel @Inject constructor(
             }
 
             //basic page
-            is OnEvent.OnQuantityChange -> _basicPageState.update {
-                it.copy(quantityCounter = it.quantityCounter + event.value)
+            is OnEvent.OnQuantityChange -> {
+                when (validateQuantityNumber(basicPageState.value.quantityCounter + event.value)) {
+                    ValidationResult.SUCCESS -> _basicPageState.update {
+                        it.copy(
+                            quantityCounter = it.quantityCounter + event.value,
+                            isQuantityHasError = false
+                        )
+                    }
+
+                    ValidationResult.ERROR -> _basicPageState.update {
+                        it.copy(isQuantityHasError = true)
+                    }
+                }
             }
 
             is OnEvent.OnRecipeTitleChange -> _basicPageState.update {

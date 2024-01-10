@@ -1,5 +1,6 @@
 package hu.tb.minichefy.presentation.screens.recipe_create.pages
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,11 +32,19 @@ fun BasicInformationPage(
     onTitleValueChange: (String) -> Unit,
     onRemoveQuantityClick: () -> Unit,
     onAddQuantityClick: () -> Unit,
-    onNextPageClick: () -> Unit
+    onNextPageClick: () -> Unit,
+    isQuantityHasError: Boolean
 ) {
+    val focusManager = LocalFocusManager.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            }
             .padding(horizontal = 22.dp)
             .padding(top = 22.dp)
     ) {
@@ -77,9 +88,16 @@ fun BasicInformationPage(
                 .height(16.dp)
         )
         AddRemoveRow(
-            onAddButtonClick = onAddQuantityClick,
-            onRemoveButtonClick = onRemoveQuantityClick,
-            displayContent = counterDisplayContent
+            onAddButtonClick = {
+                focusManager.clearFocus()
+                onAddQuantityClick()
+            },
+            onRemoveButtonClick = {
+                focusManager.clearFocus()
+                onRemoveQuantityClick()
+            },
+            displayContent = counterDisplayContent,
+            isErrorHappened = isQuantityHasError
         )
         Spacer(
             modifier = Modifier
@@ -92,7 +110,10 @@ fun BasicInformationPage(
         ) {
             OutlinedButton(
                 modifier = Modifier,
-                onClick = onNextPageClick
+                onClick = {
+                    focusManager.clearFocus()
+                    onNextPageClick()
+                }
             ) {
                 Text(
                     text = "Next page",
@@ -107,5 +128,5 @@ fun BasicInformationPage(
 @Preview
 @Composable
 fun BasicInformationPagePreview() {
-    BasicInformationPage("test name", 0, {}, {}, {}, {})
+    BasicInformationPage("test name", 0, {}, {}, {}, {}, false)
 }

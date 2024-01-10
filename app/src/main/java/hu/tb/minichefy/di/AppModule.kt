@@ -11,6 +11,7 @@ import hu.tb.minichefy.data.data_source.memory.RecipeDataSource
 import hu.tb.minichefy.data.data_source.memory.RecipeMemoryDataSource
 import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
 import hu.tb.minichefy.data.repository.RecipeMemoryRepositoryImpl
+import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
 import javax.inject.Singleton
 
 @Module
@@ -41,4 +42,8 @@ object AppModule {
     @Singleton
     fun provideRecipeDatabaseRepository(database: RecipeDatabase): RecipeDatabaseRepositoryImpl =
         RecipeDatabaseRepositoryImpl(database.recipeDao)
+
+    @Provides
+    fun provideValidateQuantityNumberUseCase(): ValidateQuantityNumber =
+        ValidateQuantityNumber()
 }
