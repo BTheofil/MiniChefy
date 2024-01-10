@@ -2,6 +2,7 @@ package hu.tb.minichefy.presentation.screens.recipe_details
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,14 +38,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.Recipe
 import hu.tb.minichefy.domain.model.RecipeStep
-import hu.tb.minichefy.presentation.screens.recipe_create.components.RecipeStepItem
+import hu.tb.minichefy.presentation.screens.recipe_details.components.DetailsRecipeStepItem
 import hu.tb.minichefy.presentation.screens.recipe_details.components.QuickInfoItem
 import java.util.Locale
 
 @Composable
 fun RecipeDetailsScreen(
-    viewModel: RecipeDetailsViewModel = hiltViewModel(),
-    navigateToRecipeList: () -> Unit,
+    viewModel: RecipeDetailsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -83,16 +82,19 @@ fun RecipeDetailsContent(
                 Column(
                     modifier = Modifier
                         .heightIn(max = (screenSize.screenHeightDp * 0.6).dp)
+                        .padding(horizontal = 16.dp)
                 ) {
-                    LazyColumn {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
                         itemsIndexed(
                             items = uiState.recipe.howToSteps,
                             key = { _, item -> item.id!! }
                         ) { index, recipe ->
-                            RecipeStepItem(
-                                index = index,
-                                item = recipe.step,
-                                onDeleteItemClick = {})
+                            DetailsRecipeStepItem(
+                                stepNumber = index + 1,
+                                stepTextDescription = recipe.step
+                            )
                         }
                     }
                 }
@@ -108,7 +110,6 @@ fun RecipeDetailsContent(
                 ) {
                     Image(
                         modifier = Modifier
-                            .clip(CircleShape)
                             .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
                             .padding(16.dp)
                             .size(200.dp),

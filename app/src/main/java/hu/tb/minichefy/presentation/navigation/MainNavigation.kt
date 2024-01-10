@@ -24,8 +24,6 @@ fun MainNavigation() {
             navigateToRecipeDetails = navController::navigateToRecipeDetails
         )
 
-        recipeDetailsNavigation(
-            navigateToRecipeList = navController::navigateToRecipeList
-        )
+        recipeDetailsNavigation()
     }
 }

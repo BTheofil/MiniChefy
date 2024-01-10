@@ -12,10 +12,8 @@ fun NavController.navigateToRecipeDetails(recipeId: Long) {
     this.navigate(RECIPE_DETAILS_ROUTE + "/${recipeId}")
 }
 
-fun NavGraphBuilder.recipeDetailsNavigation(navigateToRecipeList: () -> Unit) {
+fun NavGraphBuilder.recipeDetailsNavigation() {
     composable(route = "$RECIPE_DETAILS_ROUTE/{$RECIPE_ID_ARGUMENT_KEY}") {
-        RecipeDetailsScreen(
-            navigateToRecipeList = navigateToRecipeList
-        )
+        RecipeDetailsScreen()
     }
 }
