@@ -2,7 +2,6 @@ package hu.tb.minichefy.presentation.screens.recipe_create
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -31,24 +30,20 @@ fun CreateRecipe(
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                UiEvent.OnNextPageClick -> pager.animateScrollToPage(uiState.targetPageIndex)
-                UiEvent.OnPreviousPage -> pager.animateScrollToPage(uiState.targetPageIndex)
+                UiEvent.PageChange -> pager.animateScrollToPage(uiState.targetPageIndex)
                 UiEvent.OnRecipeCreateFinish -> onFinishRecipeButtonClick()
             }
         }
     }
 
-    val listState = rememberLazyListState()
-    LaunchedEffect(key1 = stepsPageState.recipeSteps) {
-        if (stepsPageState.recipeSteps.isNotEmpty()) {
-            listState.animateScrollToItem(stepsPageState.recipeSteps.lastIndex)
-        }
+    LaunchedEffect(key1 = pager.settledPage){
+        viewModel.onEvent(OnEvent.PageChange(pager.settledPage))
     }
 
     BackHandler(
         enabled = uiState.targetPageIndex != 0
     ) {
-        viewModel.onEvent(OnEvent.OnPreviousPageBack)
+        viewModel.onEvent(OnEvent.PageChange(uiState.targetPageIndex - 1))
     }
 
     HorizontalPager(state = pager) { pageIndex ->
@@ -60,7 +55,7 @@ fun CreateRecipe(
                     onAddQuantityClick = { viewModel.onEvent(OnEvent.OnQuantityChange(+1)) },
                     onRemoveQuantityClick = { viewModel.onEvent(OnEvent.OnQuantityChange(-1)) },
                     onTitleValueChange = { viewModel.onEvent(OnEvent.OnRecipeTitleChange(it)) },
-                    onNextPageClick = { viewModel.onEvent(OnEvent.OnNextPageClick) },
+                    onNextPageClick = { viewModel.onEvent(OnEvent.PageChange(1)) },
                     isQuantityHasError = basicPageState.isQuantityHasError
                 )
 

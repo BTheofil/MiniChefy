@@ -53,15 +53,13 @@ class CreateRecipeViewModel @Inject constructor(
     val uiEvent = _uiEvent.receiveAsFlow()
 
     sealed class UiEvent {
-        data object OnNextPageClick : UiEvent()
-        data object OnPreviousPage : UiEvent()
+        data object PageChange : UiEvent()
         data object OnRecipeCreateFinish : UiEvent()
     }
 
     sealed class OnEvent {
         //all pages event
-        data object OnNextPageClick : OnEvent()
-        data object OnPreviousPageBack : OnEvent()
+        data class PageChange(val pageIndex: Int) : OnEvent()
 
         //basic page
         data class OnQuantityChange(val value: Int) : OnEvent()
@@ -77,18 +75,11 @@ class CreateRecipeViewModel @Inject constructor(
     fun onEvent(event: OnEvent) {
         when (event) {
             //all pages event
-            OnEvent.OnNextPageClick -> viewModelScope.launch {
+            is OnEvent.PageChange -> viewModelScope.launch {
                 _uiState.update {
-                    it.copy(targetPageIndex = it.targetPageIndex + 1)
+                    it.copy(targetPageIndex = event.pageIndex)
                 }
-                _uiEvent.send(UiEvent.OnNextPageClick)
-            }
-
-            OnEvent.OnPreviousPageBack -> viewModelScope.launch {
-                _uiState.value = uiState.value.copy(
-                    targetPageIndex = uiState.value.targetPageIndex - 1
-                )
-                _uiEvent.send(UiEvent.OnPreviousPage)
+                _uiEvent.send(UiEvent.PageChange)
             }
 
             //basic page
