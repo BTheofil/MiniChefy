@@ -64,7 +64,7 @@ fun CreateRecipe(
                     uiState = stepsPageState,
                     onDeleteItemClick = { viewModel.onEvent(OnEvent.OnDeleteRecipeStep(it)) },
                     onStepTextFieldValueChange = { viewModel.onEvent(OnEvent.OnStepsFieldChange(it)) },
-                    onAddItemIconClick = { viewModel.onEvent(OnEvent.OnAddRecipeStep(stepsPageState.typeField)) },
+                    onAddItemClick = { viewModel.onEvent(OnEvent.OnAddRecipeStep(stepsPageState.typeField)) },
                     onNextButtonClick = { viewModel.onEvent(OnEvent.OnRecipeSave) }
                 )
         }
