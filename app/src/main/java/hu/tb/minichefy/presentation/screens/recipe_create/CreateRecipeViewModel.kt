@@ -138,6 +138,9 @@ class CreateRecipeViewModel @Inject constructor(
                 _stepsPageState.value.recipeSteps.forEach {
                     repository.saveStep(it, resultId)
                 }
+                if(_stepsPageState.value.typeField.isNotBlank()){
+                    repository.saveStep(RecipeStep(step = stepsPageState.value.typeField), resultId)
+                }
                 _uiEvent.send(UiEvent.OnRecipeCreateFinish)
             }
         }

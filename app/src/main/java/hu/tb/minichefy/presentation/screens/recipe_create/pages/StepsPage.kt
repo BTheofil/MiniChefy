@@ -1,5 +1,6 @@
 package hu.tb.minichefy.presentation.screens.recipe_create.pages
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,14 +17,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.domain.model.RecipeStep
 import hu.tb.minichefy.presentation.screens.recipe_create.CreateRecipeViewModel
 import hu.tb.minichefy.presentation.screens.recipe_create.components.RecipeStepItem
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun StepsPage(
     uiState: CreateRecipeViewModel.Pages.StepsPage,
@@ -32,7 +37,16 @@ fun StepsPage(
     onAddItemClick: () -> Unit,
     onNextButtonClick: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+    val keyBoardController = LocalSoftwareKeyboardController.current
+
     Scaffold(
+        modifier = Modifier
+            .pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus()
+            })
+        },
         topBar = {
             CenterAlignedTopAppBar(title = {
                 Text(text = "Write down the recipe steps")
@@ -54,23 +68,29 @@ fun StepsPage(
             ) {
                 itemsIndexed(items = uiState.recipeSteps) { index, item ->
                     RecipeStepItem(
-                        index = index + 1,
+                        index = index,
                         displayText = item.step,
+                        isTextEditable = false,
                         onDeleteItemClick = onDeleteItemClick,
-                        onRecipeStepTextFieldChange = onStepTextFieldValueChange
+                        onRecipeStepTextFieldChange = onStepTextFieldValueChange,
+                        keyboardController = keyBoardController
                     )
                 }
                 item {
                     RecipeStepItem(
-                        index = uiState.recipeSteps.size + 1,
+                        index = uiState.recipeSteps.size,
                         displayText = uiState.typeField,
-                        onDeleteItemClick = {},
-                        onRecipeStepTextFieldChange = onStepTextFieldValueChange
+                        onRecipeStepTextFieldChange = onStepTextFieldValueChange,
+                        closeIconVisible = false,
+                        isTextEditable = true,
+                        keyboardController = keyBoardController
                     )
                 }
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = onAddItemClick) {
+                    Button(onClick = {
+                        onAddItemClick()
+                    }) {
                         Text(text = "Add more step")
                     }
                 }

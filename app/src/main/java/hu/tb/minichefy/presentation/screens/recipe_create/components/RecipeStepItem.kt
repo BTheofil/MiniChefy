@@ -27,6 +27,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,10 +41,11 @@ fun RecipeStepItem(
     index: Int,
     displayText: String,
     onRecipeStepTextFieldChange: (text: String) -> Unit,
-    onDeleteItemClick: (Int) -> Unit
+    onDeleteItemClick: (Int) -> Unit = {},
+    closeIconVisible: Boolean = true,
+    isTextEditable: Boolean,
+    keyboardController: SoftwareKeyboardController?
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-
     ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,7 +69,7 @@ fun RecipeStepItem(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = index.toString(),
+                text = (index + 1).toString(),
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold
@@ -119,7 +121,8 @@ fun RecipeStepItem(
                     .copy(color = MaterialTheme.colorScheme.onPrimary),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
-                    onDone = { keyboardController?.hide() })
+                    onDone = { keyboardController?.hide() }),
+                enabled = isTextEditable
             )
         }
 
@@ -132,22 +135,29 @@ fun RecipeStepItem(
             onClick = {
                 onDeleteItemClick(index)
             }) {
-            Icon(
-                modifier = Modifier,
-                imageVector = Icons.Outlined.Clear,
-                contentDescription = "Delete step",
-                tint = MaterialTheme.colorScheme.error
-            )
+            if (closeIconVisible) {
+                Icon(
+                    modifier = Modifier,
+                    imageVector = Icons.Outlined.Clear,
+                    contentDescription = "Delete step",
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Preview
 @Composable
 fun RecipeStepItemPreview() {
+    val keyboardController = LocalSoftwareKeyboardController.current
     RecipeStepItem(
         index = 1,
         displayText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer sed elit ligula. Sed pharetra luctus maximus. Donec vestibulum purus nec vestibulum bibendum. Nunc sapien ligula, dictum at lacus ut, tempus finibus lacus. Vivamus et augue ut quam rutrum sagittis ac at sem. Vivamus in libero ut nisi malesuada imperdiet.",
         onDeleteItemClick = {},
-        onRecipeStepTextFieldChange = {})
+        onRecipeStepTextFieldChange = {},
+        isTextEditable = true,
+        keyboardController = keyboardController
+    )
 }
