@@ -20,18 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 
 @Composable
 fun RecipeItem(
-    title: String,
-    onItemClick: () -> Unit
+    modifier: Modifier = Modifier,
+    title: String
 ) {
     ElevatedCard(
-        modifier = Modifier
-            .clickableWithoutRipple {
-                onItemClick()
-            }
+        modifier = modifier
     ) {
         Column(
             modifier = Modifier
@@ -65,7 +61,6 @@ fun RecipeItem(
 @Composable
 fun RecipeItemPreview() {
     RecipeItem(
-        title = "Pie",
-        onItemClick = {}
+        title = "Pie"
     )
 }

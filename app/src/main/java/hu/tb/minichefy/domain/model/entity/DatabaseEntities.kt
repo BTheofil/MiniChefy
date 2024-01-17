@@ -22,7 +22,8 @@ data class RecipeStepEntity(
 )
 
 data class RecipeHowToCreateList(
-    @Embedded val recipeEntity: RecipeEntity,
+    @Embedded
+    val recipeEntity: RecipeEntity,
     @Relation(
         parentColumn = "recipeId",
         entityColumn = "recipeEntityId"

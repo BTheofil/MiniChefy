@@ -51,4 +51,8 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
 
     override suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long =
         dao.insertStep(step.toRecipeStepEntity(recipeEntityId))
+
+    suspend fun deleteRecipe(id: Long){
+        dao.deleteRecipe(id)
+    }
 }

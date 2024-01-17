@@ -19,7 +19,9 @@ class RecipeListViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class UiState(
-        val recipeList: List<Recipe> = emptyList()
+        val recipeList: List<Recipe> = emptyList(),
+        var selectedRecipeId: Long? = null,
+        var showSettingsPanel: Boolean = false
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -34,6 +36,8 @@ class RecipeListViewModel @Inject constructor(
 
     sealed class OnEvent {
         data class OnItemClick(val recipeId: Long) : OnEvent()
+        data class OpenRecipeSettingsPanel(val recipeId: Long): OnEvent()
+        data object DeleteItem : OnEvent()
     }
 
     init {
@@ -50,6 +54,19 @@ class RecipeListViewModel @Inject constructor(
         when (event) {
             is OnEvent.OnItemClick -> viewModelScope.launch {
                 _uiEvent.send(UiEvent.OnItemClick(event.recipeId))
+            }
+
+            OnEvent.DeleteItem -> viewModelScope.launch {
+                repository.deleteRecipe(uiState.value.selectedRecipeId!!)
+            }
+
+            is OnEvent.OpenRecipeSettingsPanel -> {
+                _uiState.update {
+                    it.copy(
+                        selectedRecipeId = event.recipeId,
+                        showSettingsPanel = true
+                    )
+                }
             }
         }
     }

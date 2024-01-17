@@ -1,7 +1,6 @@
 package hu.tb.minichefy.data.data_source.db
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -33,6 +32,6 @@ interface RecipeDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStep(stepEntity: RecipeStepEntity): Long
 
-    @Delete
-    suspend fun deleteRecipe(recipeEntity: RecipeEntity)
+    @Query("DELETE FROM RecipeEntity WHERE recipeId = :id")
+    suspend fun deleteRecipe(id: Long)
 }
