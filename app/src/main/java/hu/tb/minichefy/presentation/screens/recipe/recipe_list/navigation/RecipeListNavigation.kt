@@ -1,9 +1,9 @@
-package hu.tb.minichefy.presentation.screens.recipe_list.navigation
+package hu.tb.minichefy.presentation.screens.recipe.recipe_list.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import hu.tb.minichefy.presentation.screens.recipe_list.RecipeListScreen
+import hu.tb.minichefy.presentation.screens.recipe.recipe_list.RecipeListScreen
 
 const val RECIPE_LIST_ROUTE = "recipe_list_route"
 

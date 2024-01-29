@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.screens.recipe_create.pages
+package hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hu.tb.minichefy.presentation.screens.recipe_create.components.AddRemoveRow
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.AddRemoveRow
 import hu.tb.minichefy.presentation.ui.components.bottomBorder
 
 @Composable

@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.screens.recipe_create.pages
+package hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
@@ -25,8 +25,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.domain.model.RecipeStep
-import hu.tb.minichefy.presentation.screens.recipe_create.CreateRecipeViewModel
-import hu.tb.minichefy.presentation.screens.recipe_create.components.RecipeStepItem
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.RecipeStepItem
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable

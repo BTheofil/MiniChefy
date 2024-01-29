@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.screens.recipe_list
+package hu.tb.minichefy.presentation.screens.recipe.recipe_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

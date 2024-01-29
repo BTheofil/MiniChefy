@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.screens.recipe_list
+package hu.tb.minichefy.presentation.screens.recipe.recipe_list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.Recipe
-import hu.tb.minichefy.presentation.screens.recipe_list.components.RecipeItem
+import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
 import kotlinx.coroutines.launch
 
 @Composable

@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.screens.recipe_details
+package hu.tb.minichefy.presentation.screens.recipe.recipe_details
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -38,8 +38,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.Recipe
 import hu.tb.minichefy.domain.model.RecipeStep
-import hu.tb.minichefy.presentation.screens.recipe_details.components.DetailsRecipeStepItem
-import hu.tb.minichefy.presentation.screens.recipe_details.components.QuickInfoItem
+import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.DetailsRecipeStepItem
+import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.QuickInfoItem
 import java.util.Locale
 
 @Composable

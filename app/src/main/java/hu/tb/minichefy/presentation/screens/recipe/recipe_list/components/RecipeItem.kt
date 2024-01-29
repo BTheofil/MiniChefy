@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.screens.recipe_list.components
+package hu.tb.minichefy.presentation.screens.recipe.recipe_list.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
