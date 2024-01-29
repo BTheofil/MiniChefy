@@ -43,8 +43,9 @@ class RecipeListViewModel @Inject constructor(
     sealed class OnEvent {
         data class OnRecipeClick(val recipeId: Long) : OnEvent()
         data class OpenRecipeSettingsPanel(val recipeId: Long) : OnEvent()
-        data object DeleteRecipe : OnEvent()
         data class SearchTextChange(val text: String) : OnEvent()
+        data object DeleteRecipe : OnEvent()
+        data object ClearText : OnEvent()
     }
 
     private val allRecipes = repository.getAllRecipe()
@@ -93,6 +94,15 @@ class RecipeListViewModel @Inject constructor(
                             }
                         )
                     )
+                }
+            }
+
+            OnEvent.ClearText -> {
+                viewModelScope.launch {
+                    _uiState.update {
+                        it.copy(searchRecipeText = "")
+                    }
+                    _uiState.emit(_uiState.value.copy(recipeList = repository.searchRecipeByTitle("")))
                 }
             }
         }

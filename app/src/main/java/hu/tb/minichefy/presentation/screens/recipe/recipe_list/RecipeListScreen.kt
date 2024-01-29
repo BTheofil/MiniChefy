@@ -3,7 +3,6 @@ package hu.tb.minichefy.presentation.screens.recipe.recipe_list
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,10 +18,12 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -37,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -46,6 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.Recipe
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
+import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import kotlinx.coroutines.launch
 
 @Composable
@@ -98,6 +101,9 @@ fun RecipeListScreenContent(
     }
 
     val focusManager = LocalFocusManager.current
+    var isSearchClearIconVisible by remember {
+        mutableStateOf(false)
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -109,14 +115,16 @@ fun RecipeListScreenContent(
             }
         },
         content = { paddingValues ->
-
             Column(
                 modifier = Modifier.padding(paddingValues)
             ) {
                 SearchBar(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = 16.dp)
+                        .onFocusChanged {
+                            isSearchClearIconVisible = it.hasFocus
+                        },
                     query = uiState.searchRecipeText,
                     onQueryChange = {
                         onEvent(RecipeListViewModel.OnEvent.SearchTextChange(it))
@@ -129,19 +137,26 @@ fun RecipeListScreenContent(
                     leadingIcon = {
                         Icon(imageVector = Icons.Rounded.Search, contentDescription = "search icon")
                     },
+                    trailingIcon = {
+                        if(isSearchClearIconVisible){
+                            IconButton(onClick = { onEvent(RecipeListViewModel.OnEvent.ClearText) }) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Clear,
+                                    contentDescription = "clear text icon"
+                                )
+                            }
+                        }
+                    },
                     placeholder = {
                         Text(text = "Search recipe")
-                    }
-                ) {
-                }
+                    },
+                    content = {}
+                )
 
                 LazyVerticalGrid(
                     modifier = Modifier
                         .fillMaxSize()
-                        .clickable(
-                            interactionSource = MutableInteractionSource(),
-                            indication = null
-                        ) {
+                        .clickableWithoutRipple {
                             focusManager.clearFocus()
                         },
                     columns = GridCells.Fixed(2),

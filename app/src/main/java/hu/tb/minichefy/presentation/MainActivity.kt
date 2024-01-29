@@ -1,4 +1,4 @@
-package hu.tb.minichefy
+package hu.tb.minichefy.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
