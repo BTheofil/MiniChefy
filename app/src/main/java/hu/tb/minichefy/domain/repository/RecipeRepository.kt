@@ -13,4 +13,8 @@ interface RecipeRepository {
     suspend fun saveRecipe(recipe: Recipe): Long
 
     suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long
+
+    suspend fun deleteRecipe(id: Long)
+
+    suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe>
 }

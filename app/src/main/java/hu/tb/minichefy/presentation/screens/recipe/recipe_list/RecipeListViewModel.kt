@@ -3,46 +3,55 @@ package hu.tb.minichefy.presentation.screens.recipe.recipe_list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
 import hu.tb.minichefy.domain.model.Recipe
+import hu.tb.minichefy.domain.repository.RecipeRepository
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+
+private const val RECIPE_SEARCH_DELAY = 500L
 
 @HiltViewModel
 class RecipeListViewModel @Inject constructor(
-    private val repository: RecipeDatabaseRepositoryImpl
+    private val repository: RecipeRepository
 ) : ViewModel() {
 
     data class UiState(
         val recipeList: List<Recipe> = emptyList(),
-        var selectedRecipeId: Long? = null,
-        var showSettingsPanel: Boolean = false
+        val selectedRecipeId: Long? = null,
+        val showSettingsPanel: Boolean = false,
+        val searchRecipeText: String = ""
     )
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
 
     sealed class UiEvent {
-        data class OnItemClick(val recipeId: Long) : UiEvent()
+        data class OnRecipeClick(val recipeId: Long) : UiEvent()
     }
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
     sealed class OnEvent {
-        data class OnItemClick(val recipeId: Long) : OnEvent()
-        data class OpenRecipeSettingsPanel(val recipeId: Long): OnEvent()
-        data object DeleteItem : OnEvent()
+        data class OnRecipeClick(val recipeId: Long) : OnEvent()
+        data class OpenRecipeSettingsPanel(val recipeId: Long) : OnEvent()
+        data object DeleteRecipe : OnEvent()
+        data class SearchTextChange(val text: String) : OnEvent()
     }
+
+    private val allRecipes = repository.getAllRecipe()
 
     init {
         viewModelScope.launch {
-            repository.getAllRecipe().collect { data ->
+            allRecipes.collectLatest { data ->
                 _uiState.update {
                     it.copy(recipeList = data)
                 }
@@ -52,11 +61,11 @@ class RecipeListViewModel @Inject constructor(
 
     fun onEvent(event: OnEvent) {
         when (event) {
-            is OnEvent.OnItemClick -> viewModelScope.launch {
-                _uiEvent.send(UiEvent.OnItemClick(event.recipeId))
+            is OnEvent.OnRecipeClick -> viewModelScope.launch {
+                _uiEvent.send(UiEvent.OnRecipeClick(event.recipeId))
             }
 
-            OnEvent.DeleteItem -> viewModelScope.launch {
+            OnEvent.DeleteRecipe -> viewModelScope.launch {
                 repository.deleteRecipe(uiState.value.selectedRecipeId!!)
             }
 
@@ -65,6 +74,24 @@ class RecipeListViewModel @Inject constructor(
                     it.copy(
                         selectedRecipeId = event.recipeId,
                         showSettingsPanel = true
+                    )
+                }
+            }
+
+            is OnEvent.SearchTextChange -> {
+                viewModelScope.launch {
+                    _uiState.emit(_uiState.value.copy(searchRecipeText = event.text))
+
+                    delay(RECIPE_SEARCH_DELAY.milliseconds)
+
+                    _uiState.emit(
+                        _uiState.value.copy(
+                            recipeList = if (uiState.value.searchRecipeText.isNotBlank()) {
+                                repository.searchRecipeByTitle(event.text)
+                            } else {
+                                repository.searchRecipeByTitle("")
+                            }
+                        )
                     )
                 }
             }

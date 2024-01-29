@@ -67,7 +67,7 @@ fun RecipeDetailsContent(
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            text = uiState.recipe.name.uppercase(Locale.ROOT),
+                            text = uiState.recipe.title.uppercase(Locale.ROOT),
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -155,7 +155,7 @@ fun RecipeDetailsContentPreview() {
         uiState = RecipeDetailsViewModel.UiState(
             recipe = Recipe(
                 id = 0,
-                name = "test",
+                title = "test",
                 quantity = 1,
                 howToSteps = listOf(
                     RecipeStep(0, "first"),

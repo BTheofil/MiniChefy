@@ -6,21 +6,18 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import hu.tb.minichefy.domain.model.entity.RecipeEntity
-import hu.tb.minichefy.domain.model.entity.RecipeHowToCreateList
+import hu.tb.minichefy.domain.model.entity.RecipeWithSteps
 import hu.tb.minichefy.domain.model.entity.RecipeStepEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RecipeDAO {
 
-    //@Query("SELECT * FROM RecipeEntity WHERE recipeId = :id")
-    //suspend fun getRecipeById(id: Long): RecipeEntity
-
     @Query("SELECT * FROM RecipeEntity")
-    fun getAllRecipe(): Flow<List<RecipeHowToCreateList>>
+    fun getAllRecipe(): Flow<List<RecipeWithSteps>>
 
     @Query("SELECT * FROM RecipeEntity WHERE recipeId = :recipeId")
-    fun getRecipeById(recipeId: Long): Flow<RecipeHowToCreateList>
+    fun getRecipeById(recipeId: Long): Flow<RecipeWithSteps>
 
     @Transaction
     @Query("SELECT * FROM RecipeStepEntity WHERE recipeEntityId = :recipeId")
@@ -34,4 +31,7 @@ interface RecipeDAO {
 
     @Query("DELETE FROM RecipeEntity WHERE recipeId = :id")
     suspend fun deleteRecipe(id: Long)
+
+    @Query("SELECT * FROM RecipeEntity WHERE title LIKE :searchTitle")
+    suspend fun searchRecipeByTitle(searchTitle: String): List<RecipeWithSteps>
 }

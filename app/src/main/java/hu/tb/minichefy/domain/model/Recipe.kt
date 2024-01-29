@@ -4,14 +4,14 @@ import hu.tb.minichefy.domain.model.entity.RecipeEntity
 
 data class Recipe(
     val id: Long? = null,
-    val name: String,
+    val title: String,
     val quantity: Int,
     val howToSteps: List<RecipeStep>
 )
 
 fun Recipe.toRecipeEntity() =
     RecipeEntity(
-        title = this.name,
+        title = this.title,
         quantity = this.quantity,
         recipeId = this.id
     )

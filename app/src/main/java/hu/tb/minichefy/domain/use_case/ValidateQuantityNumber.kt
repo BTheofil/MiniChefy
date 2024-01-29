@@ -9,3 +9,8 @@ class ValidateQuantityNumber {
             ValidationResult.SUCCESS
         }
 }
+
+enum class ValidationResult {
+    SUCCESS,
+    ERROR
+}

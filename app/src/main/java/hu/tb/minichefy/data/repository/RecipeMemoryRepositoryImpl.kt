@@ -29,4 +29,12 @@ class RecipeMemoryRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
+    override suspend fun deleteRecipe(id: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe> {
+        TODO("Not yet implemented")
+    }
+
 }

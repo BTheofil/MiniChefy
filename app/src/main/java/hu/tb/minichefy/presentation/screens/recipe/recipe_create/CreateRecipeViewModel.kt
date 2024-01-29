@@ -3,9 +3,9 @@ package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
 import hu.tb.minichefy.domain.model.Recipe
 import hu.tb.minichefy.domain.model.RecipeStep
+import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import kotlinx.coroutines.channels.Channel
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateRecipeViewModel @Inject constructor(
-    private val repository: RecipeDatabaseRepositoryImpl,
+    private val repository: RecipeRepository,
     private val validateQuantityNumber: ValidateQuantityNumber
 ) : ViewModel() {
 
@@ -130,7 +130,7 @@ class CreateRecipeViewModel @Inject constructor(
 
             OnEvent.OnRecipeSave -> viewModelScope.launch {
                 val createdRecipe = Recipe(
-                    name = _basicPageState.value.recipeName,
+                    title = _basicPageState.value.recipeName,
                     quantity = _basicPageState.value.quantityCounter,
                     howToSteps = emptyList()
                 )

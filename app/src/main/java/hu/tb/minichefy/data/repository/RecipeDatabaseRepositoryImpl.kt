@@ -1,6 +1,7 @@
 package hu.tb.minichefy.data.repository
 
 import hu.tb.minichefy.data.data_source.db.RecipeDAO
+import hu.tb.minichefy.data.mapper.RecipeEntityToRecipe
 import hu.tb.minichefy.domain.model.Recipe
 import hu.tb.minichefy.domain.model.RecipeStep
 import hu.tb.minichefy.domain.model.toRecipeEntity
@@ -16,34 +17,14 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
 
     override fun getAllRecipe(): Flow<List<Recipe>> =
         dao.getAllRecipe().map { recipeHowToCreateLists ->
-            recipeHowToCreateLists.map { recipeHowToCreateList ->
-                Recipe(
-                    recipeHowToCreateList.recipeEntity.recipeId,
-                    recipeHowToCreateList.recipeEntity.title,
-                    recipeHowToCreateList.recipeEntity.quantity,
-                    howToSteps = recipeHowToCreateList.howToStepsList.map {
-                        RecipeStep(
-                            it.recipeStepId,
-                            it.step
-                        )
-                    }
-                )
+            recipeHowToCreateLists.map {
+                RecipeEntityToRecipe().map(it)
             }
         }
 
     override suspend fun getRecipeById(id: Long): Flow<Recipe> =
         dao.getRecipeById(id).map { recipeHowToCreateList ->
-            Recipe(
-                id = recipeHowToCreateList.recipeEntity.recipeId,
-                name = recipeHowToCreateList.recipeEntity.title,
-                howToSteps = recipeHowToCreateList.howToStepsList.map {
-                    RecipeStep(
-                        it.recipeStepId,
-                        it.step
-                    )
-                },
-                quantity = recipeHowToCreateList.recipeEntity.quantity
-            )
+            RecipeEntityToRecipe().map(recipeHowToCreateList)
         }
 
     override suspend fun saveRecipe(recipe: Recipe): Long =
@@ -52,7 +33,13 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
     override suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long =
         dao.insertStep(step.toRecipeStepEntity(recipeEntityId))
 
-    suspend fun deleteRecipe(id: Long){
-        dao.deleteRecipe(id)
+    override suspend fun deleteRecipe(id: Long) = dao.deleteRecipe(id)
+
+    override suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe> {
+        val recipes = dao.searchRecipeByTitle("%$searchTitle%")
+        return recipes.map {
+            RecipeEntityToRecipe().map(it)
+        }
     }
+
 }

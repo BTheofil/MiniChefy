@@ -21,14 +21,14 @@ data class RecipeStepEntity(
     val step: String
 )
 
-data class RecipeHowToCreateList(
+data class RecipeWithSteps(
     @Embedded
     val recipeEntity: RecipeEntity,
     @Relation(
         parentColumn = "recipeId",
         entityColumn = "recipeEntityId"
     )
-    val howToStepsList: List<RecipeStepEntity>
+    val recipeSteps: List<RecipeStepEntity>
 )
 
 

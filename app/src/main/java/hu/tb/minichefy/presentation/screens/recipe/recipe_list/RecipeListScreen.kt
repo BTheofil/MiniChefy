@@ -3,11 +3,13 @@ package hu.tb.minichefy.presentation.screens.recipe.recipe_list
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -17,12 +19,14 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -34,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,7 +59,7 @@ fun RecipeListScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is RecipeListViewModel.UiEvent.OnItemClick -> onItemClick(event.recipeId)
+                is RecipeListViewModel.UiEvent.OnRecipeClick -> onItemClick(event.recipeId)
             }
         }
     }
@@ -92,6 +97,8 @@ fun RecipeListScreenContent(
         }
     }
 
+    val focusManager = LocalFocusManager.current
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = onFloatingButtonClick) {
@@ -101,42 +108,77 @@ fun RecipeListScreenContent(
                 )
             }
         },
-        content = {
-            LazyVerticalGrid(
-                modifier = Modifier.padding(it),
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+        content = { paddingValues ->
+
+            Column(
+                modifier = Modifier.padding(paddingValues)
             ) {
-                items(
-                    items = uiState.recipeList,
-                    key = { item -> item.id!! }
-                ) { recipe ->
-                    RecipeItem(
-                        modifier = Modifier
-                            .combinedClickable(
-                                onClick = {
-                                    onEvent(
-                                        RecipeListViewModel.OnEvent.OnItemClick(
-                                            recipe.id!!
+                SearchBar(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    query = uiState.searchRecipeText,
+                    onQueryChange = {
+                        onEvent(RecipeListViewModel.OnEvent.SearchTextChange(it))
+                    },
+                    onSearch = {
+                        focusManager.clearFocus()
+                    },
+                    active = false,
+                    onActiveChange = {},
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Rounded.Search, contentDescription = "search icon")
+                    },
+                    placeholder = {
+                        Text(text = "Search recipe")
+                    }
+                ) {
+                }
+
+                LazyVerticalGrid(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            interactionSource = MutableInteractionSource(),
+                            indication = null
+                        ) {
+                            focusManager.clearFocus()
+                        },
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = uiState.recipeList,
+                        key = { item -> item.id!! }
+                    ) { recipe ->
+                        RecipeItem(
+                            modifier = Modifier
+                                .combinedClickable(
+                                    onClick = {
+                                        onEvent(
+                                            RecipeListViewModel.OnEvent.OnRecipeClick(
+                                                recipe.id!!
+                                            )
                                         )
-                                    )
-                                },
-                                onLongClick = {
-                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    onEvent(
-                                        RecipeListViewModel.OnEvent.OpenRecipeSettingsPanel(
-                                            recipe.id!!
+                                    },
+                                    onLongClick = {
+                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        onEvent(
+                                            RecipeListViewModel.OnEvent.OpenRecipeSettingsPanel(
+                                                recipe.id!!
+                                            )
                                         )
-                                    )
-                                    settingPanelVisible = true
-                                }
-                            ),
-                        title = recipe.name
-                    )
+                                        settingPanelVisible = true
+                                    }
+                                ),
+                            title = recipe.title
+                        )
+                    }
                 }
             }
+
 
             if (settingPanelVisible) {
                 ModalBottomSheet(
@@ -155,7 +197,7 @@ fun RecipeListScreenContent(
                                 .fillMaxWidth()
                                 .clickable(
                                     onClick = {
-                                        onEvent(RecipeListViewModel.OnEvent.DeleteItem)
+                                        onEvent(RecipeListViewModel.OnEvent.DeleteRecipe)
                                         dismissSettingPanel()
                                     }
                                 ),
