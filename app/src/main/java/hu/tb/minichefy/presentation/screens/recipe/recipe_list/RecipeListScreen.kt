@@ -1,31 +1,24 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
@@ -48,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.Recipe
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
+import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.SettingsPanel
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import kotlinx.coroutines.launch
 
@@ -90,16 +84,6 @@ fun RecipeListScreenContent(
     val scope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState()
 
-    val dismissSettingPanel = {
-        scope.launch {
-            modalSheetState.hide()
-        }.invokeOnCompletion {
-            if (!modalSheetState.isVisible) {
-                settingPanelVisible = false
-            }
-        }
-    }
-
     val focusManager = LocalFocusManager.current
     var isSearchClearIconVisible by remember {
         mutableStateOf(false)
@@ -138,7 +122,7 @@ fun RecipeListScreenContent(
                         Icon(imageVector = Icons.Rounded.Search, contentDescription = "search icon")
                     },
                     trailingIcon = {
-                        if(isSearchClearIconVisible){
+                        if (isSearchClearIconVisible) {
                             IconButton(onClick = { onEvent(RecipeListViewModel.OnEvent.ClearText) }) {
                                 Icon(
                                     imageVector = Icons.Rounded.Clear,
@@ -152,6 +136,8 @@ fun RecipeListScreenContent(
                     },
                     content = {}
                 )
+
+
 
                 LazyVerticalGrid(
                     modifier = Modifier
@@ -196,42 +182,19 @@ fun RecipeListScreenContent(
 
 
             if (settingPanelVisible) {
-                ModalBottomSheet(
-                    sheetState = modalSheetState,
-                    onDismissRequest = {
-                        dismissSettingPanel()
-                    }) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 22.dp)
-                            .padding(bottom = 22.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable(
-                                    onClick = {
-                                        onEvent(RecipeListViewModel.OnEvent.DeleteRecipe)
-                                        dismissSettingPanel()
-                                    }
-                                ),
-                            horizontalArrangement = Arrangement.Start
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Delete,
-                                contentDescription = "Delete recipe icon",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.width(22.dp))
-                            Text(
-                                text = "Delete recipe",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
+                SettingsPanel(
+                    modalSheetState = modalSheetState,
+                    dismissSettingPanel = {
+                        scope.launch {
+                            modalSheetState.hide()
+                        }.invokeOnCompletion {
+                            if (!modalSheetState.isVisible) {
+                                settingPanelVisible = false
+                            }
                         }
-                    }
-                }
+                    },
+                    onEvent = onEvent
+                )
             }
         })
 }
