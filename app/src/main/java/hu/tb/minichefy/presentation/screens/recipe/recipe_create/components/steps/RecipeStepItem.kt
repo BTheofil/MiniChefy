@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.screens.recipe.recipe_create.components
+package hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.steps
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background

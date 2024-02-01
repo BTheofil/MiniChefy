@@ -10,7 +10,6 @@ import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.presentation.screens.recipe.components.IconManager
 import hu.tb.minichefy.presentation.screens.recipe.components.FoodIcon
-import hu.tb.minichefy.presentation.screens.recipe.components.IconResource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,7 +45,7 @@ class CreateRecipeViewModel @Inject constructor(
             val quantityCounter: Int = 1,
             val isQuantityHasError: Boolean = false,
             val defaultIconCollection: List<FoodIcon> = IconManager().foodIcons,
-            val selectedFoodIcon: IconResource = defaultIconCollection[Random.nextInt(0, defaultIconCollection.size)]
+            val selectedFoodIcon: FoodIcon = defaultIconCollection[Random.nextInt(0, defaultIconCollection.size)]
         ) : Pages()
 
         data class StepsPage(
@@ -70,7 +69,7 @@ class CreateRecipeViewModel @Inject constructor(
         //basic page
         data class OnQuantityChange(val value: Int) : OnEvent()
         data class OnRecipeTitleChange(val text: String) : OnEvent()
-        data class OnSelectedIconChange(val icon: IconResource): OnEvent()
+        data class OnSelectedIconChange(val icon: FoodIcon): OnEvent()
 
         //steps page
         data class OnStepsFieldChange(val text: String) : OnEvent()
@@ -142,7 +141,7 @@ class CreateRecipeViewModel @Inject constructor(
 
             OnEvent.OnRecipeSave -> viewModelScope.launch {
                 val createdRecipe = Recipe(
-                    icon = basicPageState.value.selectedFoodIcon,
+                    icon = basicPageState.value.selectedFoodIcon.resource,
                     title = basicPageState.value.recipeName,
                     quantity = basicPageState.value.quantityCounter,
                     howToSteps = emptyList()

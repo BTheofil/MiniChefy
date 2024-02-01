@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.domain.model.RecipeStep
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
-import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.RecipeStepItem
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.steps.RecipeStepItem
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable

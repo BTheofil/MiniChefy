@@ -9,6 +9,7 @@ import androidx.room.Relation
 data class RecipeEntity(
     @PrimaryKey(autoGenerate = true)
     val recipeId: Long?,
+    val icon: Int,
     val title: String,
     val quantity: Int,
 )

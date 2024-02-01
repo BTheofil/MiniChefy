@@ -172,7 +172,7 @@ fun RecipeListScreenContent(
                                         settingPanelVisible = true
                                     }
                                 ),
-                            title = recipe.title
+                            recipe = recipe
                         )
                     }
                 }
@@ -203,7 +203,7 @@ fun RecipeListScreenPreview() {
     RecipeListScreenContent(
         uiState = RecipeListViewModel.UiState(
             recipeList = listOf(
-                Recipe(0, null,"test", quantity = 1, howToSteps = emptyList())
+                Recipe(0, 1,"test", quantity = 1, howToSteps = emptyList())
             )
         ),
         onEvent = {},

@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_details
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,8 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,14 +27,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.Recipe
-import hu.tb.minichefy.domain.model.RecipeStep
+import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info.CircleImage
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.DetailsRecipeStepItem
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.QuickInfoItem
 import java.util.Locale
@@ -103,20 +103,12 @@ fun RecipeDetailsContent(
             Column(
                 modifier = Modifier
             ) {
-                Box(
+                CircleImage(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        modifier = Modifier
-                            .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                            .padding(16.dp)
-                            .size(200.dp),
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = "recipe image"
-                    )
-                }
+                        .size(200.dp)
+                        .clip(CircleShape),
+                    image = uiState.recipe.icon
+                )
                 Spacer(modifier = Modifier.height(64.dp))
                 Box(
                     modifier = Modifier
@@ -150,18 +142,12 @@ fun RecipeDetailsContent(
 
 @Preview
 @Composable
-fun RecipeDetailsContentPreview() {
+fun RecipeDetailsContentPreview(
+    @PreviewParameter(RecipePreviewParameterProvider::class) mockRecipe: Recipe
+) {
     RecipeDetailsContent(
         uiState = RecipeDetailsViewModel.UiState(
-            recipe = Recipe(
-                id = 0,
-                title = "test",
-                quantity = 1,
-                howToSteps = listOf(
-                    RecipeStep(0, "first"),
-                    RecipeStep(1, "second")
-                )
-            )
+            recipe = mockRecipe
         )
     )
 }

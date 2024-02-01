@@ -9,6 +9,7 @@ class RecipeEntityToRecipe {
     fun map(from: RecipeWithSteps): Recipe = from.run {
         Recipe(
             id = this.recipeEntity.recipeId,
+            icon = recipeEntity.icon,
             title = this.recipeEntity.title,
             quantity = this.recipeEntity.quantity,
             howToSteps = this.recipeSteps.map {

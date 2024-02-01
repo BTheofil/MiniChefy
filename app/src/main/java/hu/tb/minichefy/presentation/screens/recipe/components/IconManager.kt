@@ -18,5 +18,5 @@ class IconManager {
 
 @Composable
 fun iconVectorResource(
-    iconResource: IconResource
-): ImageVector = ImageVector.vectorResource(iconResource.resource)
+    iconResource: Int
+): ImageVector = ImageVector.vectorResource(iconResource)

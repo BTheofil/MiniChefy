@@ -1,20 +1,22 @@
 package hu.tb.minichefy.domain.model
 
 import hu.tb.minichefy.domain.model.entity.RecipeEntity
-import hu.tb.minichefy.presentation.screens.recipe.components.IconResource
 
 data class Recipe(
     val id: Long? = null,
-    val icon: IconResource? = null,
+    val icon: Int,
     val title: String,
     val quantity: Int,
     val howToSteps: List<RecipeStep>
 )
 
-fun Recipe.toRecipeEntity() =
+fun Recipe.toRecipeEntity() = run {
     RecipeEntity(
-        title = this.title,
-        quantity = this.quantity,
-        recipeId = this.id
+        icon = icon,
+        title = title,
+        quantity = quantity,
+        recipeId = id
     )
+}
+
 
