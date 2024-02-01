@@ -137,8 +137,6 @@ fun RecipeListScreenContent(
                     content = {}
                 )
 
-
-
                 LazyVerticalGrid(
                     modifier = Modifier
                         .fillMaxSize()
@@ -205,7 +203,7 @@ fun RecipeListScreenPreview() {
     RecipeListScreenContent(
         uiState = RecipeListViewModel.UiState(
             recipeList = listOf(
-                Recipe(0, "test", quantity = 1, howToSteps = emptyList())
+                Recipe(0, null,"test", quantity = 1, howToSteps = emptyList())
             )
         ),
         onEvent = {},

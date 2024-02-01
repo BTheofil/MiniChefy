@@ -8,6 +8,9 @@ import hu.tb.minichefy.domain.model.RecipeStep
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
 import hu.tb.minichefy.domain.use_case.ValidationResult
+import hu.tb.minichefy.presentation.screens.recipe.components.IconManager
+import hu.tb.minichefy.presentation.screens.recipe.components.FoodIcon
+import hu.tb.minichefy.presentation.screens.recipe.components.IconResource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +18,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class CreateRecipeViewModel @Inject constructor(
@@ -40,7 +44,9 @@ class CreateRecipeViewModel @Inject constructor(
         data class BasicInformationPage(
             val recipeName: String = "",
             val quantityCounter: Int = 1,
-            val isQuantityHasError: Boolean = false
+            val isQuantityHasError: Boolean = false,
+            val defaultIconCollection: List<FoodIcon> = IconManager().foodIcons,
+            val selectedFoodIcon: IconResource = defaultIconCollection[Random.nextInt(0, defaultIconCollection.size)]
         ) : Pages()
 
         data class StepsPage(
@@ -64,9 +70,10 @@ class CreateRecipeViewModel @Inject constructor(
         //basic page
         data class OnQuantityChange(val value: Int) : OnEvent()
         data class OnRecipeTitleChange(val text: String) : OnEvent()
-        data class OnStepsFieldChange(val text: String) : OnEvent()
+        data class OnSelectedIconChange(val icon: IconResource): OnEvent()
 
         //steps page
+        data class OnStepsFieldChange(val text: String) : OnEvent()
         data class OnAddRecipeStep(val stepDescription: String) : OnEvent()
         data class OnDeleteRecipeStep(val index: Int) : OnEvent()
         data object OnRecipeSave : OnEvent()
@@ -102,11 +109,16 @@ class CreateRecipeViewModel @Inject constructor(
                 it.copy(recipeName = event.text)
             }
 
+
+            is OnEvent.OnSelectedIconChange -> _basicPageState.update {
+                it.copy(selectedFoodIcon = event.icon)
+            }
+
+            //steps page
             is OnEvent.OnStepsFieldChange -> _stepsPageState.update {
                 it.copy(typeField = event.text)
             }
 
-            //steps page
             is OnEvent.OnAddRecipeStep -> {
                 val updatedList = _stepsPageState.value.recipeSteps.toMutableList().apply {
                     add(RecipeStep(step = event.stepDescription))
@@ -130,15 +142,16 @@ class CreateRecipeViewModel @Inject constructor(
 
             OnEvent.OnRecipeSave -> viewModelScope.launch {
                 val createdRecipe = Recipe(
-                    title = _basicPageState.value.recipeName,
-                    quantity = _basicPageState.value.quantityCounter,
+                    icon = basicPageState.value.selectedFoodIcon,
+                    title = basicPageState.value.recipeName,
+                    quantity = basicPageState.value.quantityCounter,
                     howToSteps = emptyList()
                 )
                 val resultId = repository.saveRecipe(createdRecipe)
                 _stepsPageState.value.recipeSteps.forEach {
                     repository.saveStep(it, resultId)
                 }
-                if(_stepsPageState.value.typeField.isNotBlank()){
+                if (_stepsPageState.value.typeField.isNotBlank()) {
                     repository.saveStep(RecipeStep(step = stepsPageState.value.typeField), resultId)
                 }
                 _uiEvent.send(UiEvent.OnRecipeCreateFinish)

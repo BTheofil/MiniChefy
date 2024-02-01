@@ -9,7 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages.BasicInformationPage
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages.InformationPage
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages.StepsPage
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.UiEvent
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.OnEvent
@@ -49,14 +49,13 @@ fun CreateRecipe(
     HorizontalPager(state = pager) { pageIndex ->
         when (uiState.pages[pageIndex]) {
             is CreateRecipeViewModel.Pages.BasicInformationPage ->
-                BasicInformationPage(
-                    recipeName = basicPageState.recipeName,
-                    counterDisplayContent = basicPageState.quantityCounter,
+                InformationPage(
+                    uiState = basicPageState,
                     onAddQuantityClick = { viewModel.onEvent(OnEvent.OnQuantityChange(+1)) },
                     onRemoveQuantityClick = { viewModel.onEvent(OnEvent.OnQuantityChange(-1)) },
                     onTitleValueChange = { viewModel.onEvent(OnEvent.OnRecipeTitleChange(it)) },
                     onNextPageClick = { viewModel.onEvent(OnEvent.PageChange(1)) },
-                    isQuantityHasError = basicPageState.isQuantityHasError
+                    onSelectedIconClick = { viewModel.onEvent(OnEvent.OnSelectedIconChange(it)) }
                 )
 
             is CreateRecipeViewModel.Pages.StepsPage ->
