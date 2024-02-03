@@ -22,10 +22,8 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getRecipeById(id: Long): Flow<Recipe> =
-        dao.getRecipeById(id).map { recipeHowToCreateList ->
-            RecipeEntityToRecipe().map(recipeHowToCreateList)
-        }
+    override suspend fun getRecipeById(id: Long): Recipe =
+        RecipeEntityToRecipe().map(dao.getRecipeById(id))
 
     override suspend fun saveRecipe(recipe: Recipe): Long =
         dao.insertRecipe(recipe.toRecipeEntity())

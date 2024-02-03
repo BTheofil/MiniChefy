@@ -8,7 +8,7 @@ interface RecipeRepository {
 
     fun getAllRecipe(): Flow<List<Recipe>>
 
-    suspend fun getRecipeById(id: Long): Flow<Recipe>
+    suspend fun getRecipeById(id: Long): Recipe
 
     suspend fun saveRecipe(recipe: Recipe): Long
 

@@ -7,10 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import hu.tb.minichefy.data.data_source.db.RecipeDatabase
-import hu.tb.minichefy.data.data_source.memory.RecipeDataSource
-import hu.tb.minichefy.data.data_source.memory.RecipeMemoryDataSource
 import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
-import hu.tb.minichefy.data.repository.RecipeMemoryRepositoryImpl
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
 import javax.inject.Singleton
@@ -18,16 +15,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    @Provides
-    @Singleton
-    fun provideDataSource(): RecipeDataSource =
-        RecipeMemoryDataSource()
-
-    @Provides
-    @Singleton
-    fun provideRecipeMemoryRepository(dataSource: RecipeDataSource): RecipeMemoryRepositoryImpl =
-        RecipeMemoryRepositoryImpl(dataSource)
 
     @Provides
     @Singleton

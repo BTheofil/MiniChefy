@@ -29,12 +29,11 @@ class RecipeDetailsViewModel @Inject constructor(
     init {
         val recipeId: String = checkNotNull(savedStateHandle[RECIPE_ID_ARGUMENT_KEY])
         viewModelScope.launch {
-            recipeRepository.getRecipeById(recipeId.toLong()).collect { recipe ->
-                _uiState.update {
-                    it.copy(
-                        recipe = recipe
-                    )
-                }
+            val recipe = recipeRepository.getRecipeById(recipeId.toLong())
+            _uiState.update {
+                it.copy(
+                    recipe = recipe
+                )
             }
         }
     }

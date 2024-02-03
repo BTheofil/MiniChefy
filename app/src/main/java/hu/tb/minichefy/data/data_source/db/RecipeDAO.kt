@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import hu.tb.minichefy.domain.model.entity.RecipeEntity
 import hu.tb.minichefy.domain.model.entity.RecipeWithSteps
 import hu.tb.minichefy.domain.model.entity.RecipeStepEntity
@@ -17,11 +16,7 @@ interface RecipeDAO {
     fun getAllRecipe(): Flow<List<RecipeWithSteps>>
 
     @Query("SELECT * FROM RecipeEntity WHERE recipeId = :recipeId")
-    fun getRecipeById(recipeId: Long): Flow<RecipeWithSteps>
-
-    @Transaction
-    @Query("SELECT * FROM RecipeStepEntity WHERE recipeEntityId = :recipeId")
-    fun getRecipeStepsListById(recipeId: Long): Flow<List<RecipeStepEntity>>
+    suspend fun getRecipeById(recipeId: Long): RecipeWithSteps
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRecipe(recipeEntity: RecipeEntity): Long
