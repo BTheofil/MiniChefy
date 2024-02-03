@@ -8,19 +8,12 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import hu.tb.minichefy.presentation.navigation.BottomBarNavigation
 import hu.tb.minichefy.presentation.navigation.MainNavigation
-import hu.tb.minichefy.presentation.screens.recipe.navigation.RECIPE_GRAPH
-import hu.tb.minichefy.presentation.screens.storage.navigation.STORAGE_GRAPH
 import hu.tb.minichefy.presentation.ui.theme.MiniChefyTheme
 
 @AndroidEntryPoint
@@ -32,26 +25,7 @@ class MainActivity : ComponentActivity() {
             MiniChefyTheme {
                 val navController = rememberNavController()
                 Scaffold(
-                    bottomBar = {
-                        NavigationBar {
-                            NavigationBarItem(
-                                icon = { Icon(Icons.Filled.Favorite, contentDescription = "asd") },
-                                label = { Text("asd") },
-                                selected = true,
-                                onClick = {
-                                    navController.navigate(STORAGE_GRAPH)
-                                }
-                            )
-                            NavigationBarItem(
-                                icon = { Icon(Icons.Filled.Favorite, contentDescription = "asd") },
-                                label = { Text("qwe") },
-                                selected = true,
-                                onClick = {
-                                    navController.navigate(RECIPE_GRAPH)
-                                }
-                            )
-                        }
-                    }
+                    bottomBar = { BottomBarNavigation(navController) }
                 ) { padding ->
                     Box(
                         modifier = Modifier
@@ -59,9 +33,7 @@ class MainActivity : ComponentActivity() {
                             .padding(padding)
                             .consumeWindowInsets(padding)
                     ) {
-                        MainNavigation(
-                            navController
-                        )
+                        MainNavigation(navController)
                     }
                 }
             }
