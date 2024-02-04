@@ -32,9 +32,10 @@ import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.step
 @Composable
 fun StepsPage(
     uiState: CreateRecipeViewModel.Pages.StepsPage,
+    onStepTextFieldValueChange: (text: String, index: Int) -> Unit,
     onDeleteItemClick: (Int) -> Unit,
-    onStepTextFieldValueChange: (String) -> Unit,
-    onAddItemClick: () -> Unit,
+    onRecipeItemClick: (index: Int) -> Unit,
+    onAddButtonClick: () -> Unit,
     onNextButtonClick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -43,20 +44,20 @@ fun StepsPage(
     Scaffold(
         modifier = Modifier
             .pointerInput(Unit) {
-            detectTapGestures(onTap = {
-                focusManager.clearFocus()
-            })
-        },
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            },
         topBar = {
             CenterAlignedTopAppBar(title = {
                 Text(text = "Write down the recipe steps")
             })
         }
-    ) {
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = it.calculateTopPadding() + 16.dp)
+                .padding(top = paddingValues.calculateTopPadding() + 16.dp)
                 .padding(horizontal = 22.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -70,26 +71,19 @@ fun StepsPage(
                     RecipeStepItem(
                         index = index,
                         displayText = item.step,
-                        isTextEditable = false,
+                        closeIconVisible = uiState.recipeSteps.size > 1,
+                        onRecipeStepTextFieldChange = { text ->
+                            onStepTextFieldValueChange(text, index)
+                        },
                         onDeleteItemClick = onDeleteItemClick,
-                        onRecipeStepTextFieldChange = onStepTextFieldValueChange,
-                        keyboardController = keyBoardController
-                    )
-                }
-                item {
-                    RecipeStepItem(
-                        index = uiState.recipeSteps.size,
-                        displayText = uiState.typeField,
-                        onRecipeStepTextFieldChange = onStepTextFieldValueChange,
-                        closeIconVisible = false,
-                        isTextEditable = true,
+                        onRecipeItemClick = onRecipeItemClick,
                         keyboardController = keyBoardController
                     )
                 }
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = {
-                        onAddItemClick()
+                        onAddButtonClick()
                     }) {
                         Text(text = "Add more step")
                     }
@@ -111,8 +105,9 @@ fun StepsPagePreview() {
             recipeSteps = listOf(RecipeStep(1, "first"))
         ),
         onNextButtonClick = {},
-        onAddItemClick = {},
-        onStepTextFieldValueChange = {},
-        onDeleteItemClick = {}
+        onAddButtonClick = {},
+        onStepTextFieldValueChange = { _, _ -> },
+        onDeleteItemClick = {},
+        onRecipeItemClick = {}
     )
 }

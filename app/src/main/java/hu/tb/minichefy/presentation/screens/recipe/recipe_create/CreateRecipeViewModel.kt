@@ -45,12 +45,15 @@ class CreateRecipeViewModel @Inject constructor(
             val quantityCounter: Int = 1,
             val isQuantityHasError: Boolean = false,
             val defaultIconCollection: List<FoodIcon> = IconManager().foodIcons,
-            val selectedFoodIcon: FoodIcon = defaultIconCollection[Random.nextInt(0, defaultIconCollection.size)]
+            val selectedFoodIcon: FoodIcon = defaultIconCollection[Random.nextInt(
+                0,
+                defaultIconCollection.size
+            )]
         ) : Pages()
 
         data class StepsPage(
-            val typeField: String = "",
-            val recipeSteps: List<RecipeStep> = emptyList()
+            val stepTypeField: String = "",
+            val recipeSteps: List<RecipeStep> = listOf(RecipeStep(step = ""))
         ) : Pages()
     }
 
@@ -69,13 +72,15 @@ class CreateRecipeViewModel @Inject constructor(
         //basic page
         data class OnQuantityChange(val value: Int) : OnEvent()
         data class OnRecipeTitleChange(val text: String) : OnEvent()
-        data class OnSelectedIconChange(val icon: FoodIcon): OnEvent()
+        data class OnSelectedIconChange(val icon: FoodIcon) : OnEvent()
 
         //steps page
-        data class OnStepsFieldChange(val text: String) : OnEvent()
-        data class OnAddRecipeStep(val stepDescription: String) : OnEvent()
+        data class OnStepsFieldChange(val text: String, val index: Int) : OnEvent()
+        data class OnAddRecipeStepToList(val stepDescription: String) : OnEvent()
         data class OnDeleteRecipeStep(val index: Int) : OnEvent()
+        data class RecipeItemClick(val index: Int) : OnEvent()
         data object OnRecipeSave : OnEvent()
+        data object ClearStepField : OnEvent()
     }
 
     fun onEvent(event: OnEvent) {
@@ -114,30 +119,43 @@ class CreateRecipeViewModel @Inject constructor(
             }
 
             //steps page
-            is OnEvent.OnStepsFieldChange -> _stepsPageState.update {
-                it.copy(typeField = event.text)
-            }
-
-            is OnEvent.OnAddRecipeStep -> {
-                val updatedList = _stepsPageState.value.recipeSteps.toMutableList().apply {
-                    add(RecipeStep(step = event.stepDescription))
+            is OnEvent.OnStepsFieldChange -> {
+                val updatedRecipeSteps = stepsPageState.value.recipeSteps.toMutableList().apply {
+                    this[event.index] = RecipeStep(step = event.text)
                 }
                 _stepsPageState.update {
+                    it.copy(recipeSteps = updatedRecipeSteps)
+                }
+            }
+
+            is OnEvent.RecipeItemClick -> {
+                val selectedRecipeStep = stepsPageState.value.recipeSteps[event.index]
+                _stepsPageState.update {
                     it.copy(
-                        recipeSteps = updatedList,
-                        typeField = ""
+                        stepTypeField = selectedRecipeStep.step
                     )
                 }
             }
 
             is OnEvent.OnDeleteRecipeStep -> {
-                val updatedList = _stepsPageState.value.recipeSteps.toMutableList().apply {
+                val removedRecipeStepList = stepsPageState.value.recipeSteps.toMutableList().apply {
                     removeAt(event.index)
                 }
                 _stepsPageState.update {
-                    it.copy(recipeSteps = updatedList)
+                    it.copy(recipeSteps = removedRecipeStepList)
                 }
             }
+
+            is OnEvent.OnAddRecipeStepToList -> {
+                val recipeStepsPlusEmptyField = stepsPageState.value.recipeSteps.toMutableList().apply {
+                    add(RecipeStep(step = ""))
+                }
+                _stepsPageState.update {
+                    it.copy(recipeSteps = recipeStepsPlusEmptyField)
+                }
+            }
+
+            OnEvent.ClearStepField -> _stepsPageState.update { it.copy(stepTypeField = "") }
 
             OnEvent.OnRecipeSave -> viewModelScope.launch {
                 val createdRecipe = Recipe(
@@ -150,8 +168,11 @@ class CreateRecipeViewModel @Inject constructor(
                 _stepsPageState.value.recipeSteps.forEach {
                     repository.saveStep(it, resultId)
                 }
-                if (_stepsPageState.value.typeField.isNotBlank()) {
-                    repository.saveStep(RecipeStep(step = stepsPageState.value.typeField), resultId)
+                if (_stepsPageState.value.stepTypeField.isNotBlank()) {
+                    repository.saveStep(
+                        RecipeStep(step = stepsPageState.value.stepTypeField),
+                        resultId
+                    )
                 }
                 _uiEvent.send(UiEvent.OnRecipeCreateFinish)
             }

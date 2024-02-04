@@ -16,7 +16,6 @@ import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,17 +33,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RecipeStepItem(
     index: Int,
     displayText: String,
+    closeIconVisible: Boolean = true,
+    isTextEditable: Boolean = true,
+    keyboardController: SoftwareKeyboardController?,
     onRecipeStepTextFieldChange: (text: String) -> Unit,
     onDeleteItemClick: (Int) -> Unit = {},
-    closeIconVisible: Boolean = true,
-    isTextEditable: Boolean,
-    keyboardController: SoftwareKeyboardController?
+    onRecipeItemClick: (Int) -> Unit,
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -53,8 +54,10 @@ fun RecipeStepItem(
         val (counterBox,
             textCard,
             closeIcon,
-            line
+            line,
         ) = createRefs()
+
+        val endGuideline = createGuidelineFromEnd(48.dp)
 
         Box(
             modifier = Modifier
@@ -99,11 +102,12 @@ fun RecipeStepItem(
                 .padding(bottom = 18.dp)
                 .constrainAs(textCard, constrainBlock = {
                     start.linkTo(counterBox.end)
-                    end.linkTo(closeIcon.start)
+                    end.linkTo(endGuideline)
                     top.linkTo(parent.top)
                     width = Dimension.fillToConstraints
                 })
-                .padding(start = 16.dp),
+                .padding(start = 16.dp)
+                .clickableWithoutRipple { onRecipeItemClick(index) },
             colors = CardDefaults.elevatedCardColors(
                 containerColor = MaterialTheme.colorScheme.primary
                     .copy(alpha = 0.7f)
@@ -126,15 +130,18 @@ fun RecipeStepItem(
             )
         }
 
-        IconButton(
+        Box(
             modifier = Modifier
                 .constrainAs(closeIcon, constrainBlock = {
                     top.linkTo(parent.top)
+                    start.linkTo(endGuideline)
                     end.linkTo(parent.end)
-                }),
-            onClick = {
-                onDeleteItemClick(index)
-            }) {
+                })
+                .clickableWithoutRipple {
+                    onDeleteItemClick(index)
+                },
+            contentAlignment = Alignment.Center
+        ) {
             if (closeIconVisible) {
                 Icon(
                     modifier = Modifier,
@@ -157,6 +164,7 @@ fun RecipeStepItemPreview() {
         displayText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer sed elit ligula. Sed pharetra luctus maximus. Donec vestibulum purus nec vestibulum bibendum. Nunc sapien ligula, dictum at lacus ut, tempus finibus lacus. Vivamus et augue ut quam rutrum sagittis ac at sem. Vivamus in libero ut nisi malesuada imperdiet.",
         onDeleteItemClick = {},
         onRecipeStepTextFieldChange = {},
+        onRecipeItemClick = {},
         isTextEditable = true,
         keyboardController = keyboardController
     )

@@ -36,7 +36,7 @@ fun CreateRecipe(
         }
     }
 
-    LaunchedEffect(key1 = pager.settledPage){
+    LaunchedEffect(key1 = pager.settledPage) {
         viewModel.onEvent(OnEvent.PageChange(pager.settledPage))
     }
 
@@ -62,9 +62,15 @@ fun CreateRecipe(
                 StepsPage(
                     uiState = stepsPageState,
                     onDeleteItemClick = { viewModel.onEvent(OnEvent.OnDeleteRecipeStep(it)) },
-                    onStepTextFieldValueChange = { viewModel.onEvent(OnEvent.OnStepsFieldChange(it)) },
-                    onAddItemClick = { viewModel.onEvent(OnEvent.OnAddRecipeStep(stepsPageState.typeField)) },
-                    onNextButtonClick = { viewModel.onEvent(OnEvent.OnRecipeSave) }
+                    onStepTextFieldValueChange = { text, index ->
+                        viewModel.onEvent(OnEvent.OnStepsFieldChange(text, index))
+                    },
+                    onAddButtonClick = {
+                        viewModel.onEvent(OnEvent.OnAddRecipeStepToList(stepsPageState.stepTypeField))
+                        viewModel.onEvent(OnEvent.ClearStepField)
+                    },
+                    onNextButtonClick = { viewModel.onEvent(OnEvent.OnRecipeSave) },
+                    onRecipeItemClick = { viewModel.onEvent(OnEvent.RecipeItemClick(it)) }
                 )
         }
     }
