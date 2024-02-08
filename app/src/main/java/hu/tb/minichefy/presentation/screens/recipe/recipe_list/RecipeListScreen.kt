@@ -12,11 +12,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -39,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.Recipe
+import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.SettingsPanel
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
@@ -84,12 +83,7 @@ fun RecipeListScreenContent(
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = onFloatingButtonClick) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "create new recipe"
-                )
-            }
+            PlusFAB { onFloatingButtonClick() }
         },
         content = { paddingValues ->
             Column(
