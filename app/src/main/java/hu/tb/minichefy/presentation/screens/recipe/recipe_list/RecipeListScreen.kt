@@ -24,7 +24,6 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,18 +52,11 @@ fun RecipeListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.uiEvent.collect { event ->
-            when (event) {
-                is RecipeListViewModel.UiEvent.OnRecipeClick -> onItemClick(event.recipeId)
-            }
-        }
-    }
-
     RecipeListScreenContent(
         uiState = uiState,
         onEvent = viewModel::onEvent,
         onFloatingButtonClick = onFloatingButtonClick,
+        onRecipeItemClick = onItemClick
     )
 }
 
@@ -74,6 +66,7 @@ fun RecipeListScreenContent(
     uiState: RecipeListViewModel.UiState,
     onEvent: (RecipeListViewModel.OnEvent) -> Unit,
     onFloatingButtonClick: () -> Unit,
+    onRecipeItemClick: (Long) -> Unit
 ) {
     val haptics =
         LocalHapticFeedback.current //docs related https://developer.android.com/jetpack/compose/touch-input/pointer-input/tap-and-press
@@ -155,13 +148,7 @@ fun RecipeListScreenContent(
                         RecipeItem(
                             modifier = Modifier
                                 .combinedClickable(
-                                    onClick = {
-                                        onEvent(
-                                            RecipeListViewModel.OnEvent.OnRecipeClick(
-                                                recipe.id!!
-                                            )
-                                        )
-                                    },
+                                    onClick = { onRecipeItemClick(recipe.id!!) },
                                     onLongClick = {
                                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                         onEvent(
@@ -208,5 +195,6 @@ fun RecipeListScreenPreview() {
         ),
         onEvent = {},
         onFloatingButtonClick = {},
+        onRecipeItemClick = {}
     )
 }

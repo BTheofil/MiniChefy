@@ -5,12 +5,10 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.Recipe
 import hu.tb.minichefy.domain.repository.RecipeRepository
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,15 +31,7 @@ class RecipeListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
 
-    sealed class UiEvent {
-        data class OnRecipeClick(val recipeId: Long) : UiEvent()
-    }
-
-    private val _uiEvent = Channel<UiEvent>()
-    val uiEvent = _uiEvent.receiveAsFlow()
-
     sealed class OnEvent {
-        data class OnRecipeClick(val recipeId: Long) : OnEvent()
         data class OpenRecipeSettingsPanel(val recipeId: Long) : OnEvent()
         data class SearchTextChange(val text: String) : OnEvent()
         data object DeleteRecipe : OnEvent()
@@ -62,10 +52,6 @@ class RecipeListViewModel @Inject constructor(
 
     fun onEvent(event: OnEvent) {
         when (event) {
-            is OnEvent.OnRecipeClick -> viewModelScope.launch {
-                _uiEvent.send(UiEvent.OnRecipeClick(event.recipeId))
-            }
-
             OnEvent.DeleteRecipe -> viewModelScope.launch {
                 repository.deleteRecipe(uiState.value.selectedRecipeId!!)
             }
