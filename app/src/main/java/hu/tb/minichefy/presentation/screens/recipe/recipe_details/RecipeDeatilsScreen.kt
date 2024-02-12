@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import hu.tb.minichefy.domain.model.Recipe
+import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info.CircleImage
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.DetailsRecipeStepItem

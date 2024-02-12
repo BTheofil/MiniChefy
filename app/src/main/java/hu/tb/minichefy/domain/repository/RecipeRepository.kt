@@ -1,7 +1,7 @@
 package hu.tb.minichefy.domain.repository
 
-import hu.tb.minichefy.domain.model.Recipe
-import hu.tb.minichefy.domain.model.RecipeStep
+import hu.tb.minichefy.domain.model.recipe.Recipe
+import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import kotlinx.coroutines.flow.Flow
 
 interface RecipeRepository {
@@ -14,7 +14,7 @@ interface RecipeRepository {
 
     suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long
 
-    suspend fun deleteRecipe(id: Long)
+    suspend fun deleteRecipe(id: Long): Int
 
     suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe>
 }

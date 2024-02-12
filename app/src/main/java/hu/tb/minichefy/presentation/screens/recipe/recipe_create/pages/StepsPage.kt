@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hu.tb.minichefy.domain.model.RecipeStep
+import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.steps.RecipeStepItem
 

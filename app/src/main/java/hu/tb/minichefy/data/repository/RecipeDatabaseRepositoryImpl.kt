@@ -1,11 +1,11 @@
 package hu.tb.minichefy.data.repository
 
-import hu.tb.minichefy.data.data_source.db.RecipeDAO
+import hu.tb.minichefy.data.data_source.recipe.RecipeDAO
 import hu.tb.minichefy.data.mapper.RecipeEntityToRecipe
-import hu.tb.minichefy.domain.model.Recipe
-import hu.tb.minichefy.domain.model.RecipeStep
-import hu.tb.minichefy.domain.model.toRecipeEntity
-import hu.tb.minichefy.domain.model.toRecipeStepEntity
+import hu.tb.minichefy.domain.model.recipe.Recipe
+import hu.tb.minichefy.domain.model.recipe.RecipeStep
+import hu.tb.minichefy.domain.model.recipe.toRecipeEntity
+import hu.tb.minichefy.domain.model.recipe.toRecipeStepEntity
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -31,7 +31,7 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
     override suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long =
         dao.insertStep(step.toRecipeStepEntity(recipeEntityId))
 
-    override suspend fun deleteRecipe(id: Long) = dao.deleteRecipe(id)
+    override suspend fun deleteRecipe(id: Long): Int = dao.deleteRecipe(id)
 
     override suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe> {
         val recipes = dao.searchRecipeByTitle("%$searchTitle%")

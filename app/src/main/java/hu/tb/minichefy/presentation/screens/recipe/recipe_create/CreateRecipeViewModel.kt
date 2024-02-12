@@ -3,8 +3,8 @@ package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.tb.minichefy.domain.model.Recipe
-import hu.tb.minichefy.domain.model.RecipeStep
+import hu.tb.minichefy.domain.model.recipe.Recipe
+import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
 import hu.tb.minichefy.domain.use_case.ValidationResult
@@ -62,7 +62,6 @@ class CreateRecipeViewModel @Inject constructor(
 
     sealed class UiEvent {
         data object PageChange : UiEvent()
-        data object OnRecipeCreateFinish : UiEvent()
     }
 
     sealed class OnEvent {
@@ -174,7 +173,6 @@ class CreateRecipeViewModel @Inject constructor(
                         resultId
                     )
                 }
-                _uiEvent.send(UiEvent.OnRecipeCreateFinish)
             }
         }
     }

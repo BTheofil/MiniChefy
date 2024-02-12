@@ -11,8 +11,8 @@ fun NavController.navigateToStorageList() {
     this.navigate(MAIN_STORAGE_ROUTE)
 }
 
-fun NavGraphBuilder.storageListNavigation(){
+fun NavGraphBuilder.storageListNavigation(navigateToCreateScreen: () -> Unit){
     composable(route = MAIN_STORAGE_ROUTE){
-        StorageListScreen()
+        StorageListScreen(onFABClick = navigateToCreateScreen)
     }
 }

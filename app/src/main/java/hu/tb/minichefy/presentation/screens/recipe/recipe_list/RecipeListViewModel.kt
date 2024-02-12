@@ -3,7 +3,7 @@ package hu.tb.minichefy.presentation.screens.recipe.recipe_list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.tb.minichefy.domain.model.Recipe
+import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,11 +38,11 @@ class RecipeListViewModel @Inject constructor(
         data object ClearText : OnEvent()
     }
 
-    private val allRecipes = repository.getAllRecipe()
+    //private val allRecipes = repository.getAllRecipe()
 
     init {
         viewModelScope.launch {
-            allRecipes.collectLatest { data ->
+            repository.getAllRecipe().collectLatest { data ->
                 _uiState.update {
                     it.copy(recipeList = data)
                 }

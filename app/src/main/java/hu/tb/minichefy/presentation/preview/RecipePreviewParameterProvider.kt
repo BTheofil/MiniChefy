@@ -1,8 +1,8 @@
 package hu.tb.minichefy.presentation.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import hu.tb.minichefy.domain.model.Recipe
-import hu.tb.minichefy.domain.model.RecipeStep
+import hu.tb.minichefy.domain.model.recipe.Recipe
+import hu.tb.minichefy.domain.model.recipe.RecipeStep
 
 class RecipePreviewParameterProvider : PreviewParameterProvider<Recipe> {
     override val values: Sequence<Recipe> = sequenceOf(

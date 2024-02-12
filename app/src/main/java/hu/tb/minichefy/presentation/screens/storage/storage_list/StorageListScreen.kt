@@ -29,23 +29,26 @@ import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.Sto
 
 @Composable
 fun StorageListScreen(
-    viewModel: StorageListViewModel = hiltViewModel()
+    viewModel: StorageListViewModel = hiltViewModel(),
+    onFABClick: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     StorageScreenContent(
-        uiState = uiState
+        uiState = uiState,
+        onFABClick = onFABClick
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StorageScreenContent(
-    uiState: StorageListViewModel.UiState
+    uiState: StorageListViewModel.UiState,
+    onFABClick: () -> Unit,
 ) {
     Scaffold(
         floatingActionButton = {
-            PlusFAB {}
+            PlusFAB(onClick = onFABClick)
         }
     ) {
         Column(
@@ -107,5 +110,5 @@ fun MainScreenContentPreview() {
             filterList = listOf("fruit", "vegetable"),
             foodList = listOf("apple", "pear", "banana", "melon", "onion")
         )
-    )
+    ){}
 }

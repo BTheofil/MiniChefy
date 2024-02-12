@@ -31,7 +31,6 @@ fun CreateRecipe(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 UiEvent.PageChange -> pager.animateScrollToPage(uiState.targetPageIndex)
-                UiEvent.OnRecipeCreateFinish -> onFinishRecipeButtonClick()
             }
         }
     }
@@ -69,7 +68,10 @@ fun CreateRecipe(
                         viewModel.onEvent(OnEvent.OnAddRecipeStepToList(stepsPageState.stepTypeField))
                         viewModel.onEvent(OnEvent.ClearStepField)
                     },
-                    onNextButtonClick = { viewModel.onEvent(OnEvent.OnRecipeSave) },
+                    onNextButtonClick = {
+                        viewModel.onEvent(OnEvent.OnRecipeSave)
+                        onFinishRecipeButtonClick()
+                    },
                     onRecipeItemClick = { viewModel.onEvent(OnEvent.RecipeItemClick(it)) }
                 )
         }

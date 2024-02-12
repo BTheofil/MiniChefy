@@ -1,6 +1,6 @@
-package hu.tb.minichefy.domain.model
+package hu.tb.minichefy.domain.model.recipe
 
-import hu.tb.minichefy.domain.model.entity.RecipeEntity
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
 
 data class Recipe(
     val id: Long? = null,

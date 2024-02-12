@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import hu.tb.minichefy.domain.model.Recipe
+import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.SettingsPanel

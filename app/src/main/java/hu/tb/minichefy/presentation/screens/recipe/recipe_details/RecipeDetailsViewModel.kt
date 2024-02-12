@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.tb.minichefy.domain.model.Recipe
+import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.navigation.RECIPE_ID_ARGUMENT_KEY
 import kotlinx.coroutines.flow.MutableStateFlow

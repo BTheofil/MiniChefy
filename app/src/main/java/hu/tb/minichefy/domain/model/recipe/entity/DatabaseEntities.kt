@@ -1,4 +1,4 @@
-package hu.tb.minichefy.domain.model.entity
+package hu.tb.minichefy.domain.model.recipe.entity
 
 import androidx.room.Embedded
 import androidx.room.Entity

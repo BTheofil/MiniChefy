@@ -1,12 +1,12 @@
-package hu.tb.minichefy.data.data_source.db
+package hu.tb.minichefy.data.data_source.recipe
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import hu.tb.minichefy.domain.model.entity.RecipeEntity
-import hu.tb.minichefy.domain.model.entity.RecipeWithSteps
-import hu.tb.minichefy.domain.model.entity.RecipeStepEntity
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeWithSteps
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeStepEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -25,7 +25,7 @@ interface RecipeDAO {
     suspend fun insertStep(stepEntity: RecipeStepEntity): Long
 
     @Query("DELETE FROM RecipeEntity WHERE recipeId = :id")
-    suspend fun deleteRecipe(id: Long)
+    suspend fun deleteRecipe(id: Long): Int
 
     @Query("SELECT * FROM RecipeEntity WHERE title LIKE :searchTitle")
     suspend fun searchRecipeByTitle(searchTitle: String): List<RecipeWithSteps>

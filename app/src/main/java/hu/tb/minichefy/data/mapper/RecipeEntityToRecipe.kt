@@ -1,8 +1,8 @@
 package hu.tb.minichefy.data.mapper
 
-import hu.tb.minichefy.domain.model.Recipe
-import hu.tb.minichefy.domain.model.RecipeStep
-import hu.tb.minichefy.domain.model.entity.RecipeWithSteps
+import hu.tb.minichefy.domain.model.recipe.Recipe
+import hu.tb.minichefy.domain.model.recipe.RecipeStep
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeWithSteps
 
 class RecipeEntityToRecipe {
 

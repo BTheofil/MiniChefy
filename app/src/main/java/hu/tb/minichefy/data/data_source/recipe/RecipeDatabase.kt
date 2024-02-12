@@ -1,9 +1,9 @@
-package hu.tb.minichefy.data.data_source.db
+package hu.tb.minichefy.data.data_source.recipe
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import hu.tb.minichefy.domain.model.entity.RecipeEntity
-import hu.tb.minichefy.domain.model.entity.RecipeStepEntity
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeStepEntity
 
 @Database(entities = [RecipeEntity::class, RecipeStepEntity::class], version = 1, exportSchema = false)
 abstract class RecipeDatabase: RoomDatabase() {

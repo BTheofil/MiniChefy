@@ -3,9 +3,9 @@ package hu.tb.minichefy.data.data_source
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import hu.tb.minichefy.data.data_source.db.RecipeDAO
-import hu.tb.minichefy.data.data_source.db.RecipeDatabase
-import hu.tb.minichefy.domain.model.entity.RecipeEntity
+import hu.tb.minichefy.data.data_source.recipe.RecipeDAO
+import hu.tb.minichefy.data.data_source.recipe.RecipeDatabase
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
