@@ -41,6 +41,8 @@ import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.SettingsPanel
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
+import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
+import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 import kotlinx.coroutines.launch
 
 @Composable
@@ -92,7 +94,7 @@ fun RecipeListScreenContent(
                 SearchBar(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = SCREEN_HORIZONTAL_PADDING, vertical = SCREEN_VERTICAL_PADDING)
                         .onFocusChanged {
                             isSearchClearIconVisible = it.hasFocus
                         },

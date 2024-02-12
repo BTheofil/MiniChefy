@@ -50,7 +50,7 @@ val menuItems = listOf(
 
 sealed class BottomNavigationItem(val icon: Int, val label: String, val route: String) {
     data object Storage :
-        BottomNavigationItem(R.drawable.outline_storage_24, "Storage", STORAGE_GRAPH)
+        BottomNavigationItem(R.drawable.fridge_icon, "Storage", STORAGE_GRAPH)
 
     data object Recipe : BottomNavigationItem(R.drawable.outline_book_24, "Recipe", RECIPE_GRAPH)
 }

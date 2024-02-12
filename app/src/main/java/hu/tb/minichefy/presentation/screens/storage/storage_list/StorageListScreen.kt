@@ -24,8 +24,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import hu.tb.minichefy.domain.model.storage.Food
+import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.StorageItem
+import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
+import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 
 @Composable
 fun StorageListScreen(
@@ -36,7 +40,8 @@ fun StorageListScreen(
 
     StorageScreenContent(
         uiState = uiState,
-        onFABClick = onFABClick
+        onFABClick = onFABClick,
+        onEvent = viewModel::onEvent
     )
 }
 
@@ -45,6 +50,7 @@ fun StorageListScreen(
 fun StorageScreenContent(
     uiState: StorageListViewModel.UiState,
     onFABClick: () -> Unit,
+    onEvent: (StorageListViewModel.OnEvent) -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
@@ -55,7 +61,7 @@ fun StorageScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
-                .padding(horizontal = 22.dp, vertical = 8.dp)
+                .padding(horizontal = SCREEN_HORIZONTAL_PADDING, vertical = SCREEN_VERTICAL_PADDING)
         ) {
             SearchBar(
                 modifier = Modifier
@@ -88,14 +94,30 @@ fun StorageScreenContent(
             LazyVerticalGrid(
                 modifier = Modifier
                     .fillMaxWidth(),
-                columns = GridCells.Fixed(3),
+                columns = GridCells.Fixed(2),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(
                     items = uiState.foodList
-                ) {
-                    StorageItem()
+                ) { food ->
+                    StorageItem(food = food,
+                        onAddClick = {
+                            onEvent(
+                                StorageListViewModel.OnEvent.FoodUnitChanged(
+                                    food.id!!,
+                                    +1
+                                )
+                            )
+                        },
+                        onRemoveClick = {
+                            onEvent(
+                                StorageListViewModel.OnEvent.FoodUnitChanged(
+                                    food.id!!,
+                                    -1
+                                )
+                            )
+                        })
                 }
             }
         }
@@ -108,7 +130,20 @@ fun MainScreenContentPreview() {
     StorageScreenContent(
         StorageListViewModel.UiState(
             filterList = listOf("fruit", "vegetable"),
-            foodList = listOf("apple", "pear", "banana", "melon", "onion")
-        )
-    ){}
+            foodList = listOf(
+                Food(
+                    title = "apple",
+                    quantity = 2,
+                    unitOfMeasurement = UnitOfMeasurement.KG
+                ),
+                Food(
+                    title = "banana",
+                    quantity = 4,
+                    unitOfMeasurement = UnitOfMeasurement.DKG
+                )
+            )
+        ),
+        onEvent = {},
+        onFABClick = {}
+    )
 }
