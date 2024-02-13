@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.components.QuestionRowAnswer
 import hu.tb.minichefy.presentation.screens.storage.storage_create.components.RadioButtonWithText
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
@@ -52,7 +51,7 @@ fun StorageCreateContent(
     uiState: StorageCreateViewModel.UiState,
     onEvent: (StorageCreateViewModel.OnEvent) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(true) }
+    var expanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -115,12 +114,14 @@ fun StorageCreateContent(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "asd",
+                        text = if (uiState.selectedFoodUnitOfMeasurement != null) uiState.selectedFoodUnitOfMeasurement.toString() else "",
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
-                    IconButton(onClick = { expanded = true }) {
+                    IconButton(onClick = {
+                        expanded = true
+                    }) {
                         Icon(
                             Icons.Outlined.MoreVert,
                             contentDescription = "Unit od measurement dropdown icon",
@@ -132,11 +133,20 @@ fun StorageCreateContent(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
                 ) {
-                    repeat(UnitOfMeasurement.entries.size) {
-                        DropdownMenuItem(
-                            text = { Text(UnitOfMeasurement.entries[it].toString()) },
-                            onClick = { /* TODO */ }
-                        )
+                    repeat(uiState.foodUnitOfMeasurement.size) { index ->
+                        uiState.foodUnitOfMeasurement[index].also { uom ->
+                            DropdownMenuItem(
+                                text = { Text(uom.toString()) },
+                                onClick = {
+                                    onEvent(
+                                        StorageCreateViewModel.OnEvent.FoodUnitChange(
+                                            uom
+                                        )
+                                    )
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }

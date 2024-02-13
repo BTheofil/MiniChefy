@@ -17,10 +17,11 @@ class StorageCreateViewModel @Inject constructor(
     data class UiState(
         val foodTitleText: String = "",
         val foodType: FoodType? = null,
-        val foodUnitOfMeasurement: List<UnitOfMeasurement> = UnitOfMeasurement.entries
+        val foodUnitOfMeasurement: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
+        val selectedFoodUnitOfMeasurement: UnitOfMeasurement? = null
     )
 
-    enum class FoodType(val displayText: String){
+    enum class FoodType(val displayText: String) {
         LIQUID("Liquid"),
         SOLID("Solid")
     }
@@ -43,21 +44,28 @@ class StorageCreateViewModel @Inject constructor(
             }
 
             is OnEvent.FoodTypeChange -> {
-                when(event.type){
+                when (event.type) {
                     FoodType.LIQUID -> {
                         _uiState.update {
-                            it.copy(foodUnitOfMeasurement = listOf(
-                                UnitOfMeasurement.L,
-                                UnitOfMeasurement.DL
-                            ))
+                            it.copy(
+                                foodUnitOfMeasurement = listOf(
+                                    UnitOfMeasurement.L,
+                                    UnitOfMeasurement.DL
+                                ),
+                                selectedFoodUnitOfMeasurement = null
+                            )
                         }
                     }
+
                     FoodType.SOLID -> _uiState.update {
-                        it.copy(foodUnitOfMeasurement = listOf(
-                            UnitOfMeasurement.KG,
-                            UnitOfMeasurement.DKG,
-                            UnitOfMeasurement.G,
-                        ))
+                        it.copy(
+                            foodUnitOfMeasurement = listOf(
+                                UnitOfMeasurement.KG,
+                                UnitOfMeasurement.DKG,
+                                UnitOfMeasurement.G,
+                            ),
+                            selectedFoodUnitOfMeasurement = null
+                        )
                     }
                 }
 
@@ -65,8 +73,13 @@ class StorageCreateViewModel @Inject constructor(
                     it.copy(foodType = event.type)
                 }
             }
-            is OnEvent.FoodUnitChange -> {
 
+            is OnEvent.FoodUnitChange -> {
+                _uiState.update {
+                    it.copy(
+                        selectedFoodUnitOfMeasurement = event.type
+                    )
+                }
             }
         }
     }
