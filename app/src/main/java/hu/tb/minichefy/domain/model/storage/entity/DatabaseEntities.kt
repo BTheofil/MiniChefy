@@ -5,11 +5,18 @@ import androidx.room.PrimaryKey
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 
 @Entity
-data class StorageFoodEntity(
+data class FoodEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long?,
     val title: String,
     val quantity: Int,
     val unitOfMeasurement: UnitOfMeasurement,
     val type: String
+)
+
+@Entity
+data class FoodTagEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long?,
+    val tag: String
 )

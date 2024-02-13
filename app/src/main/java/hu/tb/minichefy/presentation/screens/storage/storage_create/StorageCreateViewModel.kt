@@ -1,12 +1,15 @@
 package hu.tb.minichefy.presentation.screens.storage.storage_create
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,6 +33,7 @@ class StorageCreateViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     sealed class OnEvent {
+        data object Save: OnEvent()
         data class FoodTextChange(val text: String) : OnEvent()
         data class FoodTypeChange(val type: FoodType) : OnEvent()
         data class FoodUnitChange(val type: UnitOfMeasurement) : OnEvent()
@@ -79,6 +83,21 @@ class StorageCreateViewModel @Inject constructor(
                     it.copy(
                         selectedFoodUnitOfMeasurement = event.type
                     )
+                }
+            }
+
+            OnEvent.Save -> {
+                viewModelScope.launch {
+                    uiState.value.also {
+                        storageRepository.saveOrModifyFoodEntity(
+                            Food(
+                                title = it.foodTitleText,
+                                quantity = 5,
+                                unitOfMeasurement = it.selectedFoodUnitOfMeasurement!!,
+                                type = ""
+                            )
+                        )
+                    }
                 }
             }
         }

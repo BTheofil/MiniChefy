@@ -1,11 +1,11 @@
 package hu.tb.minichefy.data.mapper
 
 import hu.tb.minichefy.domain.model.storage.Food
-import hu.tb.minichefy.domain.model.storage.entity.StorageFoodEntity
+import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
 
 class FoodEntityToFood {
 
-    fun map(from: StorageFoodEntity): Food = from.run {
+    fun map(from: FoodEntity): Food = from.run {
         Food(
             id = id,
             title = title,

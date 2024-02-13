@@ -1,5 +1,7 @@
 package hu.tb.minichefy.domain.model.storage
 
+import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
+
 data class Food(
     val id: Long? = null,
     val title: String,
@@ -8,7 +10,15 @@ data class Food(
     val type: String
 )
 
-enum class UnitOfMeasurement(val id: Int){
+fun Food.toFoodEntity() = FoodEntity(
+    id = this.id,
+    title = title,
+    quantity = quantity,
+    unitOfMeasurement = unitOfMeasurement,
+    type = type
+)
+
+enum class UnitOfMeasurement(val id: Int) {
     DL(1),
     L(2),
     G(3),
