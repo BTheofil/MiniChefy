@@ -26,10 +26,10 @@ import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.presentation.screens.recipe.components.iconVectorResource
+import hu.tb.minichefy.presentation.screens.components.icons.iconVectorResource
 import hu.tb.minichefy.presentation.ui.theme.Green500
 import hu.tb.minichefy.presentation.ui.theme.Red400
-import hu.tb.minichefy.presentation.ui.theme.SMALL_PADDING_BETWEEN_ELEMENTS
+import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 
 @Composable
 fun StorageItem(
@@ -69,13 +69,13 @@ fun StorageItem(
                         colorFilter = ColorFilter.tint(Red400)
                     )
                 }
-                Spacer(modifier = Modifier.width(SMALL_PADDING_BETWEEN_ELEMENTS))
+                Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
                 Text(
                     text = food.quantity.toString() + " " + food.unitOfMeasurement,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                 )
-                Spacer(modifier = Modifier.width(SMALL_PADDING_BETWEEN_ELEMENTS))
+                Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
                 IconButton(onClick = onAddClick) {
                     Image(
                         imageVector = Icons.Outlined.Add,
@@ -96,7 +96,8 @@ fun StorageItemPreview() {
         food = Food(
             title = "apple",
             quantity = 5,
-            unitOfMeasurement = UnitOfMeasurement.KG
+            unitOfMeasurement = UnitOfMeasurement.KG,
+            type = ""
         ),
         onAddClick = {},
         onRemoveClick = {}

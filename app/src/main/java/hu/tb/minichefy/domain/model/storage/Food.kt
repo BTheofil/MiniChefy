@@ -4,7 +4,8 @@ data class Food(
     val id: Long? = null,
     val title: String,
     val quantity: Int,
-    val unitOfMeasurement: UnitOfMeasurement
+    val unitOfMeasurement: UnitOfMeasurement,
+    val type: String
 )
 
 enum class UnitOfMeasurement(val id: Int){

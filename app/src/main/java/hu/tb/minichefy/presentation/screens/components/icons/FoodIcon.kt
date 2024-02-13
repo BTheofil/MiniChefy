@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.screens.recipe.components
+package hu.tb.minichefy.presentation.screens.components.icons
 
 import hu.tb.minichefy.R
 

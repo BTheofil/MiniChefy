@@ -1,15 +1,12 @@
 package hu.tb.minichefy.presentation.screens.storage.storage_create
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.domain.model.storage.entity.StorageFoodEntity
 import hu.tb.minichefy.domain.repository.StorageRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,37 +15,58 @@ class StorageCreateViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class UiState(
-        val id: Long? = null
+        val foodTitleText: String = "",
+        val foodType: FoodType? = null,
+        val foodUnitOfMeasurement: List<UnitOfMeasurement> = UnitOfMeasurement.entries
     )
+
+    enum class FoodType(val displayText: String){
+        LIQUID("Liquid"),
+        SOLID("Solid")
+    }
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
 
     sealed class OnEvent {
-        data object BtnClick : OnEvent()
-        data object OtherBtnClick: OnEvent()
+        data class FoodTextChange(val text: String) : OnEvent()
+        data class FoodTypeChange(val type: FoodType) : OnEvent()
+        data class FoodUnitChange(val type: UnitOfMeasurement) : OnEvent()
     }
 
     fun onEvent(event: OnEvent) {
         when (event) {
-            OnEvent.BtnClick -> {
-                viewModelScope.launch {
-                    val id = storageRepository.saveOrModifyFoodEntity(
-                        foodEntity = StorageFoodEntity(id = null, title = "apple", quantity = 1, unitOfMeasurement = UnitOfMeasurement.KG)
-                    )
-
-                    _uiState.update {
-                        it.copy(id = id)
-                    }
-                }
+            is OnEvent.FoodTextChange -> _uiState.update {
+                it.copy(
+                    foodTitleText = event.text
+                )
             }
 
-            OnEvent.OtherBtnClick -> {
-                viewModelScope.launch {
-                    storageRepository.saveOrModifyFoodEntity(
-                        StorageFoodEntity(id = uiState.value.id, "apple", quantity = 5, unitOfMeasurement = UnitOfMeasurement.DKG)
-                    )
+            is OnEvent.FoodTypeChange -> {
+                when(event.type){
+                    FoodType.LIQUID -> {
+                        _uiState.update {
+                            it.copy(foodUnitOfMeasurement = listOf(
+                                UnitOfMeasurement.L,
+                                UnitOfMeasurement.DL
+                            ))
+                        }
+                    }
+                    FoodType.SOLID -> _uiState.update {
+                        it.copy(foodUnitOfMeasurement = listOf(
+                            UnitOfMeasurement.KG,
+                            UnitOfMeasurement.DKG,
+                            UnitOfMeasurement.G,
+                        ))
+                    }
                 }
+
+                _uiState.update {
+                    it.copy(foodType = event.type)
+                }
+            }
+            is OnEvent.FoodUnitChange -> {
+
             }
         }
     }

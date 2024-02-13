@@ -134,12 +134,14 @@ fun MainScreenContentPreview() {
                 Food(
                     title = "apple",
                     quantity = 2,
-                    unitOfMeasurement = UnitOfMeasurement.KG
+                    unitOfMeasurement = UnitOfMeasurement.KG,
+                    type = "fruit"
                 ),
                 Food(
                     title = "banana",
                     quantity = 4,
-                    unitOfMeasurement = UnitOfMeasurement.DKG
+                    unitOfMeasurement = UnitOfMeasurement.DKG,
+                    type = "vegetable"
                 )
             )
         ),

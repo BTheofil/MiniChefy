@@ -10,7 +10,8 @@ class FoodEntityToFood {
             id = id,
             title = title,
             quantity = quantity,
-            unitOfMeasurement = unitOfMeasurement
+            unitOfMeasurement = unitOfMeasurement,
+            type = type
         )
     }
 }

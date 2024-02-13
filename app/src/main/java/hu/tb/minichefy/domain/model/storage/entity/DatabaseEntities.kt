@@ -10,5 +10,6 @@ data class StorageFoodEntity(
     val id: Long?,
     val title: String,
     val quantity: Int,
-    val unitOfMeasurement: UnitOfMeasurement
+    val unitOfMeasurement: UnitOfMeasurement,
+    val type: String
 )

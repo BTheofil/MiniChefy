@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hu.tb.minichefy.presentation.screens.recipe.components.FoodIcon
+import hu.tb.minichefy.presentation.screens.components.icons.FoodIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

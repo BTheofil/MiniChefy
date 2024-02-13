@@ -8,8 +8,8 @@ import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
 import hu.tb.minichefy.domain.use_case.ValidationResult
-import hu.tb.minichefy.presentation.screens.recipe.components.IconManager
-import hu.tb.minichefy.presentation.screens.recipe.components.FoodIcon
+import hu.tb.minichefy.presentation.screens.components.icons.IconManager
+import hu.tb.minichefy.presentation.screens.components.icons.FoodIcon
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
