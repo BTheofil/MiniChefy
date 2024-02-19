@@ -92,6 +92,8 @@ class StorageCreateViewModel @Inject constructor(
             }
 
             OnEvent.Save -> {
+
+
                 viewModelScope.launch {
                     uiState.value.also {
                         storageRepository.saveOrModifyFoodEntity(

@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -139,6 +140,7 @@ fun StorageCreateContent(
                         text = if (uiState.selectedFoodUnitOfMeasurement != null) uiState.selectedFoodUnitOfMeasurement.toString() else "",
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
                     IconButton(onClick = {
