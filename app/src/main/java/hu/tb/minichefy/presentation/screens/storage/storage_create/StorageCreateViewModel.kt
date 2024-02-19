@@ -21,7 +21,9 @@ class StorageCreateViewModel @Inject constructor(
         val foodTitleText: String = "",
         val foodType: FoodType? = null,
         val foodUnitOfMeasurement: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
-        val selectedFoodUnitOfMeasurement: UnitOfMeasurement? = null
+        val selectedFoodUnitOfMeasurement: UnitOfMeasurement? = null,
+        val tagList: List<String> = emptyList(),
+        val tagDialogValue: String = ""
     )
 
     enum class FoodType(val displayText: String) {
@@ -33,10 +35,13 @@ class StorageCreateViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     sealed class OnEvent {
-        data object Save: OnEvent()
+        data object Save : OnEvent()
+        data object AddTagToList: OnEvent()
+        data class TagValueChange(val text: String) : OnEvent()
         data class FoodTextChange(val text: String) : OnEvent()
         data class FoodTypeChange(val type: FoodType) : OnEvent()
         data class FoodUnitChange(val type: UnitOfMeasurement) : OnEvent()
+        data class RemoveTag(val index: Int) : OnEvent()
     }
 
     fun onEvent(event: OnEvent) {
@@ -98,6 +103,37 @@ class StorageCreateViewModel @Inject constructor(
                             )
                         )
                     }
+                }
+            }
+
+            is OnEvent.TagValueChange -> {
+                _uiState.update {
+                    it.copy(
+                        tagDialogValue = event.text
+                    )
+                }
+            }
+
+            OnEvent.AddTagToList -> {
+                val temp = uiState.value.tagList.toMutableList()
+                temp.add(uiState.value.tagDialogValue)
+                _uiState.update {
+                    it.copy(
+                        tagList = temp,
+                        tagDialogValue = ""
+                    )
+                }
+
+            }
+
+            is OnEvent.RemoveTag -> {
+                val temp = uiState.value.tagList.toMutableList()
+                temp.removeAt(event.index)
+                _uiState.update {
+                    it.copy(
+                        tagList = temp,
+                        tagDialogValue = ""
+                    )
                 }
             }
         }
