@@ -26,9 +26,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hu.tb.minichefy.presentation.screens.components.icons.FoodIcon
+import hu.tb.minichefy.presentation.screens.components.icons.MealIcon
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
-import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info.CircleImage
+import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info.QuestionForm
 import kotlinx.coroutines.launch
@@ -41,7 +41,7 @@ fun InformationPage(
     onRemoveQuantityClick: () -> Unit,
     onAddQuantityClick: () -> Unit,
     onNextPageClick: () -> Unit,
-    onSelectedIconClick: (icon: FoodIcon) -> Unit
+    onSelectedIconClick: (icon: MealIcon) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -63,7 +63,7 @@ fun InformationPage(
             .padding(top = 22.dp)
     ) {
         CircleImage(
-            image = uiState.selectedFoodIcon.resource,
+            image = uiState.selectedMealIcon.resource,
             borderWidth = 2.dp,
             borderColor = MaterialTheme.colorScheme.primary,
             borderShape = CircleShape,
@@ -111,8 +111,8 @@ fun InformationPage(
         if (showIconPicker) {
             IconSelectorSheet(
                 sheetState = sheetState,
-                foodIconList = uiState.defaultIconCollection,
-                selectedFoodIcon = uiState.selectedFoodIcon,
+                mealIconList = uiState.defaultIconCollection,
+                selectedMealIcon = uiState.selectedMealIcon,
                 onItemClick = {
                     onSelectedIconClick(it)
                 },

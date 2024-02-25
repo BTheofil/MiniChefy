@@ -11,7 +11,7 @@ class FoodEntityToFood {
             title = title,
             quantity = quantity,
             unitOfMeasurement = unitOfMeasurement,
-            type = type
+            foodTagList = tagList
         )
     }
 }

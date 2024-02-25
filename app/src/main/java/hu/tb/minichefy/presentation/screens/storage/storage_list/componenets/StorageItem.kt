@@ -97,7 +97,7 @@ fun StorageItemPreview() {
             title = "apple",
             quantity = 5,
             unitOfMeasurement = UnitOfMeasurement.KG,
-            type = ""
+            foodTagList = null
         ),
         onAddClick = {},
         onRemoveClick = {}

@@ -7,16 +7,16 @@ import kotlinx.coroutines.flow.Flow
 interface StorageRepository {
 
     //food
-    fun getAllFoodEntity(): Flow<List<Food>>
+    fun getAllFood(): Flow<List<Food>>
 
-    suspend fun saveOrModifyFoodEntity(food: Food): Long
+    suspend fun saveOrModifyFood(food: Food): Long
 
-    suspend fun deleteFoodEntity(id: Long): Int
+    suspend fun deleteFoodById(id: Long): Int
 
     //tag
-    fun getAllFoodTagEntity(): Flow<List<FoodTag>>
+    fun getAllFoodTag(): Flow<List<FoodTag>>
 
-    suspend fun saveOrModifyFoodTagEntity(tag: FoodTag): Long
+    suspend fun saveOrModifyFoodTag(tag: FoodTag): Long
 
-    suspend fun deleteFoodTagEntity(id: Long): Int
+    suspend fun deleteFoodTag(id: Long): Int
 }

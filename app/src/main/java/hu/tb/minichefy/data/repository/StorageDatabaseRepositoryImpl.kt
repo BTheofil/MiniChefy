@@ -16,7 +16,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
 ) : StorageRepository {
 
     //food
-    override fun getAllFoodEntity(): Flow<List<Food>> {
+    override fun getAllFood(): Flow<List<Food>> {
         val foodsEntities = dao.getAllStorageFood()
         return foodsEntities.map { storageFoodEntities ->
             storageFoodEntities.map {
@@ -25,14 +25,14 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveOrModifyFoodEntity(food: Food): Long =
+    override suspend fun saveOrModifyFood(food: Food): Long =
         dao.saveOrModifyFood(food.toFoodEntity())
 
-    override suspend fun deleteFoodEntity(id: Long): Int =
+    override suspend fun deleteFoodById(id: Long): Int =
         dao.deleteFoodEntity(id)
 
     //tag
-    override fun getAllFoodTagEntity(): Flow<List<FoodTag>> {
+    override fun getAllFoodTag(): Flow<List<FoodTag>> {
         val tagEntities = dao.getAllFoodTag()
         return tagEntities.map { entities ->
             entities.map {
@@ -44,8 +44,8 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveOrModifyFoodTagEntity(tag: FoodTag): Long =
+    override suspend fun saveOrModifyFoodTag(tag: FoodTag): Long =
         dao.saveOrModifyFoodTag(tag.toFoodTagEntity())
 
-    override suspend fun deleteFoodTagEntity(id: Long): Int = dao.deleteFoodTag(id)
+    override suspend fun deleteFoodTag(id: Long): Int = dao.deleteFoodTag(id)
 }

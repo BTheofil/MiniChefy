@@ -24,15 +24,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hu.tb.minichefy.presentation.screens.components.icons.FoodIcon
+import hu.tb.minichefy.presentation.screens.components.icons.MealIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IconSelectorSheet(
     sheetState: SheetState,
-    foodIconList: List<FoodIcon>,
-    selectedFoodIcon: FoodIcon,
-    onItemClick: (foodIcon: FoodIcon) -> Unit,
+    mealIconList: List<MealIcon>,
+    selectedMealIcon: MealIcon,
+    onItemClick: (mealIcon: MealIcon) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     ModalBottomSheet(
@@ -48,7 +48,7 @@ fun IconSelectorSheet(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(
-                items = foodIconList
+                items = mealIconList
             ) { foodIcon ->
                 ElevatedButton(
                     modifier = Modifier
@@ -58,7 +58,7 @@ fun IconSelectorSheet(
                     elevation = ButtonDefaults.elevatedButtonElevation(
                         defaultElevation = 3.dp
                     ),
-                    border = if (foodIcon == selectedFoodIcon) BorderStroke(
+                    border = if (foodIcon == selectedMealIcon) BorderStroke(
                         8.dp,
                         MaterialTheme.colorScheme.primary
                     ) else null
@@ -80,8 +80,8 @@ fun IconSelectorSheet(
 fun IconSelectorSheetPreview() {
     IconSelectorSheet(
         sheetState = rememberModalBottomSheetState(),
-        foodIconList = emptyList(),
-        selectedFoodIcon = FoodIcon.JUNK_FOOD,
+        mealIconList = emptyList(),
+        selectedMealIcon = MealIcon.JUNK_FOOD,
         onItemClick = {},
         onDismissRequest = {})
 }

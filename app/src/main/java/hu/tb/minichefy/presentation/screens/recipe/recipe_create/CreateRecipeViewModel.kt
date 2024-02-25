@@ -9,7 +9,7 @@ import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.presentation.screens.components.icons.IconManager
-import hu.tb.minichefy.presentation.screens.components.icons.FoodIcon
+import hu.tb.minichefy.presentation.screens.components.icons.MealIcon
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,8 +44,8 @@ class CreateRecipeViewModel @Inject constructor(
             val recipeName: String = "",
             val quantityCounter: Int = 1,
             val isQuantityHasError: Boolean = false,
-            val defaultIconCollection: List<FoodIcon> = IconManager().foodIcons,
-            val selectedFoodIcon: FoodIcon = defaultIconCollection[Random.nextInt(
+            val defaultIconCollection: List<MealIcon> = IconManager().allSystemMealIconLists,
+            val selectedMealIcon: MealIcon = defaultIconCollection[Random.nextInt(
                 0,
                 defaultIconCollection.size
             )]
@@ -71,7 +71,7 @@ class CreateRecipeViewModel @Inject constructor(
         //basic page
         data class OnQuantityChange(val value: Int) : OnEvent()
         data class OnRecipeTitleChange(val text: String) : OnEvent()
-        data class OnSelectedIconChange(val icon: FoodIcon) : OnEvent()
+        data class OnSelectedIconChange(val icon: MealIcon) : OnEvent()
 
         //steps page
         data class OnStepsFieldChange(val text: String, val index: Int) : OnEvent()
@@ -114,7 +114,7 @@ class CreateRecipeViewModel @Inject constructor(
 
 
             is OnEvent.OnSelectedIconChange -> _basicPageState.update {
-                it.copy(selectedFoodIcon = event.icon)
+                it.copy(selectedMealIcon = event.icon)
             }
 
             //steps page
@@ -158,7 +158,7 @@ class CreateRecipeViewModel @Inject constructor(
 
             OnEvent.OnRecipeSave -> viewModelScope.launch {
                 val createdRecipe = Recipe(
-                    icon = basicPageState.value.selectedFoodIcon.resource,
+                    icon = basicPageState.value.selectedMealIcon.resource,
                     title = basicPageState.value.recipeName,
                     quantity = basicPageState.value.quantityCounter,
                     howToSteps = emptyList()

@@ -37,7 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
-import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info.CircleImage
+import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.DetailsRecipeStepItem
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.QuickInfoItem
 import java.util.Locale

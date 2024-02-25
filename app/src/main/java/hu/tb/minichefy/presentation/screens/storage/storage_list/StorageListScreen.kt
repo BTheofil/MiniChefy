@@ -135,13 +135,13 @@ fun MainScreenContentPreview() {
                     title = "apple",
                     quantity = 2,
                     unitOfMeasurement = UnitOfMeasurement.KG,
-                    type = "fruit"
+                    foodTagList = null
                 ),
                 Food(
                     title = "banana",
                     quantity = 4,
                     unitOfMeasurement = UnitOfMeasurement.DKG,
-                    type = "vegetable"
+                    foodTagList = null
                 )
             )
         ),

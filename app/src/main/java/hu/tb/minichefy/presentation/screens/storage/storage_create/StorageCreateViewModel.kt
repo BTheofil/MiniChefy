@@ -5,7 +5,10 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.domain.model.storage.entity.FoodTagListWrapper
 import hu.tb.minichefy.domain.repository.StorageRepository
+import hu.tb.minichefy.presentation.screens.components.icons.IconManager
+import hu.tb.minichefy.presentation.screens.components.icons.ProductIcon
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,10 +21,11 @@ class StorageCreateViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class UiState(
-        val foodTitleText: String = "",
-        val foodType: FoodType? = null,
-        val foodUnitOfMeasurement: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
-        val selectedFoodUnitOfMeasurement: UnitOfMeasurement? = null,
+        val productIcon: ProductIcon = IconManager().getRandomProduct(),
+        val productTitleText: String = "",
+        val productType: FoodType? = null,
+        val productUnitOfMeasurement: UnitOfMeasurement? = null,
+        val availableUnitOfMeasurementList: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
         val tagList: List<String> = emptyList(),
         val tagDialogValue: String = ""
     )
@@ -36,7 +40,7 @@ class StorageCreateViewModel @Inject constructor(
 
     sealed class OnEvent {
         data object Save : OnEvent()
-        data object AddTagToList: OnEvent()
+        data object AddTagToList : OnEvent()
         data class TagValueChange(val text: String) : OnEvent()
         data class FoodTextChange(val text: String) : OnEvent()
         data class FoodTypeChange(val type: FoodType) : OnEvent()
@@ -48,7 +52,7 @@ class StorageCreateViewModel @Inject constructor(
         when (event) {
             is OnEvent.FoodTextChange -> _uiState.update {
                 it.copy(
-                    foodTitleText = event.text
+                    productTitleText = event.text
                 )
             }
 
@@ -57,51 +61,49 @@ class StorageCreateViewModel @Inject constructor(
                     FoodType.LIQUID -> {
                         _uiState.update {
                             it.copy(
-                                foodUnitOfMeasurement = listOf(
+                                availableUnitOfMeasurementList = listOf(
                                     UnitOfMeasurement.L,
                                     UnitOfMeasurement.DL
                                 ),
-                                selectedFoodUnitOfMeasurement = null
+                                productUnitOfMeasurement = null
                             )
                         }
                     }
 
                     FoodType.SOLID -> _uiState.update {
                         it.copy(
-                            foodUnitOfMeasurement = listOf(
+                            availableUnitOfMeasurementList = listOf(
                                 UnitOfMeasurement.KG,
                                 UnitOfMeasurement.DKG,
                                 UnitOfMeasurement.G,
                             ),
-                            selectedFoodUnitOfMeasurement = null
+                            productUnitOfMeasurement = null
                         )
                     }
                 }
 
                 _uiState.update {
-                    it.copy(foodType = event.type)
+                    it.copy(productType = event.type)
                 }
             }
 
             is OnEvent.FoodUnitChange -> {
                 _uiState.update {
                     it.copy(
-                        selectedFoodUnitOfMeasurement = event.type
+                        productUnitOfMeasurement = event.type
                     )
                 }
             }
 
             OnEvent.Save -> {
-
-
                 viewModelScope.launch {
                     uiState.value.also {
-                        storageRepository.saveOrModifyFoodEntity(
+                        storageRepository.saveOrModifyFood(
                             Food(
-                                title = it.foodTitleText,
+                                title = it.productTitleText,
                                 quantity = 5,
-                                unitOfMeasurement = it.selectedFoodUnitOfMeasurement!!,
-                                type = ""
+                                unitOfMeasurement = it.productUnitOfMeasurement!!,
+                                foodTagList = FoodTagListWrapper(emptyList())
                             )
                         )
                     }

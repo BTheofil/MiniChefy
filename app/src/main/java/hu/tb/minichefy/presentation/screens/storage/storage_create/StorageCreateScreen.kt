@@ -40,11 +40,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.components.QuestionRowAnswer
 import hu.tb.minichefy.presentation.screens.storage.storage_create.components.RadioButtonWithText
 import hu.tb.minichefy.presentation.ui.components.bottomBorder
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
+import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 
 @Composable
@@ -72,11 +74,15 @@ fun StorageCreateContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = SCREEN_HORIZONTAL_PADDING)
+            .padding(horizontal = SCREEN_HORIZONTAL_PADDING, vertical = SCREEN_VERTICAL_PADDING)
     ) {
+        CircleImage(
+            image = uiState.productIcon.resource
+        )
+
         QuestionRowAnswer(
             questionText = "Title:",
-            textFieldValue = uiState.foodTitleText,
+            textFieldValue = uiState.productTitleText,
             onTextFieldValueChange = { onEvent(StorageCreateViewModel.OnEvent.FoodTextChange(it)) }
         )
         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
@@ -97,7 +103,7 @@ fun StorageCreateContent(
                     StorageCreateViewModel.FoodType.entries[foodTypeIndex].also {
                         RadioButtonWithText(
                             displayText = it.displayText,
-                            isSelected = uiState.foodType == it,
+                            isSelected = uiState.productType == it,
                             onClick = {
                                 onEvent(
                                     StorageCreateViewModel.OnEvent.FoodTypeChange(
@@ -137,7 +143,7 @@ fun StorageCreateContent(
                                 color = MaterialTheme.colorScheme.primary,
                                 strokeWidth = 1.dp
                             ),
-                        text = if (uiState.selectedFoodUnitOfMeasurement != null) uiState.selectedFoodUnitOfMeasurement.toString() else "",
+                        text = if (uiState.productUnitOfMeasurement != null) uiState.productUnitOfMeasurement.toString() else "",
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center
@@ -157,8 +163,8 @@ fun StorageCreateContent(
                     expanded = isUnitMenuExpanded,
                     onDismissRequest = { isUnitMenuExpanded = false },
                 ) {
-                    repeat(uiState.foodUnitOfMeasurement.size) { index ->
-                        uiState.foodUnitOfMeasurement[index].also { uom ->
+                    repeat(uiState.availableUnitOfMeasurementList.size) { index ->
+                        uiState.availableUnitOfMeasurementList[index].also { uom ->
                             DropdownMenuItem(
                                 text = { Text(uom.toString()) },
                                 onClick = {
@@ -203,8 +209,16 @@ fun StorageCreateContent(
             }
         }
 
-        Button(onClick = { onEvent(StorageCreateViewModel.OnEvent.Save) }) {
-            Text(text = "Save")
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(bottom = 32.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Button(onClick = { onEvent(StorageCreateViewModel.OnEvent.Save) }) {
+                Text(text = "Save")
+            }
         }
     }
 
