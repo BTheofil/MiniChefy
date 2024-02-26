@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import com.google.gson.Gson
+import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 
 @Entity
@@ -16,15 +17,23 @@ data class FoodEntity(
     val tagList: FoodTagListWrapper?
 )
 
+data class FoodTagListWrapper(
+    val foodTagList : List<FoodTagEntity>
+)
+
+fun FoodTagListWrapper.toFoodTag(): List<FoodTag> =
+    foodTagList.map {
+        FoodTag(
+            it.id,
+            it.tag
+        )
+    }
+
 @Entity
 data class FoodTagEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long?,
     val tag: String
-)
-
-data class FoodTagListWrapper(
-    val foodTagList : List<FoodTagEntity>
 )
 
 class RoomTypeConverters{

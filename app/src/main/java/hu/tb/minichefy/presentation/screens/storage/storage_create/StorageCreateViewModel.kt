@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.storage.Food
+import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.domain.model.storage.entity.FoodTagListWrapper
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.presentation.screens.components.icons.IconManager
 import hu.tb.minichefy.presentation.screens.components.icons.ProductIcon
@@ -20,13 +20,26 @@ class StorageCreateViewModel @Inject constructor(
     private val storageRepository: StorageRepository
 ) : ViewModel() {
 
+    init {
+        viewModelScope.launch {
+            storageRepository.getAllFoodTag().collect { tags ->
+                _uiState.update {
+                    it.copy(
+                        allProductTagList = tags
+                    )
+                }
+            }
+        }
+    }
+
     data class UiState(
         val productIcon: ProductIcon = IconManager().getRandomProduct(),
         val productTitleText: String = "",
         val productType: FoodType? = null,
-        val productUnitOfMeasurement: UnitOfMeasurement? = null,
+        val productUnitOfMeasurement: UnitOfMeasurement = UnitOfMeasurement.entries.first(),
         val availableUnitOfMeasurementList: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
-        val tagList: List<String> = emptyList(),
+        val selectedTagList: List<FoodTag> = emptyList(),
+        val allProductTagList: List<FoodTag> = emptyList(),
         val tagDialogValue: String = ""
     )
 
@@ -40,12 +53,10 @@ class StorageCreateViewModel @Inject constructor(
 
     sealed class OnEvent {
         data object Save : OnEvent()
-        data object AddTagToList : OnEvent()
-        data class TagValueChange(val text: String) : OnEvent()
         data class FoodTextChange(val text: String) : OnEvent()
         data class FoodTypeChange(val type: FoodType) : OnEvent()
         data class FoodUnitChange(val type: UnitOfMeasurement) : OnEvent()
-        data class RemoveTag(val index: Int) : OnEvent()
+        data class DialogChipTouched(val index: Int) : OnEvent()
     }
 
     fun onEvent(event: OnEvent) {
@@ -62,10 +73,10 @@ class StorageCreateViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 availableUnitOfMeasurementList = listOf(
-                                    UnitOfMeasurement.L,
-                                    UnitOfMeasurement.DL
+                                    UnitOfMeasurement.DL,
+                                    UnitOfMeasurement.L
                                 ),
-                                productUnitOfMeasurement = null
+                                productUnitOfMeasurement = UnitOfMeasurement.DL
                             )
                         }
                     }
@@ -73,11 +84,11 @@ class StorageCreateViewModel @Inject constructor(
                     FoodType.SOLID -> _uiState.update {
                         it.copy(
                             availableUnitOfMeasurementList = listOf(
-                                UnitOfMeasurement.KG,
-                                UnitOfMeasurement.DKG,
                                 UnitOfMeasurement.G,
+                                UnitOfMeasurement.DKG,
+                                UnitOfMeasurement.KG,
                             ),
-                            productUnitOfMeasurement = null
+                            productUnitOfMeasurement = UnitOfMeasurement.G,
                         )
                     }
                 }
@@ -102,41 +113,25 @@ class StorageCreateViewModel @Inject constructor(
                             Food(
                                 title = it.productTitleText,
                                 quantity = 5,
-                                unitOfMeasurement = it.productUnitOfMeasurement!!,
-                                foodTagList = FoodTagListWrapper(emptyList())
+                                unitOfMeasurement = it.productUnitOfMeasurement,
+                                foodTagList = it.selectedTagList
                             )
                         )
                     }
                 }
             }
 
-            is OnEvent.TagValueChange -> {
-                _uiState.update {
-                    it.copy(
-                        tagDialogValue = event.text
-                    )
+            is OnEvent.DialogChipTouched -> {
+                val selectedElement = uiState.value.allProductTagList[event.index]
+                val updatedTagList = uiState.value.selectedTagList.toMutableList()
+                if (uiState.value.selectedTagList.contains(selectedElement)) {
+                    updatedTagList.remove(selectedElement)
+                } else {
+                    updatedTagList.add(uiState.value.allProductTagList[event.index])
                 }
-            }
-
-            OnEvent.AddTagToList -> {
-                val temp = uiState.value.tagList.toMutableList()
-                temp.add(uiState.value.tagDialogValue)
                 _uiState.update {
                     it.copy(
-                        tagList = temp,
-                        tagDialogValue = ""
-                    )
-                }
-
-            }
-
-            is OnEvent.RemoveTag -> {
-                val temp = uiState.value.tagList.toMutableList()
-                temp.removeAt(event.index)
-                _uiState.update {
-                    it.copy(
-                        tagList = temp,
-                        tagDialogValue = ""
+                        selectedTagList = updatedTagList
                     )
                 }
             }

@@ -1,6 +1,7 @@
 package hu.tb.minichefy.domain.model.storage
 
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
+import hu.tb.minichefy.domain.model.storage.entity.FoodTagEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodTagListWrapper
 
 data class Food(
@@ -8,7 +9,7 @@ data class Food(
     val title: String,
     val quantity: Int,
     val unitOfMeasurement: UnitOfMeasurement,
-    val foodTagList: FoodTagListWrapper?
+    val foodTagList: List<FoodTag>?
 )
 
 fun Food.toFoodEntity() = FoodEntity(
@@ -16,7 +17,11 @@ fun Food.toFoodEntity() = FoodEntity(
     title = title,
     quantity = quantity,
     unitOfMeasurement = unitOfMeasurement,
-    tagList = foodTagList
+    tagList = this.foodTagList?.let { foodTags ->
+        FoodTagListWrapper(foodTagList = foodTags.map {
+            FoodTagEntity(it.id, it.tag)
+        })
+    }
 )
 
 enum class UnitOfMeasurement(val id: Int) {

@@ -2,6 +2,7 @@ package hu.tb.minichefy.data.mapper
 
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
+import hu.tb.minichefy.domain.model.storage.entity.toFoodTag
 
 class FoodEntityToFood {
 
@@ -11,7 +12,7 @@ class FoodEntityToFood {
             title = title,
             quantity = quantity,
             unitOfMeasurement = unitOfMeasurement,
-            foodTagList = tagList
+            foodTagList = tagList?.toFoodTag()
         )
     }
 }

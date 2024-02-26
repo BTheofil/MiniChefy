@@ -21,12 +21,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.components.QuestionRowAnswer
 import hu.tb.minichefy.presentation.screens.storage.storage_create.components.RadioButtonWithText
@@ -143,7 +144,7 @@ fun StorageCreateContent(
                                 color = MaterialTheme.colorScheme.primary,
                                 strokeWidth = 1.dp
                             ),
-                        text = if (uiState.productUnitOfMeasurement != null) uiState.productUnitOfMeasurement.toString() else "",
+                        text = uiState.productUnitOfMeasurement.toString(),
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center
@@ -200,11 +201,11 @@ fun StorageCreateContent(
                         contentDescription = "add more tag icon chip"
                     )
                 })
-            repeat(uiState.tagList.size) {
+            repeat(uiState.selectedTagList.size) {
                 AssistChip(
-                    onClick = { onEvent(StorageCreateViewModel.OnEvent.RemoveTag(it)) },
+                    onClick = { isTagPopupVisible = true },
                     label = {
-                        Text(text = uiState.tagList[it])
+                        Text(text = uiState.selectedTagList[it].tag)
                     })
             }
         }
@@ -236,25 +237,32 @@ fun StorageCreateContent(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    TextField(
-                        value = uiState.tagDialogValue,
-                        onValueChange = {
-                            onEvent(StorageCreateViewModel.OnEvent.TagValueChange(it))
-                        },
-                        label = {
-                            Text(text = "Write new tag")
-                        })
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS)
+                    ) {
+                        repeat(uiState.allProductTagList.size) {
+                            FilterChip(
+                                selected = uiState.selectedTagList.contains(uiState.allProductTagList[it]),
+                                onClick = {
+                                    onEvent(StorageCreateViewModel.OnEvent.DialogChipTouched(it))
+                                },
+                                label = {
+                                    Text(
+                                        text = uiState.allProductTagList[it].tag,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                })
+                        }
+                    }
                     Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         OutlinedButton(onClick = { isTagPopupVisible = false }) {
-                            Text(text = "Close")
-                        }
-                        Button(onClick = { onEvent(StorageCreateViewModel.OnEvent.AddTagToList) }) {
-                            Text(text = "Add")
+                            Text(text = "Done")
                         }
                     }
                 }
@@ -266,5 +274,12 @@ fun StorageCreateContent(
 @Preview
 @Composable
 fun StorageCreateContentPreview() {
-    StorageCreateContent(StorageCreateViewModel.UiState()) {}
+    StorageCreateContent(
+        StorageCreateViewModel.UiState(
+            allProductTagList = listOf(
+                FoodTag(0, "fruit"),
+                FoodTag(2, "vegetable"),
+            )
+        )
+    ) {}
 }
