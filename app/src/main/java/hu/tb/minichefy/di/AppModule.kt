@@ -10,9 +10,13 @@ import hu.tb.minichefy.data.data_source.recipe.RecipeDatabase
 import hu.tb.minichefy.data.data_source.storage.StorageDatabase
 import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
 import hu.tb.minichefy.data.repository.StorageDatabaseRepositoryImpl
+import hu.tb.minichefy.domain.model.storage.entity.FoodTagEntity
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
 @Module
@@ -41,13 +45,28 @@ object AppModule {
     @Singleton
     fun provideStorageDatabase(
         app: Application
-    ): StorageDatabase =
-        Room.databaseBuilder(
+    ): StorageDatabase {
+        val db = Room.databaseBuilder(
             app,
             StorageDatabase::class.java,
             StorageDatabase.DATABASE_NAME
         )
             .build()
+
+        val dbFile = app.applicationContext.getDatabasePath(StorageDatabase.DATABASE_NAME)
+        if (!dbFile.exists()){
+            CoroutineScope(Dispatchers.IO).launch {
+                db.storageDao.saveOrModifyFoodTag(
+                    FoodTagEntity(id = null, tag = "fruit")
+                )
+                db.storageDao.saveOrModifyFoodTag(
+                    FoodTagEntity(id = null, tag = "vegetable")
+                )
+            }
+        }
+
+        return db
+    }
 
     @Provides
     @Singleton
