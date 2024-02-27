@@ -4,22 +4,15 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -38,9 +30,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
+import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.SettingsPanel
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
+import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 import kotlinx.coroutines.launch
@@ -79,9 +73,6 @@ fun RecipeListScreenContent(
     val modalSheetState = rememberModalBottomSheetState()
 
     val focusManager = LocalFocusManager.current
-    var isSearchClearIconVisible by remember {
-        mutableStateOf(false)
-    }
 
     Scaffold(
         floatingActionButton = {
@@ -89,43 +80,23 @@ fun RecipeListScreenContent(
         },
         content = { paddingValues ->
             Column(
-                modifier = Modifier.padding(paddingValues)
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(
+                        horizontal = SCREEN_HORIZONTAL_PADDING,
+                        vertical = SCREEN_VERTICAL_PADDING
+                    )
             ) {
-                SearchBar(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = SCREEN_HORIZONTAL_PADDING, vertical = SCREEN_VERTICAL_PADDING)
-                        .onFocusChanged {
-                            isSearchClearIconVisible = it.hasFocus
-                        },
-                    query = uiState.searchRecipeText,
+                SearchItemBar(
+                    queryText = uiState.searchRecipeText,
                     onQueryChange = {
                         onEvent(RecipeListViewModel.OnEvent.SearchTextChange(it))
                     },
-                    onSearch = {
-                        focusManager.clearFocus()
-                    },
-                    active = false,
-                    onActiveChange = {},
-                    leadingIcon = {
-                        Icon(imageVector = Icons.Rounded.Search, contentDescription = "search icon")
-                    },
-                    trailingIcon = {
-                        if (isSearchClearIconVisible) {
-                            IconButton(onClick = { onEvent(RecipeListViewModel.OnEvent.ClearText) }) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Clear,
-                                    contentDescription = "clear text icon"
-                                )
-                            }
-                        }
-                    },
-                    placeholder = {
-                        Text(text = "Search recipe")
-                    },
-                    content = {}
+                    clearIconButtonClick = {
+                        onEvent(RecipeListViewModel.OnEvent.ClearText)
+                    }
                 )
-
+                Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                 LazyVerticalGrid(
                     modifier = Modifier
                         .fillMaxSize()
@@ -133,7 +104,6 @@ fun RecipeListScreenContent(
                             focusManager.clearFocus()
                         },
                     columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -161,7 +131,6 @@ fun RecipeListScreenContent(
                 }
             }
 
-
             if (settingPanelVisible) {
                 SettingsPanel(
                     modalSheetState = modalSheetState,
@@ -186,7 +155,7 @@ fun RecipeListScreenPreview() {
     RecipeListScreenContent(
         uiState = RecipeListViewModel.UiState(
             recipeList = listOf(
-                Recipe(0, 1,"test", quantity = 1, howToSteps = emptyList())
+                Recipe(0, 2131099677, "test", quantity = 1, howToSteps = emptyList())
             )
         ),
         onEvent = {},

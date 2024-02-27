@@ -84,7 +84,7 @@ fun StorageCreateContent(
         CircleImage(
             image = uiState.productIcon.resource
         )
-
+        Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         QuestionRowAnswer(
             questionText = "Title:",
             textFieldValue = uiState.productTitleText,

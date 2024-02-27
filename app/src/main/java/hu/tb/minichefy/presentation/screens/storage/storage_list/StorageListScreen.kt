@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
+import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.StorageItem
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
@@ -56,25 +56,18 @@ fun StorageScreenContent(
         floatingActionButton = {
             PlusFAB(onClick = onFABClick)
         }
-    ) {
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
+                .padding(paddingValues)
                 .padding(horizontal = SCREEN_HORIZONTAL_PADDING, vertical = SCREEN_VERTICAL_PADDING)
         ) {
-            SearchBar(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                query = uiState.searchText,
-                onQueryChange = {},
-                onSearch = {},
-                placeholder = {
-                    Text(text = "Search food")
-                },
-                active = false,
-                onActiveChange = {}
-            ) {}
+            SearchItemBar(
+                queryText = uiState.searchText,
+                onQueryChange = { onEvent(StorageListViewModel.OnEvent.SearchTextChange(it)) },
+                clearIconButtonClick = { onEvent(StorageListViewModel.OnEvent.ClearSearch) }
+            )
             Spacer(modifier = Modifier.height(22.dp))
             LazyRow(
                 modifier = Modifier
