@@ -11,17 +11,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -201,11 +205,17 @@ fun StorageCreateContent(
                         contentDescription = "add more tag icon chip"
                     )
                 })
-            repeat(uiState.selectedTagList.size) {
+            uiState.selectedTagList.forEach { tagItem ->
                 AssistChip(
-                    onClick = { isTagPopupVisible = true },
+                    onClick = { onEvent(StorageCreateViewModel.OnEvent.DialogChipTouched(tagItem)) },
                     label = {
-                        Text(text = uiState.selectedTagList[it].tag)
+                        Text(text = tagItem.tag)
+                    },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Rounded.Close,
+                            contentDescription = "remove tag icon"
+                        )
                     })
             }
         }
@@ -240,19 +250,31 @@ fun StorageCreateContent(
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS)
                     ) {
-                        repeat(uiState.allProductTagList.size) {
+                        uiState.allProductTagList.forEach { tagItem ->
                             FilterChip(
-                                selected = uiState.selectedTagList.contains(uiState.allProductTagList[it]),
+                                selected = uiState.selectedTagList.contains(tagItem),
                                 onClick = {
-                                    onEvent(StorageCreateViewModel.OnEvent.DialogChipTouched(it))
+                                    onEvent(StorageCreateViewModel.OnEvent.DialogChipTouched(tagItem))
                                 },
                                 label = {
                                     Text(
-                                        text = uiState.allProductTagList[it].tag,
+                                        text = tagItem.tag,
                                         color = MaterialTheme.colorScheme.primary,
                                         style = MaterialTheme.typography.labelLarge
                                     )
-                                })
+                                },
+                                leadingIcon = if (uiState.selectedTagList.contains(tagItem)) {
+                                    {
+                                        Icon(
+                                            imageVector = Icons.Filled.Done,
+                                            contentDescription = "Done icon",
+                                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                                        )
+                                    }
+                                } else {
+                                    null
+                                },
+                            )
                         }
                     }
                     Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))

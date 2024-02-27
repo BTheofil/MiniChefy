@@ -35,7 +35,7 @@ class StorageCreateViewModel @Inject constructor(
     data class UiState(
         val productIcon: ProductIcon = IconManager().getRandomProduct(),
         val productTitleText: String = "",
-        val productType: FoodType? = null,
+        val productType: FoodType? = FoodType.LIQUID,
         val productUnitOfMeasurement: UnitOfMeasurement = UnitOfMeasurement.entries.first(),
         val availableUnitOfMeasurementList: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
         val selectedTagList: List<FoodTag> = emptyList(),
@@ -56,7 +56,7 @@ class StorageCreateViewModel @Inject constructor(
         data class FoodTextChange(val text: String) : OnEvent()
         data class FoodTypeChange(val type: FoodType) : OnEvent()
         data class FoodUnitChange(val type: UnitOfMeasurement) : OnEvent()
-        data class DialogChipTouched(val index: Int) : OnEvent()
+        data class DialogChipTouched(val editedTag: FoodTag) : OnEvent()
     }
 
     fun onEvent(event: OnEvent) {
@@ -122,12 +122,11 @@ class StorageCreateViewModel @Inject constructor(
             }
 
             is OnEvent.DialogChipTouched -> {
-                val selectedElement = uiState.value.allProductTagList[event.index]
                 val updatedTagList = uiState.value.selectedTagList.toMutableList()
-                if (uiState.value.selectedTagList.contains(selectedElement)) {
-                    updatedTagList.remove(selectedElement)
+                if (uiState.value.selectedTagList.contains(event.editedTag)) {
+                    updatedTagList.remove(event.editedTag)
                 } else {
-                    updatedTagList.add(uiState.value.allProductTagList[event.index])
+                    updatedTagList.add(event.editedTag)
                 }
                 _uiState.update {
                     it.copy(
