@@ -6,6 +6,7 @@ import androidx.navigation.compose.navigation
 import hu.tb.minichefy.presentation.screens.storage.storage_create.navigation.navigateToStorageCreate
 import hu.tb.minichefy.presentation.screens.storage.storage_create.navigation.storageCreateNavigation
 import hu.tb.minichefy.presentation.screens.storage.storage_list.navigation.MAIN_STORAGE_ROUTE
+import hu.tb.minichefy.presentation.screens.storage.storage_list.navigation.navigateToStorageList
 import hu.tb.minichefy.presentation.screens.storage.storage_list.navigation.storageListNavigation
 
 const val STORAGE_GRAPH = "storage_graph"
@@ -16,6 +17,8 @@ fun NavGraphBuilder.storageNestedGraph(navController: NavController){
             navigateToCreateScreen = navController::navigateToStorageCreate
         )
 
-        storageCreateNavigation()
+        storageCreateNavigation(
+            navigateToListScreen = navController::navigateToStorageList
+        )
     }
 }

@@ -11,8 +11,10 @@ fun NavController.navigateToStorageCreate() {
     this.navigate(STORAGE_CREATE_ROUTE)
 }
 
-fun NavGraphBuilder.storageCreateNavigation(){
+fun NavGraphBuilder.storageCreateNavigation(navigateToListScreen: () -> Unit) {
     composable(route = STORAGE_CREATE_ROUTE){
-        StorageCreateScreen()
+        StorageCreateScreen(
+            saveSuccess = navigateToListScreen
+        )
     }
 }

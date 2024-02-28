@@ -9,8 +9,10 @@ import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.presentation.screens.components.icons.IconManager
 import hu.tb.minichefy.presentation.screens.components.icons.ProductIcon
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,6 +40,7 @@ class StorageCreateViewModel @Inject constructor(
         val productType: FoodType? = FoodType.LIQUID,
         val productUnitOfMeasurement: UnitOfMeasurement = UnitOfMeasurement.entries.first(),
         val availableUnitOfMeasurementList: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
+        val quantity: String = "",
         val selectedTagList: List<FoodTag> = emptyList(),
         val allProductTagList: List<FoodTag> = emptyList(),
         val tagDialogValue: String = ""
@@ -56,7 +59,15 @@ class StorageCreateViewModel @Inject constructor(
         data class FoodTextChange(val text: String) : OnEvent()
         data class FoodTypeChange(val type: FoodType) : OnEvent()
         data class FoodUnitChange(val type: UnitOfMeasurement) : OnEvent()
+        data class FoodQuantityChange(val quantity: String) : OnEvent()
         data class DialogChipTouched(val editedTag: FoodTag) : OnEvent()
+    }
+
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
+
+    sealed class UiEvent {
+        data object SaveSuccess : UiEvent()
     }
 
     fun onEvent(event: OnEvent) {
@@ -112,12 +123,13 @@ class StorageCreateViewModel @Inject constructor(
                         storageRepository.saveOrModifyFood(
                             Food(
                                 title = it.productTitleText,
-                                quantity = 5,
+                                quantity = it.quantity.toInt(),
                                 unitOfMeasurement = it.productUnitOfMeasurement,
                                 foodTagList = it.selectedTagList
                             )
                         )
                     }
+                    _uiEvent.send(UiEvent.SaveSuccess)
                 }
             }
 
@@ -131,6 +143,20 @@ class StorageCreateViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         selectedTagList = updatedTagList
+                    )
+                }
+            }
+
+            is OnEvent.FoodQuantityChange -> {
+                val value = if(event.quantity.isEmpty() || event.quantity.isBlank() || event.quantity == "-"){
+                    ""
+                } else {
+                    event.quantity
+                }
+
+                _uiState.update {
+                    it.copy(
+                        quantity = value
                     )
                 }
             }
