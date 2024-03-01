@@ -12,7 +12,7 @@ data class FoodEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long?,
     val title: String,
-    val quantity: Int,
+    val quantity: Float,
     val unitOfMeasurement: UnitOfMeasurement,
     val tagList: FoodTagListWrapper?
 )

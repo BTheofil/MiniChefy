@@ -124,13 +124,13 @@ fun MainScreenContentPreview() {
             foodList = listOf(
                 Food(
                     title = "apple",
-                    quantity = 2,
+                    quantity = 2f,
                     unitOfMeasurement = UnitOfMeasurement.KG,
                     foodTagList = null
                 ),
                 Food(
                     title = "banana",
-                    quantity = 4,
+                    quantity = 4f,
                     unitOfMeasurement = UnitOfMeasurement.DKG,
                     foodTagList = null
                 )

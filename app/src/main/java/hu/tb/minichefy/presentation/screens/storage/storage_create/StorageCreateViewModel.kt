@@ -123,7 +123,7 @@ class StorageCreateViewModel @Inject constructor(
                         storageRepository.saveOrModifyFood(
                             Food(
                                 title = it.productTitleText,
-                                quantity = it.quantity.toInt(),
+                                quantity = it.quantity.toFloat(),
                                 unitOfMeasurement = it.productUnitOfMeasurement,
                                 foodTagList = it.selectedTagList
                             )

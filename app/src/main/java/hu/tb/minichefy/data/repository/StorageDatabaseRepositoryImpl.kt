@@ -4,7 +4,6 @@ import hu.tb.minichefy.data.data_source.storage.StorageDAO
 import hu.tb.minichefy.data.mapper.FoodEntityToFood
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
-import hu.tb.minichefy.domain.model.storage.toFoodEntity
 import hu.tb.minichefy.domain.model.storage.toFoodTagEntity
 import hu.tb.minichefy.domain.repository.StorageRepository
 import kotlinx.coroutines.flow.Flow

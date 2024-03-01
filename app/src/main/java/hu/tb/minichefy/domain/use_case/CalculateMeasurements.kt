@@ -1,91 +1,50 @@
 package hu.tb.minichefy.domain.use_case
 
+import hu.tb.minichefy.domain.model.storage.SimpleProduct
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 
 class CalculateMeasurements {
 
-    data class FoodResult(val quantity: Int, val unit: UnitOfMeasurement)
+    private val liquidRange = 1..2
+    private val massRange = 3..5
 
-    fun solidFoodCalculation(
-        numberOne: Int,
-        numberOneUnit: UnitOfMeasurement,
-        numberTwo: Int,
-        numberTwoUnit: UnitOfMeasurement,
+    fun simpleProductCalculations(
+        productBase: SimpleProduct,
+        productChanger: SimpleProduct,
         calculation: Calculation
-    ): FoodResult {
-        return if (numberOneUnit == numberTwoUnit) {
-            val quantity = performCalculation(numberOne, numberTwo, calculation)
-            FoodResult(quantity, numberOneUnit)
-        } else {
+    ): SimpleProduct {
+        val isLiquid =
+            productBase.unitOfMeasurement.id in liquidRange && productChanger.unitOfMeasurement.id in liquidRange
+        val isMass =
+            productBase.unitOfMeasurement.id in massRange && productChanger.unitOfMeasurement.id in massRange
 
-            if (numberOneUnit.id in 1..2 && numberTwoUnit.id in 1..2) {
-                val convertedNumberOne = convertToDeciliter(numberOne, numberOneUnit)
-                val convertedNumberTwo = convertToDeciliter(numberTwo, numberTwoUnit)
+        if (!isLiquid && !isMass) throw IllegalArgumentException("Not compatible unit of measurements")
 
-                val result = performCalculation(convertedNumberOne, convertedNumberTwo, calculation)
-                when {
-                    result >= 10 -> {
-                        FoodResult(result / 10, UnitOfMeasurement.L)
-                    }
+        val result = performCalculation(
+            productBase.convertToSmallestUnit(),
+            productChanger.convertToSmallestUnit(),
+            calculation
+        )
 
-                    else -> {
-                        FoodResult(result, UnitOfMeasurement.DL)
-                    }
-                }
-            } else if (numberOneUnit.id in 3..5 && numberTwoUnit.id in 3..5) {
-                val convertedNumberOne = convertToGrams(numberOne, numberOneUnit)
-                val convertedNumberTwo = convertToGrams(numberTwo, numberTwoUnit)
-
-                val result = performCalculation(convertedNumberOne, convertedNumberTwo, calculation)
-                when {
-                    result >= 1000 -> {
-                        FoodResult(result / 1000, UnitOfMeasurement.KG)
-                    }
-
-                    result >= 100 -> {
-                        FoodResult(result / 100, UnitOfMeasurement.DKG)
-                    }
-
-                    else -> {
-                        FoodResult(result, UnitOfMeasurement.G)
-                    }
-                }
-            } else {
-                throw IllegalArgumentException("Not the same type")
-            }
+        return when {
+            isLiquid && result >= 10 -> SimpleProduct(result / 10, UnitOfMeasurement.L)
+            isLiquid -> SimpleProduct(result, UnitOfMeasurement.DL)
+            result >= 1000 -> SimpleProduct(result / 1000, UnitOfMeasurement.KG)
+            result >= 10 -> SimpleProduct(result / 10, UnitOfMeasurement.DKG)
+            else -> SimpleProduct(result, UnitOfMeasurement.G)
         }
     }
 
-    private fun performCalculation(numberOne: Int, numberTwo: Int, calculation: Calculation): Int {
-        return if (calculation == Calculation.ADD) {
-            numberOne + numberTwo
-        } else {
-            if (numberOne - numberTwo <= 0) {
-                0
-            } else {
-                numberOne - numberTwo
-            }
-        }
-    }
-
-    private fun convertToGrams(quantity: Int, unit: UnitOfMeasurement): Int {
-        return when (unit) {
-            UnitOfMeasurement.KG -> quantity * 1000
-            UnitOfMeasurement.DKG -> quantity * 100
-            UnitOfMeasurement.G -> quantity
-            else -> throw IllegalArgumentException("Unsupported unit: $unit")
-        }
-    }
-
-    private fun convertToDeciliter(quantity: Int, unit: UnitOfMeasurement): Int {
-        return when (unit) {
-            UnitOfMeasurement.L -> quantity * 10
-            UnitOfMeasurement.DL -> quantity
-            else -> throw IllegalArgumentException("Unsupported unit: $unit")
-        }
+    private fun performCalculation(
+        numberOne: Float,
+        numberTwo: Float,
+        calculation: Calculation
+    ): Float = when (calculation) {
+        Calculation.ADDITION -> numberOne + numberTwo
+        Calculation.SUBTRACTION -> if (numberOne < numberTwo) 0f else numberOne - numberTwo
     }
 
     enum class Calculation {
-        ADD, SUBTRACTION
+        ADDITION, SUBTRACTION
     }
 }

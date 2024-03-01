@@ -95,7 +95,7 @@ fun StorageItemPreview() {
     StorageItem(
         food = Food(
             title = "apple",
-            quantity = 5,
+            quantity = 5f,
             unitOfMeasurement = UnitOfMeasurement.KG,
             foodTagList = null
         ),
