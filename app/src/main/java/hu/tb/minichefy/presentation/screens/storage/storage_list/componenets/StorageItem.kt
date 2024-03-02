@@ -1,9 +1,11 @@
 package hu.tb.minichefy.presentation.screens.storage.storage_list.componenets
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -20,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,12 +41,14 @@ fun StorageItem(
     onRemoveClick: () -> Unit
 ) {
     ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = 2.dp
         )
     ) {
         Column(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -59,8 +64,10 @@ fun StorageItem(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(
-                modifier = Modifier,
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
                 IconButton(onClick = onRemoveClick) {
                     Image(
@@ -71,9 +78,12 @@ fun StorageItem(
                 }
                 Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
                 Text(
+                    modifier = Modifier
+                        .weight(1f),
                     text = food.quantity.toString() + " " + food.unitOfMeasurement,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                    textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
                 IconButton(onClick = onAddClick) {
@@ -95,7 +105,7 @@ fun StorageItemPreview() {
     StorageItem(
         food = Food(
             title = "apple",
-            quantity = 5f,
+            quantity = 15f,
             unitOfMeasurement = UnitOfMeasurement.KG,
             foodTagList = null
         ),

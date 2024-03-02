@@ -3,6 +3,7 @@ package hu.tb.minichefy.presentation.preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
+import hu.tb.minichefy.presentation.screens.components.icons.IconManager
 
 class RecipePreviewParameterProvider : PreviewParameterProvider<Recipe> {
     override val values: Sequence<Recipe> = sequenceOf(
@@ -14,7 +15,7 @@ private object MockRecipeDomain {
 
     val mockRecipe = Recipe(
         0,
-        icon = 0,
+        icon = IconManager().getRandomProduct().resource,
         "Apple pie",
         4,
         listOf(

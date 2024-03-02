@@ -84,7 +84,8 @@ fun StorageScreenContent(
             Spacer(modifier = Modifier.height(8.dp))
             LazyVerticalGrid(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxSize()
+                    .padding(bottom = SCREEN_VERTICAL_PADDING),
                 columns = GridCells.Fixed(2),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -95,18 +96,12 @@ fun StorageScreenContent(
                     StorageItem(food = food,
                         onAddClick = {
                             onEvent(
-                                StorageListViewModel.OnEvent.FoodUnitChanged(
-                                    food.id!!,
-                                    +1
-                                )
+                                StorageListViewModel.OnEvent.FoodUnitChanged(food, +1)
                             )
                         },
                         onRemoveClick = {
                             onEvent(
-                                StorageListViewModel.OnEvent.FoodUnitChanged(
-                                    food.id!!,
-                                    -1
-                                )
+                                StorageListViewModel.OnEvent.FoodUnitChanged(food, -1)
                             )
                         })
                 }
