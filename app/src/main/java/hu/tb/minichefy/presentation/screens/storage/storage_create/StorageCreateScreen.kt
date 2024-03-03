@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +52,7 @@ import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.components.QuestionRowAnswer
 import hu.tb.minichefy.presentation.screens.storage.storage_create.components.RadioButtonWithText
 import hu.tb.minichefy.presentation.ui.components.bottomBorder
+import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
@@ -84,13 +86,15 @@ fun StorageCreateContent(
     onEvent: (StorageCreateViewModel.OnEvent) -> Unit
 ) {
     var isUnitMenuExpanded by remember { mutableStateOf(false) }
-
     var isTagPopupVisible by remember { mutableStateOf(false) }
+
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = SCREEN_HORIZONTAL_PADDING, vertical = SCREEN_VERTICAL_PADDING)
+            .clickableWithoutRipple { focusManager.clearFocus() }
     ) {
         CircleImage(
             image = uiState.productIcon.resource
@@ -140,65 +144,70 @@ fun StorageCreateContent(
             keyboardType = KeyboardType.Number
         )
         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Unit of measurement:",
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleLarge,
-            )
-            Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-            Box(
+        if (uiState.productType != StorageCreateViewModel.FoodType.PIECE) {
+            Row(
                 modifier = Modifier
-                    .wrapContentSize()
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                Text(
+                    text = "Unit of measurement:",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
+                Box(
+                    modifier = Modifier
+                        .wrapContentSize()
                 ) {
-                    Text(
-                        modifier = Modifier
-                            .weight(1f)
-                            .bottomBorder(
-                                color = MaterialTheme.colorScheme.primary,
-                                strokeWidth = 1.dp
-                            ),
-                        text = uiState.productUnitOfMeasurement.toString(),
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
-                    IconButton(onClick = {
-                        isUnitMenuExpanded = true
-                    }) {
-                        Icon(
-                            Icons.Outlined.MoreVert,
-                            contentDescription = "Unit od measurement dropdown icon",
-                            tint = MaterialTheme.colorScheme.primary
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .weight(1f)
+                                .bottomBorder(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    strokeWidth = 1.dp
+                                )
+                                .clickableWithoutRipple {
+                                    isUnitMenuExpanded = true
+                                },
+                            text = uiState.productUnitOfMeasurement.toString(),
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center
                         )
-                    }
-                }
-                DropdownMenu(
-                    expanded = isUnitMenuExpanded,
-                    onDismissRequest = { isUnitMenuExpanded = false },
-                ) {
-                    repeat(uiState.availableUnitOfMeasurementList.size) { index ->
-                        uiState.availableUnitOfMeasurementList[index].also { uom ->
-                            DropdownMenuItem(
-                                text = { Text(uom.toString()) },
-                                onClick = {
-                                    onEvent(
-                                        StorageCreateViewModel.OnEvent.FoodUnitChange(
-                                            uom
-                                        )
-                                    )
-                                    isUnitMenuExpanded = false
-                                }
+                        Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
+                        IconButton(onClick = {
+                            isUnitMenuExpanded = true
+                        }) {
+                            Icon(
+                                Icons.Outlined.MoreVert,
+                                contentDescription = "Unit od measurement dropdown icon",
+                                tint = MaterialTheme.colorScheme.primary
                             )
+                        }
+                    }
+                    DropdownMenu(
+                        expanded = isUnitMenuExpanded,
+                        onDismissRequest = { isUnitMenuExpanded = false },
+                    ) {
+                        repeat(uiState.availableUnitOfMeasurementList.size) { index ->
+                            uiState.availableUnitOfMeasurementList[index].also { uom ->
+                                DropdownMenuItem(
+                                    text = { Text(uom.toString()) },
+                                    onClick = {
+                                        onEvent(
+                                            StorageCreateViewModel.OnEvent.FoodUnitChange(
+                                                uom
+                                            )
+                                        )
+                                        isUnitMenuExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }

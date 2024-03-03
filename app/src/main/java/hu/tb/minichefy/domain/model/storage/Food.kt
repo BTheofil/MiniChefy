@@ -16,7 +16,7 @@ data class Food(
             title = title,
             quantity = quantity,
             unitOfMeasurement = unitOfMeasurement,
-            tagList = this.foodTagList?.let { foodTags ->
+            tagList = foodTagList?.let { foodTags ->
                 FoodTagListWrapper(foodTagList = foodTags.map {
                     FoodTagEntity(it.id, it.tag)
                 })
@@ -24,9 +24,10 @@ data class Food(
 }
 
 enum class UnitOfMeasurement(val id: Int) {
+    PIECE(0),
     DL(1),
     L(2),
     G(3),
     DKG(4),
-    KG(5),
+    KG(5)
 }

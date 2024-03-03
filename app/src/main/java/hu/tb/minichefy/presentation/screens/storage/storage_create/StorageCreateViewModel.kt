@@ -38,7 +38,7 @@ class StorageCreateViewModel @Inject constructor(
         val productIcon: ProductIcon = IconManager().getRandomProduct(),
         val productTitleText: String = "",
         val productType: FoodType? = FoodType.LIQUID,
-        val productUnitOfMeasurement: UnitOfMeasurement = UnitOfMeasurement.entries.first(),
+        val productUnitOfMeasurement: UnitOfMeasurement = UnitOfMeasurement.entries[1],
         val availableUnitOfMeasurementList: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
         val quantity: String = "",
         val selectedTagList: List<FoodTag> = emptyList(),
@@ -48,7 +48,8 @@ class StorageCreateViewModel @Inject constructor(
 
     enum class FoodType(val displayText: String) {
         LIQUID("Liquid"),
-        SOLID("Solid")
+        SOLID("Solid"),
+        PIECE("Piece")
     }
 
     private val _uiState = MutableStateFlow(UiState())
@@ -102,6 +103,8 @@ class StorageCreateViewModel @Inject constructor(
                             productUnitOfMeasurement = UnitOfMeasurement.G,
                         )
                     }
+
+                    FoodType.PIECE -> {}
                 }
 
                 _uiState.update {

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.storage.Food
+import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.repository.StorageRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,12 +27,22 @@ class StorageListViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            storageRepository.getAllFoodTag().collect { tagList ->
+                _uiState.update {
+                    it.copy(filterList = tagList)
+                }
+            }
+        }
+
     }
 
     data class UiState(
         val searchText: String = "",
-        val filterList: List<String> = emptyList(),
-        val foodList: List<Food> = emptyList()
+        val filterList: List<FoodTag> = emptyList(),
+        val activeFilter: List<FoodTag> = emptyList(),
+        val foodList: List<Food> = emptyList(),
+        val editedFood: Food? = null
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -41,6 +52,8 @@ class StorageListViewModel @Inject constructor(
         data object ClearSearch : OnEvent()
         data class FoodUnitChanged(val food: Food, val change: Int) : OnEvent()
         data class SearchTextChange(val text: String) : OnEvent()
+        data class EditFoodClicked(val food: Food) : OnEvent()
+        data class FilterChipClicked(val tag: FoodTag) : OnEvent()
     }
 
     fun onEvent(event: OnEvent) {
@@ -60,6 +73,22 @@ class StorageListViewModel @Inject constructor(
 
             OnEvent.ClearSearch -> _uiState.update {
                 it.copy(searchText = "")
+            }
+
+            is OnEvent.EditFoodClicked -> _uiState.update {
+                it.copy(editedFood = event.food)
+            }
+
+            is OnEvent.FilterChipClicked -> {
+                val temp = uiState.value.activeFilter.toMutableList()
+                if (uiState.value.activeFilter.contains(event.tag)) {
+                    temp.remove(event.tag)
+                } else {
+                    temp.add(event.tag)
+                }
+                _uiState.update {
+                    it.copy(activeFilter = temp)
+                }
             }
         }
     }

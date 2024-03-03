@@ -1,26 +1,29 @@
 package hu.tb.minichefy.presentation.screens.storage.storage_list.componenets
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
@@ -30,71 +33,71 @@ import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.components.icons.iconVectorResource
-import hu.tb.minichefy.presentation.ui.theme.Green500
-import hu.tb.minichefy.presentation.ui.theme.Red400
-import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
+import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
+import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
+import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 
 @Composable
 fun StorageItem(
     food: Food,
-    onAddClick: () -> Unit,
-    onRemoveClick: () -> Unit
+    onEditClick: () -> Unit
 ) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 2.dp
-        )
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(12.dp)
+                .height(IntrinsicSize.Min)
         ) {
-            Image(
-                imageVector = iconVectorResource(iconResource = R.drawable.junk_food_icon),
-                contentDescription = "Store icon"
-            )
-            Spacer(modifier = Modifier.height(18.dp))
-            Text(
-                text = food.title.toUpperCase(Locale.current),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f))
+                    .padding(8.dp)
             ) {
-                IconButton(onClick = onRemoveClick) {
-                    Image(
-                        painter = painterResource(id = R.drawable.baseline_remove_24),
-                        contentDescription = "remove quantity icon",
-                        colorFilter = ColorFilter.tint(Red400)
-                    )
-                }
-                Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
+                Image(
+                    imageVector = iconVectorResource(iconResource = R.drawable.junk_food_icon),
+                    contentDescription = "Store icon"
+                )
+            }
+            Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .padding(vertical = SCREEN_VERTICAL_PADDING),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(
-                    modifier = Modifier
-                        .weight(1f),
+                    text = food.title.toUpperCase(Locale.current),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
+                Text(
+                    modifier = Modifier,
                     text = food.quantity.toString() + " " + food.unitOfMeasurement,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f),
                     textAlign = TextAlign.Center
                 )
-                Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
-                IconButton(onClick = onAddClick) {
-                    Image(
-                        imageVector = Icons.Outlined.Add,
-                        contentDescription = "add quantity icon",
-                        colorFilter = ColorFilter.tint(Green500)
-                    )
-                }
             }
-
+            Box(
+                modifier = Modifier
+                    .weight(1f),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                Image(
+                    modifier = Modifier
+                        .clickableWithoutRipple(onEditClick),
+                    imageVector = Icons.Outlined.Menu,
+                    contentDescription = "add quantity icon",
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                )
+            }
         }
     }
 }
@@ -109,7 +112,6 @@ fun StorageItemPreview() {
             unitOfMeasurement = UnitOfMeasurement.KG,
             foodTagList = null
         ),
-        onAddClick = {},
-        onRemoveClick = {}
+        onEditClick = {},
     )
 }
