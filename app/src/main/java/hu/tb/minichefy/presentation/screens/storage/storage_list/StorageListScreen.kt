@@ -97,11 +97,11 @@ fun StorageScreenContent(
                         label = "",
                     ) {
                         when (it) {
-                            true -> EditStorageItem {
-
-                            }
-
-                            false -> StorageItem(
+                            false -> EditStorageItem(
+                                food = food,
+                                onItemClick = {}
+                            )
+                            true -> StorageItem(
                                 food = food,
                                 onEditClick = {
                                     onEvent(
@@ -135,7 +135,7 @@ fun MainScreenContentPreview() {
                     title = "banana",
                     quantity = 4f,
                     unitOfMeasurement = UnitOfMeasurement.DKG,
-                    foodTagList = null
+                    foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(2, "fruit"))
                 )
             )
         ),
