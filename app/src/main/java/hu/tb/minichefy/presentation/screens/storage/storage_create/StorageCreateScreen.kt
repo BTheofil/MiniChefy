@@ -11,25 +11,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,12 +38,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.components.QuestionRowAnswer
+import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_create.components.RadioButtonWithText
 import hu.tb.minichefy.presentation.ui.components.bottomBorder
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
@@ -261,62 +255,16 @@ fun StorageCreateContent(
     }
 
     if (isTagPopupVisible) {
-        Dialog(onDismissRequest = { isTagPopupVisible = false }) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .padding(vertical = 16.dp),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS)
-                    ) {
-                        uiState.allProductTagList.forEach { tagItem ->
-                            FilterChip(
-                                selected = uiState.selectedTagList.contains(tagItem),
-                                onClick = {
-                                    onEvent(StorageCreateViewModel.OnEvent.DialogChipTouched(tagItem))
-                                },
-                                label = {
-                                    Text(
-                                        text = tagItem.tag,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        style = MaterialTheme.typography.labelLarge
-                                    )
-                                },
-                                leadingIcon = if (uiState.selectedTagList.contains(tagItem)) {
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Filled.Done,
-                                            contentDescription = "Done icon",
-                                            modifier = Modifier.size(FilterChipDefaults.IconSize)
-                                        )
-                                    }
-                                } else {
-                                    null
-                                },
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        OutlinedButton(onClick = { isTagPopupVisible = false }) {
-                            Text(text = "Done")
-                        }
-                    }
-                }
-            }
-        }
+        ProductTagSelectorDialog(
+            dismissAndCloseAction = {
+                isTagPopupVisible = false
+            },
+            onTagClick = {
+                onEvent(StorageCreateViewModel.OnEvent.DialogChipTouched(it))
+            },
+            allTagList = uiState.allProductTagList,
+            selectedTagList = uiState.selectedTagList
+        )
     }
 }
 

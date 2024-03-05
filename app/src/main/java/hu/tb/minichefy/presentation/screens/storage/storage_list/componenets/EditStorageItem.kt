@@ -1,28 +1,34 @@
 package hu.tb.minichefy.presentation.screens.storage.storage_list.componenets
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
@@ -36,17 +42,22 @@ import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.components.icons.iconVectorResource
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
+import hu.tb.minichefy.presentation.ui.theme.Green500
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
-import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
+import hu.tb.minichefy.presentation.ui.theme.Red400
 
 @Composable
 fun EditStorageItem(
     food: Food,
-    onItemClick: () -> Unit
+    onCloseClick: () -> Unit,
+    onAddTagClick: () -> Unit,
+    onDeleteTagClick: (tag: FoodTag) -> Unit,
+    onChangeQuantity: (value: Float) -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
+            .heightIn(max = 250.dp)
     ) {
         ConstraintLayout(
             modifier = Modifier
@@ -77,12 +88,16 @@ fun EditStorageItem(
 
             Column(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .constrainAs(content, constrainBlock = {
                         start.linkTo(iconBox.end)
+                        end.linkTo(parent.end)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
+                        width = Dimension.fillToConstraints
                     })
-                    .padding(vertical = SCREEN_VERTICAL_PADDING),
+                    .padding(vertical = 16.dp)
+                    .padding(start = MEDIUM_SPACE_BETWEEN_ELEMENTS),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -91,30 +106,73 @@ fun EditStorageItem(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
+                AssistChip(
+                    onClick = onAddTagClick,
+                    label = {
+                        Icon(
+                            painterResource(id = R.drawable.baseline_add_24),
+                            contentDescription = ""
+                        )
+                    },
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary)
+                )
                 food.foodTagList?.let { tags ->
                     repeat(tags.size) { index ->
                         AssistChip(
-                            onClick = { /*TODO*/ },
-                            label = { Text(text = tags[index].tag) },
+                            onClick = { onDeleteTagClick(tags[index]) },
+                            label = {
+                                Text(
+                                    text = tags[index].tag,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
                             trailingIcon = {
                                 Icon(
                                     imageVector = Icons.Outlined.Clear,
-                                    contentDescription = ""
+                                    contentDescription = "Remove tag"
                                 )
                             })
                     }
                 }
-                Text(
-                    modifier = Modifier,
-                    text = food.quantity.toString() + " " + food.unitOfMeasurement,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f),
-                    textAlign = TextAlign.Center
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        modifier = Modifier,
+                        onClick = { onChangeQuantity(-1f) }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_remove_24),
+                            contentDescription = "Decrease quantity",
+                            tint = Color(Red400.value)
+                        )
+                    }
+                    Text(
+                        modifier = Modifier
+                            .weight(1f),
+                        text = food.quantity.toString() + " " + food.unitOfMeasurement,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                        textAlign = TextAlign.Center
+                    )
+                    IconButton(onClick = { onChangeQuantity(1f) }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_add_24),
+                            contentDescription = "Increase quantity",
+                            tint = Color(Green500.value)
+                        )
+                    }
+                }
+
             }
 
             Box(
                 modifier = Modifier
+                    .padding(top = 16.dp, end = 16.dp)
                     .constrainAs(
                         closeIcon, constrainBlock = {
                             end.linkTo(parent.end)
@@ -123,12 +181,13 @@ fun EditStorageItem(
                     ),
                 contentAlignment = Alignment.TopEnd
             ) {
-                Image(
+                Icon(
                     modifier = Modifier
-                        .clickableWithoutRipple(onItemClick),
-                    imageVector = Icons.Outlined.Menu,
+                        .size(32.dp)
+                        .clickableWithoutRipple(onCloseClick),
+                    imageVector = Icons.Outlined.KeyboardArrowUp,
                     contentDescription = "add quantity icon",
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                    tint = Color(MaterialTheme.colorScheme.primary.value)
                 )
             }
         }
@@ -146,6 +205,6 @@ private fun EditStorageItemPreview() {
             unitOfMeasurement = UnitOfMeasurement.PIECE,
             foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(2, "fruitfruitfruit"))
         ),
-        onItemClick = {}
+        {}, {}, {}, {},
     )
 }

@@ -30,7 +30,7 @@ class StorageListViewModel @Inject constructor(
         viewModelScope.launch {
             storageRepository.getAllFoodTag().collect { tagList ->
                 _uiState.update {
-                    it.copy(filterList = tagList)
+                    it.copy(foodTagList = tagList)
                 }
             }
         }
@@ -39,7 +39,7 @@ class StorageListViewModel @Inject constructor(
 
     data class UiState(
         val searchText: String = "",
-        val filterList: List<FoodTag> = emptyList(),
+        val foodTagList: List<FoodTag> = emptyList(),
         val activeFilter: List<FoodTag> = emptyList(),
         val foodList: List<Food> = emptyList(),
         val editedFood: Food? = null
@@ -50,10 +50,13 @@ class StorageListViewModel @Inject constructor(
 
     sealed class OnEvent {
         data object ClearSearch : OnEvent()
+        data object SaveEditedFood : OnEvent()
         data class FoodUnitChanged(val food: Food, val change: Int) : OnEvent()
         data class SearchTextChange(val text: String) : OnEvent()
         data class EditFoodClicked(val food: Food) : OnEvent()
         data class FilterChipClicked(val tag: FoodTag) : OnEvent()
+        data class ModifyEditedFoodTag(val tag: FoodTag) : OnEvent()
+        data class ChangeQuantity(val value: Float) : OnEvent()
     }
 
     fun onEvent(event: OnEvent) {
@@ -69,7 +72,6 @@ class StorageListViewModel @Inject constructor(
             is OnEvent.SearchTextChange -> _uiState.update {
                 it.copy(searchText = event.text)
             }
-
 
             OnEvent.ClearSearch -> _uiState.update {
                 it.copy(searchText = "")
@@ -88,6 +90,38 @@ class StorageListViewModel @Inject constructor(
                 }
                 _uiState.update {
                     it.copy(activeFilter = temp)
+                }
+            }
+
+            is OnEvent.ChangeQuantity -> {
+
+            }
+            is OnEvent.ModifyEditedFoodTag -> {
+                /*uiState.value.editedFood?.let { food ->
+                    if(food.foodTagList != null){
+                    } else if (temp)
+                    try {
+                        if (temp!!.contains(event.tag)){
+                            temp.remove(event.tag)
+                        } else {
+                            temp.add(event.tag)
+                        }
+                    } catch (e: Exception){
+                        temp.add(event.tag)
+                    }
+                    _uiState.update {
+                        it.copy(
+                            editedFood = food.copy(
+                                foodTagList = temp
+                            )
+                        )
+                    }
+                }*/
+            }
+
+            OnEvent.SaveEditedFood -> {
+                _uiState.update {
+                    it.copy(editedFood = null)
                 }
             }
         }

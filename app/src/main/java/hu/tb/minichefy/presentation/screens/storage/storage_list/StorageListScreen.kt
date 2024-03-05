@@ -16,6 +16,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,6 +29,7 @@ import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
+import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditStorageItem
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.StorageItem
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
@@ -51,6 +55,10 @@ fun StorageScreenContent(
     onFABClick: () -> Unit,
     onEvent: (StorageListViewModel.OnEvent) -> Unit
 ) {
+    var isEditProductTagSelectorOpen by remember {
+        mutableStateOf(false)
+    }
+
     Scaffold(
         floatingActionButton = {
             PlusFAB(onClick = onFABClick)
@@ -74,7 +82,7 @@ fun StorageScreenContent(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(
-                    items = uiState.filterList
+                    items = uiState.foodTagList
                 ) { filter ->
                     FilterChip(
                         selected = uiState.activeFilter.contains(filter),
@@ -93,15 +101,31 @@ fun StorageScreenContent(
                     items = uiState.foodList
                 ) { food ->
                     AnimatedContent(
-                        targetState = food == uiState.editedFood,
+                        targetState = uiState.editedFood != null,
                         label = "",
-                    ) {
-                        when (it) {
-                            false -> EditStorageItem(
-                                food = food,
-                                onItemClick = {}
+                    ) { isFoodEdited ->
+                        when (isFoodEdited) {
+                            true -> EditStorageItem(
+                                food = uiState.editedFood!!,
+                                onCloseClick = { onEvent(StorageListViewModel.OnEvent.SaveEditedFood) },
+                                onDeleteTagClick = {
+                                    onEvent(
+                                        StorageListViewModel.OnEvent.ModifyEditedFoodTag(
+                                            it
+                                        )
+                                    )
+                                },
+                                onAddTagClick = { isEditProductTagSelectorOpen = true },
+                                onChangeQuantity = {
+                                    onEvent(
+                                        StorageListViewModel.OnEvent.ChangeQuantity(
+                                            it
+                                        )
+                                    )
+                                },
                             )
-                            true -> StorageItem(
+
+                            false -> StorageItem(
                                 food = food,
                                 onEditClick = {
                                     onEvent(
@@ -116,6 +140,17 @@ fun StorageScreenContent(
             }
         }
     }
+
+    if (isEditProductTagSelectorOpen) {
+        ProductTagSelectorDialog(
+            dismissAndCloseAction = { isEditProductTagSelectorOpen = false },
+            onTagClick = {
+                onEvent(StorageListViewModel.OnEvent.ModifyEditedFoodTag(it))
+            },
+            allTagList = uiState.foodTagList,
+            selectedTagList = uiState.editedFood?.foodTagList.orEmpty()
+        )
+    }
 }
 
 @Preview
@@ -123,7 +158,7 @@ fun StorageScreenContent(
 fun MainScreenContentPreview() {
     StorageScreenContent(
         StorageListViewModel.UiState(
-            filterList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
+            foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
             foodList = listOf(
                 Food(
                     title = "apple",
