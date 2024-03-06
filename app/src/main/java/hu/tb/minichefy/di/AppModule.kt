@@ -13,6 +13,7 @@ import hu.tb.minichefy.data.repository.StorageDatabaseRepositoryImpl
 import hu.tb.minichefy.domain.model.storage.entity.FoodTagEntity
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
+import hu.tb.minichefy.domain.use_case.CalculateMeasurements
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -78,4 +79,8 @@ object AppModule {
     @Provides
     fun provideValidateQuantityNumberUseCase(): ValidateQuantityNumber =
         ValidateQuantityNumber()
+
+    @Provides
+    fun provideCalculateMeasurements(): CalculateMeasurements =
+        CalculateMeasurements()
 }

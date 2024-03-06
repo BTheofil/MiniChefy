@@ -10,8 +10,7 @@ class CalculateMeasurements {
 
     fun simpleProductCalculations(
         productBase: SimpleProduct,
-        productChanger: SimpleProduct,
-        calculation: Calculation
+        productChanger: SimpleProduct
     ): SimpleProduct {
         val isLiquid =
             productBase.unitOfMeasurement.id in liquidRange && productChanger.unitOfMeasurement.id in liquidRange
@@ -22,8 +21,7 @@ class CalculateMeasurements {
 
         val result = performCalculation(
             productBase.convertToSmallestUnit(),
-            productChanger.convertToSmallestUnit(),
-            calculation
+            productChanger.convertToSmallestUnit()
         )
 
         return when {
@@ -38,13 +36,5 @@ class CalculateMeasurements {
     private fun performCalculation(
         numberOne: Float,
         numberTwo: Float,
-        calculation: Calculation
-    ): Float = when (calculation) {
-        Calculation.ADDITION -> numberOne + numberTwo
-        Calculation.SUBTRACTION -> if (numberOne < numberTwo) 0f else numberOne - numberTwo
-    }
-
-    enum class Calculation {
-        ADDITION, SUBTRACTION
-    }
+    ): Float = if ((numberOne + numberTwo) < 0) 0f else numberOne + numberTwo
 }

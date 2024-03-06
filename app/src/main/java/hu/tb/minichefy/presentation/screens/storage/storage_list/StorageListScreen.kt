@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -97,30 +98,28 @@ fun StorageScreenContent(
                     .padding(bottom = SCREEN_VERTICAL_PADDING),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(
+                itemsIndexed(
                     items = uiState.foodList
-                ) { food ->
+                ) { index, food ->
                     AnimatedContent(
-                        targetState = uiState.editedFood != null,
+                        targetState = uiState.modifiedProductIndex == index,
                         label = "",
                     ) { isFoodEdited ->
                         when (isFoodEdited) {
                             true -> EditStorageItem(
-                                food = uiState.editedFood!!,
+                                food = food,
                                 onCloseClick = { onEvent(StorageListViewModel.OnEvent.SaveEditedFood) },
-                                onDeleteTagClick = {
+                                onDeleteTagClick = { tag ->
                                     onEvent(
-                                        StorageListViewModel.OnEvent.ModifyEditedFoodTag(
-                                            it
-                                        )
+                                        StorageListViewModel.OnEvent.ModifyProductTag(tag)
                                     )
                                 },
-                                onAddTagClick = { isEditProductTagSelectorOpen = true },
-                                onChangeQuantity = {
+                                onAddTagClick = {
+                                    isEditProductTagSelectorOpen = true
+                                },
+                                onChangeQuantity = { value ->
                                     onEvent(
-                                        StorageListViewModel.OnEvent.ChangeQuantity(
-                                            it
-                                        )
+                                        StorageListViewModel.OnEvent.ChangeQuantity(value)
                                     )
                                 },
                             )
@@ -128,11 +127,7 @@ fun StorageScreenContent(
                             false -> StorageItem(
                                 food = food,
                                 onEditClick = {
-                                    onEvent(
-                                        StorageListViewModel.OnEvent.EditFoodClicked(
-                                            food
-                                        )
-                                    )
+                                    onEvent(StorageListViewModel.OnEvent.EditFoodClicked(index))
                                 })
                         }
                     }
@@ -143,12 +138,16 @@ fun StorageScreenContent(
 
     if (isEditProductTagSelectorOpen) {
         ProductTagSelectorDialog(
-            dismissAndCloseAction = { isEditProductTagSelectorOpen = false },
+            dismissAndCloseAction = {
+                isEditProductTagSelectorOpen = false
+            },
             onTagClick = {
-                onEvent(StorageListViewModel.OnEvent.ModifyEditedFoodTag(it))
+                onEvent(
+                    StorageListViewModel.OnEvent.ModifyProductTag(it)
+                )
             },
             allTagList = uiState.foodTagList,
-            selectedTagList = uiState.editedFood?.foodTagList.orEmpty()
+            selectedTagList = uiState.foodList[uiState.modifiedProductIndex].foodTagList.orEmpty()
         )
     }
 }
