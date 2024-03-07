@@ -44,7 +44,7 @@ class CreateRecipeViewModel @Inject constructor(
             val recipeName: String = "",
             val quantityCounter: Int = 1,
             val isQuantityHasError: Boolean = false,
-            val defaultIconCollection: List<MealIcon> = IconManager().allSystemMealIconLists,
+            val defaultIconCollection: List<MealIcon> = IconManager().getAllSystemMealIconLists,
             val selectedMealIcon: MealIcon = defaultIconCollection[Random.nextInt(
                 0,
                 defaultIconCollection.size

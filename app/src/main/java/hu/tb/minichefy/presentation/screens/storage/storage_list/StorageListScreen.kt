@@ -31,8 +31,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
+import hu.tb.minichefy.presentation.screens.components.icons.IconManager
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditStorageItem
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.StorageItem
@@ -63,6 +65,10 @@ fun StorageScreenContent(
         mutableStateOf(false)
     }
 
+    var isIconSelectorOpen by remember {
+        mutableStateOf(false)
+    }
+
     Scaffold(
         floatingActionButton = {
             PlusFAB(onClick = onFABClick)
@@ -77,7 +83,7 @@ fun StorageScreenContent(
             SearchItemBar(
                 queryText = uiState.searchText,
                 onQueryChange = { onEvent(StorageListViewModel.OnEvent.SearchTextChange(it)) },
-                clearIconButtonClick = { onEvent(StorageListViewModel.OnEvent.ClearSearch) }
+                clearIconButtonClick = { onEvent(StorageListViewModel.OnEvent.ClearSearchText) }
             )
             Spacer(modifier = Modifier.height(22.dp))
             LazyRow(
@@ -110,11 +116,12 @@ fun StorageScreenContent(
                         targetState = uiState.modifiedProductIndex == index,
                         transitionSpec = {
                             scaleIn().togetherWith(scaleOut())
-                        }
+                        }, label = "edit product animation"
                     ) { isFoodEdited ->
                         when (isFoodEdited) {
                             true -> EditStorageItem(
                                 food = food,
+                                onIconClick = { isIconSelectorOpen = true },
                                 onCloseClick = { onEvent(StorageListViewModel.OnEvent.SaveEditedFood) },
                                 onDeleteTagClick = { tag ->
                                     onEvent(
@@ -126,7 +133,7 @@ fun StorageScreenContent(
                                 },
                                 onChangeQuantity = { value ->
                                     onEvent(
-                                        StorageListViewModel.OnEvent.ChangeQuantity(value)
+                                        StorageListViewModel.OnEvent.ModifyProductQuantity(value)
                                     )
                                 },
                             )
@@ -134,13 +141,22 @@ fun StorageScreenContent(
                             false -> StorageItem(
                                 food = food,
                                 onEditClick = {
-                                    onEvent(StorageListViewModel.OnEvent.EditFoodClicked(index))
+                                    onEvent(StorageListViewModel.OnEvent.UpdateModifyProductIndex(index))
                                 })
                         }
                     }
                 }
             }
         }
+    }
+
+    if (isIconSelectorOpen) {
+        IconSelectorSheet(
+            allIconList = uiState.allProductIconList,
+            selectedIcon = IconManager().convertIntToProductIcon(uiState.foodList[uiState.modifiedProductIndex].icon)!!,
+            onItemClick = { onEvent(StorageListViewModel.OnEvent.ModifyProductIcon(it)) },
+            onDismissRequest = { isIconSelectorOpen = false }
+        )
     }
 
     if (isEditProductTagSelectorOpen) {
@@ -162,12 +178,16 @@ fun StorageScreenContent(
 @Preview
 @Composable
 fun MainScreenContentPreview() {
+
+    val testIcon = IconManager().getRandomProduct()
+
     StorageScreenContent(
         StorageListViewModel.UiState(
             foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
             foodList = listOf(
                 Food(
                     id = 1,
+                    icon = testIcon.resource,
                     title = "apple",
                     quantity = 2f,
                     unitOfMeasurement = UnitOfMeasurement.KG,
@@ -175,6 +195,7 @@ fun MainScreenContentPreview() {
                 ),
                 Food(
                     id = 2,
+                    icon = testIcon.resource,
                     title = "banana",
                     quantity = 4f,
                     unitOfMeasurement = UnitOfMeasurement.DKG,

@@ -7,7 +7,7 @@ import kotlin.random.Random
 
 class IconManager {
 
-    val allSystemMealIconLists = listOf(
+    val getAllSystemMealIconLists = listOf(
         MealIcon.FRIED_EGG,
         MealIcon.JUNK_FOOD,
         MealIcon.HOT_SOUP,
@@ -16,7 +16,7 @@ class IconManager {
         MealIcon.SWEETS,
     )
 
-    val allProductIconList = listOf(
+    val getAllProductIconList = listOf(
         ProductIcon.APPLE,
         ProductIcon.AVOCADO,
         ProductIcon.BREAD,
@@ -24,8 +24,11 @@ class IconManager {
     )
 
     fun getRandomProduct(): ProductIcon{
-        return  allProductIconList[Random.nextInt(0, allProductIconList.size)]
+        return  getAllProductIconList[Random.nextInt(0, getAllProductIconList.size)]
     }
+
+    fun convertIntToProductIcon(iconInt: Int): IconResource? = getAllProductIconList.find { it.resource == iconInt}
+
 }
 
 @Composable

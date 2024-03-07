@@ -6,6 +6,7 @@ import hu.tb.minichefy.domain.model.storage.entity.FoodTagListWrapper
 
 data class Food(
     val id: Long? = null,
+    val icon: Int,
     val title: String,
     val quantity: Float,
     val unitOfMeasurement: UnitOfMeasurement,
@@ -13,6 +14,7 @@ data class Food(
 ) {
     fun toFoodEntity(): FoodEntity =
         FoodEntity(id = id,
+            icon = icon,
             title = title,
             quantity = quantity,
             unitOfMeasurement = unitOfMeasurement,

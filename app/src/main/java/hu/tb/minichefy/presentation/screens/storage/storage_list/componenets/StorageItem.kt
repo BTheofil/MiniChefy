@@ -27,10 +27,10 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
-import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.presentation.preview.ProductPreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.icons.iconVectorResource
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
@@ -58,7 +58,9 @@ fun StorageItem(
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    imageVector = iconVectorResource(iconResource = R.drawable.junk_food_icon),
+                    modifier = Modifier
+                        .size(64.dp),
+                    imageVector = iconVectorResource(iconResource = food.icon),
                     contentDescription = "Store icon"
                 )
             }
@@ -108,14 +110,11 @@ fun StorageItem(
 
 @Preview
 @Composable
-fun StorageItemPreview() {
+fun StorageItemPreview(
+    @PreviewParameter(ProductPreviewParameterProvider::class) product: List<Food>
+) {
     StorageItem(
-        food = Food(
-            title = "apple",
-            quantity = 15f,
-            unitOfMeasurement = UnitOfMeasurement.KG,
-            foodTagList = null
-        ),
+        food = product.first(),
         onEditClick = {},
     )
 }

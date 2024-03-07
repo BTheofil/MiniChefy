@@ -11,6 +11,7 @@ import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 data class FoodEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long?,
+    val icon: Int,
     val title: String,
     val quantity: Float,
     val unitOfMeasurement: UnitOfMeasurement,

@@ -36,13 +36,14 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
-import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.presentation.preview.ProductPreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.icons.iconVectorResource
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.Green500
@@ -55,6 +56,7 @@ import kotlin.math.min
 @Composable
 fun EditStorageItem(
     food: Food,
+    onIconClick: () -> Unit,
     onCloseClick: () -> Unit,
     onAddTagClick: () -> Unit,
     onDeleteTagClick: (tag: FoodTag) -> Unit,
@@ -85,12 +87,13 @@ fun EditStorageItem(
                     })
                     .clip(RoundedCornerShape(12.dp))
                     .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f))
+                    .clickableWithoutRipple(onIconClick)
                     .padding(12.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
                     modifier = Modifier,
-                    imageVector = iconVectorResource(iconResource = R.drawable.junk_food_icon),
+                    imageVector = iconVectorResource(iconResource = food.icon),
                     contentDescription = "Store icon"
                 )
             }
@@ -223,21 +226,11 @@ fun EditStorageItem(
 
 @Preview
 @Composable
-private fun EditStorageItemPreview() {
+private fun EditStorageItemPreview(
+    @PreviewParameter(ProductPreviewParameterProvider::class) productList: List<Food>
+) {
     EditStorageItem(
-        food = Food(
-            id = 0,
-            title = "apple",
-            quantity = 3f,
-            unitOfMeasurement = UnitOfMeasurement.PIECE,
-            foodTagList = listOf(
-                FoodTag(0, "fruit"),
-                FoodTag(1, "vegetable"),
-                //FoodTag(2, "fruitfruitfruit"),
-                //FoodTag(3, "fruitfruitfruit"),
-                //FoodTag(4, "fruitfruitfruit"),
-            )
-        ),
-        {}, {}, {}, {},
+        food = productList.first(),
+        {}, {}, {}, {}, {}
     )
 }

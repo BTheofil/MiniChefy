@@ -9,6 +9,7 @@ class FoodEntityToFood {
     fun map(from: FoodEntity): Food = from.run {
         Food(
             id = id,
+            icon = icon,
             title = title,
             quantity = quantity,
             unitOfMeasurement = unitOfMeasurement,

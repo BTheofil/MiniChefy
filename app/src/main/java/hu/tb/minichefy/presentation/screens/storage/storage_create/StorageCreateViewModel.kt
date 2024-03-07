@@ -125,6 +125,7 @@ class StorageCreateViewModel @Inject constructor(
                     uiState.value.also {
                         storageRepository.saveOrModifyFood(
                             Food(
+                                icon = it.productIcon.resource,
                                 title = it.productTitleText,
                                 quantity = it.quantity.toFloat(),
                                 unitOfMeasurement = it.productUnitOfMeasurement,
