@@ -129,7 +129,9 @@ class StorageListViewModel @Inject constructor(
                 saveEditedFood(uiState.value.foodList[uiState.value.modifiedProductIndex].copy(foodTagList = foodTagList))
             }
 
-            OnEvent.SaveEditedFood -> {}
+            OnEvent.SaveEditedFood -> {
+                _uiState.update { it.copy(modifiedProductIndex = -1) }
+            }
         }
     }
 

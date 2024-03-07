@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,10 +20,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,7 +48,10 @@ import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.Green500
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.Red400
+import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
+import kotlin.math.min
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EditStorageItem(
     food: Food,
@@ -54,10 +60,13 @@ fun EditStorageItem(
     onDeleteTagClick: (tag: FoodTag) -> Unit,
     onChangeQuantity: (value: Float) -> Unit
 ) {
-    ElevatedCard(
+    OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(max = 250.dp)
+            .heightIn(max = 250.dp),
+        colors = CardDefaults.outlinedCardColors(
+            contentColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
+        )
     ) {
         ConstraintLayout(
             modifier = Modifier
@@ -97,7 +106,7 @@ fun EditStorageItem(
                         width = Dimension.fillToConstraints
                     })
                     .padding(vertical = 16.dp)
-                    .padding(start = MEDIUM_SPACE_BETWEEN_ELEMENTS),
+                    .padding(horizontal = MEDIUM_SPACE_BETWEEN_ELEMENTS),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -106,34 +115,52 @@ fun EditStorageItem(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-                AssistChip(
-                    onClick = onAddTagClick,
-                    label = {
-                        Icon(
-                            painterResource(id = R.drawable.baseline_add_24),
-                            contentDescription = ""
-                        )
-                    },
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary)
-                )
-                food.foodTagList?.let { tags ->
-                    repeat(tags.size) { index ->
-                        AssistChip(
-                            onClick = { onDeleteTagClick(tags[index]) },
-                            label = {
-                                Text(
-                                    text = tags[index].tag,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
-                            trailingIcon = {
-                                Icon(
-                                    imageVector = Icons.Outlined.Clear,
-                                    contentDescription = "Remove tag"
-                                )
-                            })
+                FlowRow(
+                    maxItemsInEachRow = 3,
+                    horizontalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS),
+                ) {
+                    AssistChip(
+                        onClick = onAddTagClick,
+                        label = {
+                            Icon(
+                                painterResource(id = R.drawable.baseline_add_24),
+                                contentDescription = "add more tag icon",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        },
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary)
+                    )
+                    food.foodTagList?.let { tags ->
+                        repeat(min(tags.size, 3)) { index ->
+                            AssistChip(
+                                onClick = { onDeleteTagClick(tags[index]) },
+                                label = {
+                                    Text(
+                                        text = tags[index].tag,
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                },
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
+                                trailingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Clear,
+                                        contentDescription = "Remove tag"
+                                    )
+                                })
+                        }
+                        if (tags.size > 3) {
+                            AssistChip(
+                                onClick = onAddTagClick,
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
+                                label = {
+                                    Text(
+                                        text = "More...",
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                })
+                        }
                     }
                 }
                 Row(
@@ -203,7 +230,13 @@ private fun EditStorageItemPreview() {
             title = "apple",
             quantity = 3f,
             unitOfMeasurement = UnitOfMeasurement.PIECE,
-            foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(2, "fruitfruitfruit"))
+            foodTagList = listOf(
+                FoodTag(0, "fruit"),
+                FoodTag(1, "vegetable"),
+                //FoodTag(2, "fruitfruitfruit"),
+                //FoodTag(3, "fruitfruitfruit"),
+                //FoodTag(4, "fruitfruitfruit"),
+            )
         ),
         {}, {}, {}, {},
     )

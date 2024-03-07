@@ -1,7 +1,6 @@
 package hu.tb.minichefy.presentation.screens.storage.storage_list.componenets
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,18 +11,18 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material3.Card
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
@@ -35,28 +34,28 @@ import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.components.icons.iconVectorResource
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
-import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
+import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 
 @Composable
 fun StorageItem(
     food: Food,
     onEditClick: () -> Unit
 ) {
-    Card(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
+            .height(IntrinsicSize.Min)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
                 .height(IntrinsicSize.Min)
+                .clickableWithoutRipple(onEditClick)
         ) {
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f))
-                    .padding(8.dp)
+                    .fillMaxHeight(),
+                contentAlignment = Alignment.Center
             ) {
                 Image(
                     imageVector = iconVectorResource(iconResource = R.drawable.junk_food_icon),
@@ -66,39 +65,44 @@ fun StorageItem(
             Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .padding(vertical = SCREEN_VERTICAL_PADDING),
-                verticalArrangement = Arrangement.SpaceBetween
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = food.title.toUpperCase(Locale.current),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = food.title.toUpperCase(Locale.current),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Icon(
+                        modifier = Modifier
+                            .size(32.dp),
+                        imageVector = Icons.Outlined.KeyboardArrowDown,
+                        contentDescription = "add quantity icon",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
                 Text(
                     modifier = Modifier,
                     text = food.quantity.toString() + " " + food.unitOfMeasurement,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f),
+                    color = MaterialTheme.colorScheme.secondary,
                     textAlign = TextAlign.Center
                 )
             }
-            Box(
-                modifier = Modifier
-                    .weight(1f),
-                contentAlignment = Alignment.TopEnd
-            ) {
-                Image(
-                    modifier = Modifier
-                        .clickableWithoutRipple(onEditClick),
-                    imageVector = Icons.Outlined.Menu,
-                    contentDescription = "add quantity icon",
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-                )
-            }
         }
+        HorizontalDivider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = MEDIUM_SPACE_BETWEEN_ELEMENTS)
+                .padding(top = SMALL_SPACE_BETWEEN_ELEMENTS),
+            thickness = 1.dp,
+            color = Color.Gray
+        )
     }
 }
 

@@ -1,6 +1,9 @@
 package hu.tb.minichefy.presentation.screens.storage.storage_list
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -99,11 +102,15 @@ fun StorageScreenContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 itemsIndexed(
-                    items = uiState.foodList
+                    items = uiState.foodList,
+                    key = { _, item -> item.id!! },
+                    contentType = { _, item -> item }
                 ) { index, food ->
                     AnimatedContent(
                         targetState = uiState.modifiedProductIndex == index,
-                        label = "",
+                        transitionSpec = {
+                            scaleIn().togetherWith(scaleOut())
+                        }
                     ) { isFoodEdited ->
                         when (isFoodEdited) {
                             true -> EditStorageItem(
@@ -160,12 +167,14 @@ fun MainScreenContentPreview() {
             foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
             foodList = listOf(
                 Food(
+                    id = 1,
                     title = "apple",
                     quantity = 2f,
                     unitOfMeasurement = UnitOfMeasurement.KG,
                     foodTagList = null
                 ),
                 Food(
+                    id = 2,
                     title = "banana",
                     quantity = 4f,
                     unitOfMeasurement = UnitOfMeasurement.DKG,
