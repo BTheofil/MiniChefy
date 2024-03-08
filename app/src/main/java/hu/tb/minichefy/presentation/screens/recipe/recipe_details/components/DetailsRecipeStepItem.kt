@@ -41,7 +41,7 @@ fun DetailsRecipeStepItem(
             Text(
                 modifier = Modifier,
                 text = stepNumber.toString(),
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.secondary,
                 style = MaterialTheme.typography.bodySmall
             )
         }
