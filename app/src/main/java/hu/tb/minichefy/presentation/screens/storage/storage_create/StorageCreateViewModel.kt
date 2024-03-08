@@ -138,17 +138,12 @@ class StorageCreateViewModel @Inject constructor(
             }
 
             is OnEvent.DialogChipTouched -> {
-                val updatedTagList = uiState.value.selectedTagList.toMutableList()
-                if (uiState.value.selectedTagList.contains(event.editedTag)) {
-                    updatedTagList.remove(event.editedTag)
-                } else {
-                    updatedTagList.add(event.editedTag)
+                val updatedTagList = uiState.value.selectedTagList.toMutableList().apply {
+                    if (contains(event.editedTag)) remove(event.editedTag)
+                    else add(event.editedTag)
                 }
-                _uiState.update {
-                    it.copy(
-                        selectedTagList = updatedTagList
-                    )
-                }
+
+                _uiState.update { it.copy(selectedTagList = updatedTagList) }
             }
 
             is OnEvent.FoodQuantityChange -> {

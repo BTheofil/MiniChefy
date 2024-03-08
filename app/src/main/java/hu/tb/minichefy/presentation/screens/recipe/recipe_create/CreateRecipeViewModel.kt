@@ -1,11 +1,14 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
+import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.repository.RecipeRepository
+import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.presentation.screens.components.icons.IconManager
@@ -21,20 +24,32 @@ import kotlin.random.Random
 
 @HiltViewModel
 class CreateRecipeViewModel @Inject constructor(
-    private val repository: RecipeRepository,
+    private val recipeRepository: RecipeRepository,
+    private val storageRepository: StorageRepository,
     private val validateQuantityNumber: ValidateQuantityNumber
 ) : ViewModel() {
+
+    init {
+        viewModelScope.launch {
+            storageRepository.getAllFood().collect { foodList ->
+                _ingredientsPageState.update { it.copy(allIngredientList = foodList) }
+            }
+        }
+    }
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
 
     data class UiState(
-        val pages: List<Pages> = listOf(Pages.BasicInformationPage(), Pages.StepsPage()),
+        val pages: List<Pages> = listOf(Pages.BasicInformationPage(), Pages.IngredientsPage(), Pages.StepsPage()),
         val targetPageIndex: Int = 0
     )
 
     private val _basicPageState = MutableStateFlow(Pages.BasicInformationPage())
     val basicPageState = _basicPageState.asStateFlow()
+
+    private val _ingredientsPageState = MutableStateFlow(Pages.IngredientsPage())
+    val ingredientsPageState = _ingredientsPageState.asStateFlow()
 
     private val _stepsPageState = MutableStateFlow(Pages.StepsPage())
     val stepsPageState = _stepsPageState.asStateFlow()
@@ -49,6 +64,11 @@ class CreateRecipeViewModel @Inject constructor(
                 0,
                 defaultIconCollection.size
             )]
+        ) : Pages()
+
+        data class IngredientsPage(
+            val selectedIngredientList: List<Food> = emptyList(),
+            val allIngredientList: List<Food> = emptyList()
         ) : Pages()
 
         data class StepsPage(
@@ -72,6 +92,9 @@ class CreateRecipeViewModel @Inject constructor(
         data class OnQuantityChange(val value: Int) : OnEvent()
         data class OnRecipeTitleChange(val text: String) : OnEvent()
         data class OnSelectedIconChange(val icon: MealIcon) : OnEvent()
+
+        //ingredients page
+        data class IngredientAddRemove(val product: Food) : OnEvent()
 
         //steps page
         data class OnStepsFieldChange(val text: String, val index: Int) : OnEvent()
@@ -112,9 +135,20 @@ class CreateRecipeViewModel @Inject constructor(
                 it.copy(recipeName = event.text)
             }
 
-
             is OnEvent.OnSelectedIconChange -> _basicPageState.update {
                 it.copy(selectedMealIcon = event.icon)
+            }
+
+            //ingredients page
+            is OnEvent.IngredientAddRemove -> {
+                Log.d("MYTAG", ingredientsPageState.value.allIngredientList.toString())
+                val list = ingredientsPageState.value.allIngredientList.toMutableList()
+
+                list.remove(event.product)
+                list.add(event.product)
+
+                _ingredientsPageState.update { it.copy(allIngredientList = list) }
+                Log.d("MYTAG", ingredientsPageState.value.allIngredientList.toString())
             }
 
             //steps page
@@ -146,9 +180,10 @@ class CreateRecipeViewModel @Inject constructor(
             }
 
             is OnEvent.OnAddRecipeStepToList -> {
-                val recipeStepsPlusEmptyField = stepsPageState.value.recipeSteps.toMutableList().apply {
-                    add(RecipeStep(step = ""))
-                }
+                val recipeStepsPlusEmptyField =
+                    stepsPageState.value.recipeSteps.toMutableList().apply {
+                        add(RecipeStep(step = ""))
+                    }
                 _stepsPageState.update {
                     it.copy(recipeSteps = recipeStepsPlusEmptyField)
                 }
@@ -163,12 +198,12 @@ class CreateRecipeViewModel @Inject constructor(
                     quantity = basicPageState.value.quantityCounter,
                     howToSteps = emptyList()
                 )
-                val resultId = repository.saveRecipe(createdRecipe)
+                val resultId = recipeRepository.saveRecipe(createdRecipe)
                 _stepsPageState.value.recipeSteps.forEach {
-                    repository.saveStep(it, resultId)
+                    recipeRepository.saveStep(it, resultId)
                 }
                 if (_stepsPageState.value.stepTypeField.isNotBlank()) {
-                    repository.saveStep(
+                    recipeRepository.saveStep(
                         RecipeStep(step = stepsPageState.value.stepTypeField),
                         resultId
                     )

@@ -13,6 +13,7 @@ import hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages.Informati
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages.StepsPage
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.UiEvent
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.OnEvent
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages.IngredientsPage
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -21,8 +22,9 @@ fun CreateRecipe(
     onFinishRecipeButtonClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val stepsPageState by viewModel.stepsPageState.collectAsStateWithLifecycle()
     val basicPageState by viewModel.basicPageState.collectAsStateWithLifecycle()
+    val ingredientsPageState by viewModel.ingredientsPageState.collectAsStateWithLifecycle()
+    val stepsPageState by viewModel.stepsPageState.collectAsStateWithLifecycle()
 
     val pager = rememberPagerState {
         uiState.pages.size
@@ -56,6 +58,15 @@ fun CreateRecipe(
                     onNextPageClick = { viewModel.onEvent(OnEvent.PageChange(1)) },
                     onSelectedIconClick = { viewModel.onEvent(OnEvent.OnSelectedIconChange(it)) }
                 )
+
+            is CreateRecipeViewModel.Pages.IngredientsPage ->
+                IngredientsPage(
+                    allIngredients = ingredientsPageState.allIngredientList,
+                    onProductClick = { viewModel.onEvent(OnEvent.IngredientAddRemove(it)) },
+                    queryText = "",
+                    onQueryChange = {},
+                    onSearchClear = { /*TODO*/ }) {
+                }
 
             is CreateRecipeViewModel.Pages.StepsPage ->
                 StepsPage(
