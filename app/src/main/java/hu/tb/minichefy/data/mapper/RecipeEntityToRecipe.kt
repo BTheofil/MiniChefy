@@ -8,16 +8,18 @@ class RecipeEntityToRecipe {
 
     fun map(from: RecipeWithSteps): Recipe = from.run {
         Recipe(
-            id = this.recipeEntity.recipeId,
+            id = recipeEntity.recipeId,
             icon = recipeEntity.icon,
-            title = this.recipeEntity.title,
-            quantity = this.recipeEntity.quantity,
-            howToSteps = this.recipeSteps.map {
+            title = recipeEntity.title,
+            quantity = recipeEntity.quantity,
+            howToSteps = recipeSteps.map {
                 RecipeStep(
                     id = it.recipeStepId,
                     step = it.step
                 )
-            }
+            },
+            timeToCreate = recipeEntity.timeToCreate,
+            timeUnit = recipeEntity.timeUnit
         )
     }
 }

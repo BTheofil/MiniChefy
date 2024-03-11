@@ -4,6 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import hu.tb.minichefy.domain.model.recipe.TimeUnit
 
 @Entity
 data class RecipeEntity(
@@ -12,6 +13,8 @@ data class RecipeEntity(
     val icon: Int,
     val title: String,
     val quantity: Int,
+    val timeToCreate: Float,
+    val timeUnit: TimeUnit,
 )
 
 @Entity

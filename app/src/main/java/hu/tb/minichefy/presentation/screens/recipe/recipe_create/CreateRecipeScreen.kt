@@ -76,7 +76,7 @@ fun CreateRecipe(
                         viewModel.onEvent(OnEvent.OnStepsFieldChange(text, index))
                     },
                     onAddButtonClick = {
-                        viewModel.onEvent(OnEvent.OnAddRecipeStepToList(stepsPageState.stepTypeField))
+                        viewModel.onEvent(OnEvent.OnAddRecipeStepToList(stepsPageState.stepBoxTextField))
                         viewModel.onEvent(OnEvent.ClearStepField)
                     },
                     onNextButtonClick = {

@@ -25,10 +25,12 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.recipe.Recipe
+import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
@@ -151,12 +153,12 @@ fun RecipeListScreenContent(
 
 @Preview
 @Composable
-fun RecipeListScreenPreview() {
+fun RecipeListScreenPreview(
+    @PreviewParameter(RecipePreviewParameterProvider::class) recipe: Recipe
+) {
     RecipeListScreenContent(
         uiState = RecipeListViewModel.UiState(
-            recipeList = listOf(
-                Recipe(0, 2131099677, "test", quantity = 1, howToSteps = emptyList())
-            )
+            recipeList = listOf(recipe)
         ),
         onEvent = {},
         onFloatingButtonClick = {},

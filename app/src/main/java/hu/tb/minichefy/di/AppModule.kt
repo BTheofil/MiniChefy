@@ -6,14 +6,14 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import hu.tb.minichefy.data.data_source.recipe.RecipeDatabase
-import hu.tb.minichefy.data.data_source.storage.StorageDatabase
+import hu.tb.minichefy.data.data_source.db.MiniChefyDatabase
 import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
 import hu.tb.minichefy.data.repository.StorageDatabaseRepositoryImpl
 import hu.tb.minichefy.domain.model.storage.entity.FoodTagEntity
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.CalculateMeasurements
+import hu.tb.minichefy.domain.use_case.DataStoreManager
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,35 +27,16 @@ object AppModule {
     // recipe db
     @Provides
     @Singleton
-    fun provideRecipeDatabase(app: Application): RecipeDatabase =
-        Room.databaseBuilder(
-            app,
-            RecipeDatabase::class.java,
-            RecipeDatabase.DATABASE_NAME
-        )
-            .build()
-
-    @Provides
-    @Singleton
-    fun provideRecipeDatabaseRepository(database: RecipeDatabase): RecipeRepository =
-        RecipeDatabaseRepositoryImpl(database.recipeDao)
-
-
-    // storage db
-    @Provides
-    @Singleton
-    fun provideStorageDatabase(
-        app: Application
-    ): StorageDatabase {
+    fun provideRecipeDatabase(app: Application): MiniChefyDatabase {
         val db = Room.databaseBuilder(
             app,
-            StorageDatabase::class.java,
-            StorageDatabase.DATABASE_NAME
+            MiniChefyDatabase::class.java,
+            MiniChefyDatabase.DATABASE_NAME
         )
             .build()
 
-        val dbFile = app.applicationContext.getDatabasePath(StorageDatabase.DATABASE_NAME)
-        if (!dbFile.exists()){
+        val dbFile = app.applicationContext.getDatabasePath(MiniChefyDatabase.DATABASE_NAME)
+        if (!dbFile.exists()) {
             CoroutineScope(Dispatchers.IO).launch {
                 db.storageDao.saveOrModifyFoodTag(
                     FoodTagEntity(id = null, tag = "fruit")
@@ -63,15 +44,24 @@ object AppModule {
                 db.storageDao.saveOrModifyFoodTag(
                     FoodTagEntity(id = null, tag = "vegetable")
                 )
+                db.storageDao.saveOrModifyFoodTag(
+                    FoodTagEntity(id = null, tag = "dish")
+                )
             }
         }
 
         return db
     }
 
+
     @Provides
     @Singleton
-    fun provideStorageDatabaseRepository(database: StorageDatabase): StorageRepository =
+    fun provideRecipeDatabaseRepository(database: MiniChefyDatabase): RecipeRepository =
+        RecipeDatabaseRepositoryImpl(database.recipeDao)
+
+    @Provides
+    @Singleton
+    fun provideStorageDatabaseRepository(database: MiniChefyDatabase): StorageRepository =
         StorageDatabaseRepositoryImpl(database.storageDao)
 
 
@@ -83,4 +73,10 @@ object AppModule {
     @Provides
     fun provideCalculateMeasurements(): CalculateMeasurements =
         CalculateMeasurements()
+
+    @Provides
+    @Singleton
+    fun provideDataStore(app: Application): DataStoreManager =
+        DataStoreManager(app)
 }
+

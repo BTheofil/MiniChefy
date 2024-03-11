@@ -1,10 +1,12 @@
 package hu.tb.minichefy.data.repository
 
-import hu.tb.minichefy.data.data_source.storage.StorageDAO
+import hu.tb.minichefy.data.data_source.dao.StorageDAO
 import hu.tb.minichefy.data.mapper.FoodEntityToFood
+import hu.tb.minichefy.data.mapper.ProductTagEntityToTag
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
-import hu.tb.minichefy.domain.model.storage.toFoodTagEntity
+import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
 import hu.tb.minichefy.domain.repository.StorageRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -27,6 +29,12 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
     override suspend fun saveOrModifyFood(food: Food): Long =
         dao.saveOrModifyFood(food.toFoodEntity())
 
+    override suspend fun searchFoodByDishProperties(title: String, uof: UnitOfMeasurement): Food? {
+        val entity: FoodEntity = dao.searchFoodByDishProperties(title, unitOfMeasurement = uof)
+            ?: return null
+        return FoodEntityToFood().map(entity)
+    }
+
     override suspend fun deleteFoodById(id: Long): Int =
         dao.deleteFoodEntity(id)
 
@@ -35,12 +43,14 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         val tagEntities = dao.getAllFoodTag()
         return tagEntities.map { entities ->
             entities.map {
-                FoodTag(
-                    id = it.id,
-                    tag = it.tag
-                )
+                ProductTagEntityToTag().map(it)
             }
         }
+    }
+
+    override suspend fun getTagById(id: Long): FoodTag {
+        val tagEntity = dao.getTagById(id)
+        return  ProductTagEntityToTag().map(tagEntity)
     }
 
     override suspend fun saveOrModifyFoodTag(tag: FoodTag): Long =

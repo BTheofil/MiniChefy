@@ -20,15 +20,15 @@ data class FoodEntity(
 
 data class FoodTagListWrapper(
     val foodTagList : List<FoodTagEntity>
-)
-
-fun FoodTagListWrapper.toFoodTag(): List<FoodTag> =
-    foodTagList.map {
-        FoodTag(
-            it.id,
-            it.tag
-        )
-    }
+) {
+    fun toFoodTag(): List<FoodTag> =
+        foodTagList.map {
+            FoodTag(
+                it.id,
+                it.tag
+            )
+        }
+}
 
 @Entity
 data class FoodTagEntity(

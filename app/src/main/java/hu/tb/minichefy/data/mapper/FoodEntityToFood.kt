@@ -2,7 +2,6 @@ package hu.tb.minichefy.data.mapper
 
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
-import hu.tb.minichefy.domain.model.storage.entity.toFoodTag
 
 class FoodEntityToFood {
 

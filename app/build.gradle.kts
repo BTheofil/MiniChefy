@@ -84,6 +84,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10")
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 }
 
 kapt {

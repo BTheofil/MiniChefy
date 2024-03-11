@@ -1,11 +1,9 @@
 package hu.tb.minichefy.data.repository
 
-import hu.tb.minichefy.data.data_source.recipe.RecipeDAO
+import hu.tb.minichefy.data.data_source.dao.RecipeDAO
 import hu.tb.minichefy.data.mapper.RecipeEntityToRecipe
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
-import hu.tb.minichefy.domain.model.recipe.toRecipeEntity
-import hu.tb.minichefy.domain.model.recipe.toRecipeStepEntity
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

@@ -3,6 +3,7 @@ package hu.tb.minichefy.presentation.preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
+import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.presentation.screens.components.icons.IconManager
 
 class RecipePreviewParameterProvider : PreviewParameterProvider<Recipe> {
@@ -14,14 +15,16 @@ class RecipePreviewParameterProvider : PreviewParameterProvider<Recipe> {
 private object MockRecipeDomain {
 
     val mockRecipe = Recipe(
-        0,
+        id = 0,
         icon = IconManager().getRandomProduct().resource,
-        "Apple pie",
-        4,
-        listOf(
+        title = "Apple pie",
+        quantity = 4,
+        howToSteps = listOf(
             RecipeStep(0, "make dao"),
             RecipeStep(1, "put the oven"),
             RecipeStep(2, "enjoy")
-        )
+        ),
+        timeUnit = TimeUnit.MINUTES,
+        timeToCreate = 30f
     )
 }

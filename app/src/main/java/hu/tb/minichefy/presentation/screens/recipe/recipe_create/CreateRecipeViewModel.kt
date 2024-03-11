@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
+import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
@@ -41,7 +42,11 @@ class CreateRecipeViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     data class UiState(
-        val pages: List<Pages> = listOf(Pages.BasicInformationPage(), Pages.IngredientsPage(), Pages.StepsPage()),
+        val pages: List<Pages> = listOf(
+            Pages.BasicInformationPage(),
+            Pages.IngredientsPage(),
+            Pages.StepsPage()
+        ),
         val targetPageIndex: Int = 0
     )
 
@@ -72,7 +77,7 @@ class CreateRecipeViewModel @Inject constructor(
         ) : Pages()
 
         data class StepsPage(
-            val stepTypeField: String = "",
+            val stepBoxTextField: String = "",
             val recipeSteps: List<RecipeStep> = listOf(RecipeStep(step = ""))
         ) : Pages()
     }
@@ -165,7 +170,7 @@ class CreateRecipeViewModel @Inject constructor(
                 val selectedRecipeStep = stepsPageState.value.recipeSteps[event.index]
                 _stepsPageState.update {
                     it.copy(
-                        stepTypeField = selectedRecipeStep.step
+                        stepBoxTextField = selectedRecipeStep.step
                     )
                 }
             }
@@ -189,22 +194,24 @@ class CreateRecipeViewModel @Inject constructor(
                 }
             }
 
-            OnEvent.ClearStepField -> _stepsPageState.update { it.copy(stepTypeField = "") }
+            OnEvent.ClearStepField -> _stepsPageState.update { it.copy(stepBoxTextField = "") }
 
             OnEvent.OnRecipeSave -> viewModelScope.launch {
                 val createdRecipe = Recipe(
                     icon = basicPageState.value.selectedMealIcon.resource,
                     title = basicPageState.value.recipeName,
                     quantity = basicPageState.value.quantityCounter,
-                    howToSteps = emptyList()
+                    howToSteps = stepsPageState.value.recipeSteps,
+                    timeToCreate = 0f,
+                    timeUnit = TimeUnit.MINUTES
                 )
                 val resultId = recipeRepository.saveRecipe(createdRecipe)
                 _stepsPageState.value.recipeSteps.forEach {
                     recipeRepository.saveStep(it, resultId)
                 }
-                if (_stepsPageState.value.stepTypeField.isNotBlank()) {
+                if (_stepsPageState.value.stepBoxTextField.isNotBlank()) {
                     recipeRepository.saveStep(
-                        RecipeStep(step = stepsPageState.value.stepTypeField),
+                        RecipeStep(step = stepsPageState.value.stepBoxTextField),
                         resultId
                     )
                 }

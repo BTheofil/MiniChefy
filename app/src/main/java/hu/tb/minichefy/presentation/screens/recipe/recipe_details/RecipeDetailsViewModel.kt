@@ -11,6 +11,7 @@ import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
+import hu.tb.minichefy.domain.use_case.DataStoreManager
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.navigation.RECIPE_ID_ARGUMENT_KEY
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,17 +21,73 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RecipeDetailsViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val recipeRepository: RecipeRepository,
-    private val storageRepository: StorageRepository
+    private val storageRepository: StorageRepository,
+    private val dataStoreManager: DataStoreManager,
 ) : ViewModel() {
 
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState = _uiState.asStateFlow()
+
     init {
+        loadRecipe()
+        loadInformDialogShouldShowValue()
+    }
+
+    data class UiState(
+        val recipe: Recipe? = null,
+        val recipeQuickInfoList: List<SimpleQuickRecipeInfo> = emptyList(),
+        val isInformDialogShouldShow: Boolean = true
+    )
+
+    sealed class OnEvent {
+        data object MakeRecipe : OnEvent()
+        data class ShouldDialogAppear(val isDialogNeverShow: Boolean) : OnEvent()
+    }
+
+    fun onEvent(event: OnEvent) {
+        when (event) {
+            is OnEvent.MakeRecipe -> {
+                viewModelScope.launch {
+
+                    val dishTag = storageRepository.getTagById(3)
+
+                    val result = storageRepository.searchFoodByDishProperties(uiState.value.recipe!!.title, UnitOfMeasurement.PIECE)
+
+                    uiState.value.recipe.also {
+                        val savedProductId = storageRepository.saveOrModifyFood(
+                            Food(
+                                id = result?.id,
+                                icon = it!!.icon,
+                                title = it.title,
+                                quantity = it.quantity.toFloat() + (result?.quantity ?: 0f),
+                                unitOfMeasurement = UnitOfMeasurement.PIECE,
+                                foodTagList = listOf(dishTag)
+                            )
+                        )
+                        Log.i("RecipeDetailsVM", savedProductId.toString())
+                    }
+                }
+            }
+
+            is OnEvent.ShouldDialogAppear -> if (event.isDialogNeverShow) {
+                viewModelScope.launch {
+                    dataStoreManager.setNeverShowDialogInDetailsScreen()
+                }
+            }
+        }
+    }
+
+    private fun loadRecipe() {
         val recipeId: String = checkNotNull(savedStateHandle[RECIPE_ID_ARGUMENT_KEY])
         viewModelScope.launch {
             val recipe = recipeRepository.getRecipeById(recipeId.toLong())
 
-            val quickInfoList = listOf(SimpleQuickRecipeInfo(recipe.quantity.toString(), "serve"))
+            val quickInfoList = listOf(
+                SimpleQuickRecipeInfo(recipe.quantity.toString(), "serve"),
+                SimpleQuickRecipeInfo(recipe.timeToCreate.toString(), recipe.timeUnit.toString())
+            )
 
             _uiState.update {
                 it.copy(
@@ -41,36 +98,16 @@ class RecipeDetailsViewModel @Inject constructor(
         }
     }
 
-    data class UiState(
-        val recipe: Recipe? = null,
-        val recipeQuickInfoList: List<SimpleQuickRecipeInfo> = emptyList()
-    )
-
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState = _uiState.asStateFlow()
-
-    sealed class OnEvent {
-        data object MakeRecipe : OnEvent()
-    }
-
-    fun onEvent(event: OnEvent) {
-        when (event) {
-            OnEvent.MakeRecipe -> {
-                viewModelScope.launch {
-                    uiState.value.recipe.also {
-                        val savedProductId = storageRepository.saveOrModifyFood(
-                            Food(
-                                icon = it!!.icon,
-                                title = it.title,
-                                quantity = it.quantity.toFloat(),
-                                unitOfMeasurement = UnitOfMeasurement.PIECE,
-                                foodTagList = emptyList()
-                            )
+    private fun loadInformDialogShouldShowValue() {
+        viewModelScope.launch {
+            dataStoreManager.isDialogShouldShowInDetailsScreen()
+                .collect { isDialogShouldShow ->
+                    _uiState.update {
+                        it.copy(
+                            isInformDialogShouldShow = isDialogShouldShow
                         )
-                        Log.i("RecipeDetailsVM", savedProductId.toString())
                     }
                 }
-            }
         }
     }
 }

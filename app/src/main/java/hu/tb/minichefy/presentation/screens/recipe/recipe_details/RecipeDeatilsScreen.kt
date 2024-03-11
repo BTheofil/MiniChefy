@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_details
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,15 +17,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.RoundRect
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,10 +35,11 @@ import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.SimpleQuickRecipeInfo
 import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.icons.iconVectorResource
+import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.ConfirmRecipeAddToStorageDialog
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.DetailsRecipeStepItem
+import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.OneColorBackground
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.QuickInfoBox
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
-import hu.tb.minichefy.presentation.ui.theme.Pink50
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 
@@ -66,23 +62,11 @@ fun RecipeDetailsContent(
 ) {
     val screenSize = LocalConfiguration.current
 
-    Canvas(Modifier.fillMaxSize()) {
-        val cornerRadius = CornerRadius(64f, 64f)
-        val path = Path().apply {
-            addRoundRect(
-                RoundRect(
-                    rect = Rect(
-                        offset = Offset(0f, 0f),
-                        size = Size(size.width, size.height / 3f),
-                    ),
-                    bottomLeft = cornerRadius,
-                    bottomRight = cornerRadius,
-                )
-            )
-        }
-        drawPath(path, color = Color(Pink50.value))
-
+    var isConfirmDialogVisible by remember {
+        mutableStateOf(false)
     }
+
+    OneColorBackground()
 
     uiState.recipe?.let { recipe ->
         Column(
@@ -110,9 +94,11 @@ fun RecipeDetailsContent(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
+            Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
             QuickInfoBox(infoList = uiState.recipeQuickInfoList)
+            Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(MEDIUM_SPACE_BETWEEN_ELEMENTS)
+                verticalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS)
             ) {
                 itemsIndexed(recipe.howToSteps) { index, step ->
                     DetailsRecipeStepItem(
@@ -122,13 +108,36 @@ fun RecipeDetailsContent(
                 }
             }
 
-            Button(onClick = {
-                onEvent(RecipeDetailsViewModel.OnEvent.MakeRecipe)
-            }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                Text(text = "Make recipe")
+                Button(onClick = {
+                    if (uiState.isInformDialogShouldShow) {
+                        isConfirmDialogVisible = true
+                    } else {
+                        onEvent(RecipeDetailsViewModel.OnEvent.MakeRecipe)
+                    }
+                }
+                ) {
+                    Text(text = "Make recipe")
+                }
             }
         }
+    }
+
+    if (isConfirmDialogVisible && uiState.isInformDialogShouldShow) {
+        ConfirmRecipeAddToStorageDialog(
+            onConfirmButtonClick = {
+                onEvent(RecipeDetailsViewModel.OnEvent.ShouldDialogAppear(it))
+                onEvent(RecipeDetailsViewModel.OnEvent.MakeRecipe)
+                isConfirmDialogVisible = false
+            },
+            onCancelButtonClick = {
+                onEvent(RecipeDetailsViewModel.OnEvent.ShouldDialogAppear(it))
+                isConfirmDialogVisible = false
+            }
+        )
     }
 }
 
@@ -140,7 +149,13 @@ fun RecipeDetailsContentPreview(
     RecipeDetailsContent(
         uiState = RecipeDetailsViewModel.UiState(
             recipe = mockRecipe,
-            recipeQuickInfoList = listOf(SimpleQuickRecipeInfo("5", "serve"))
+            recipeQuickInfoList = listOf(
+                SimpleQuickRecipeInfo(mockRecipe.quantity.toString(), "serve"),
+                SimpleQuickRecipeInfo(
+                    mockRecipe.timeToCreate.toInt().toString(),
+                    mockRecipe.timeUnit.toString()
+                )
+            )
         ),
         onEvent = {}
     )

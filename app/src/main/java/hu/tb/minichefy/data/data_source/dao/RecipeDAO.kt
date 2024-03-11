@@ -1,4 +1,4 @@
-package hu.tb.minichefy.data.data_source.recipe
+package hu.tb.minichefy.data.data_source.dao
 
 import androidx.room.Dao
 import androidx.room.Insert

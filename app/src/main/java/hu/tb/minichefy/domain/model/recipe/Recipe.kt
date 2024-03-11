@@ -7,16 +7,25 @@ data class Recipe(
     val icon: Int,
     val title: String,
     val quantity: Int,
+    val timeToCreate: Float,
+    val timeUnit: TimeUnit,
     val howToSteps: List<RecipeStep>
-)
+) {
+    fun toRecipeEntity() = run {
+        RecipeEntity(
+            icon = icon,
+            title = title,
+            quantity = quantity,
+            recipeId = id,
+            timeToCreate = timeToCreate,
+            timeUnit = timeUnit
+        )
+    }
+}
 
-fun Recipe.toRecipeEntity() = run {
-    RecipeEntity(
-        icon = icon,
-        title = title,
-        quantity = quantity,
-        recipeId = id
-    )
+enum class TimeUnit(val id: Int) {
+    MINUTES(1),
+    HOUR(2)
 }
 
 

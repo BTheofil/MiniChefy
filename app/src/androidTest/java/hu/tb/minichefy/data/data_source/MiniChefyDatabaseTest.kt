@@ -3,8 +3,9 @@ package hu.tb.minichefy.data.data_source
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import hu.tb.minichefy.data.data_source.recipe.RecipeDAO
-import hu.tb.minichefy.data.data_source.recipe.RecipeDatabase
+import hu.tb.minichefy.data.data_source.dao.RecipeDAO
+import hu.tb.minichefy.data.data_source.db.MiniChefyDatabase
+import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -14,28 +15,28 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class RecipeDatabaseTest {
+class MiniChefyDatabaseTest {
 
     private lateinit var recipeDao: RecipeDAO
-    private lateinit var recipeDatabase: RecipeDatabase
+    private lateinit var miniChefyDatabase: MiniChefyDatabase
 
     @Before
     fun createDb() {
-        recipeDatabase = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(), RecipeDatabase::class.java
+        miniChefyDatabase = Room.inMemoryDatabaseBuilder(
+            ApplicationProvider.getApplicationContext(), MiniChefyDatabase::class.java
         )
             .build()
-        recipeDao = recipeDatabase.recipeDao
+        recipeDao = miniChefyDatabase.recipeDao
     }
 
     @After
     fun closeDb() {
-        recipeDatabase.close()
+        miniChefyDatabase.close()
     }
 
     @Test
     fun insertAndRetrieveRecipe() = runBlocking {
-        val recipeEntity = RecipeEntity(recipeId = null, icon = 1, title = "Pasta", quantity = 2)
+        val recipeEntity = RecipeEntity(recipeId = null, icon = 1, title = "Pasta", quantity = 2, timeUnit = TimeUnit.MINUTES, timeToCreate = 30f)
 
         val recipeId = recipeDao.insertRecipe(recipeEntity)
 
