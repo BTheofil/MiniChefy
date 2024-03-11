@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,6 +37,10 @@ fun IngredientsPage(
     onSearchClear: () -> Unit,
     onNextClick: () -> Unit
 ) {
+    val selectedList = remember {
+        mutableStateListOf<Food>()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,14 +55,23 @@ fun IngredientsPage(
             clearIconButtonClick = onSearchClear
         )
         LazyColumn {
-            items(allIngredients,
-                key = { item -> item.id!! }) { product ->
+            items(
+                items = allIngredients,
+                key = { item -> item.id!! }
+            ) { product ->
                 Row(
                     modifier = Modifier
                         .animateItemPlacement(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Checkbox(checked = false, onCheckedChange = { onProductClick(product) })
+                    Checkbox(checked = selectedList.contains(product), onCheckedChange = {
+                        onProductClick(product)
+                        if(selectedList.contains(product)){
+                            selectedList.remove(product)
+                        } else {
+                            selectedList.add(product)
+                        }
+                    })
                     Text(
                         text = product.title,
                         style = MaterialTheme.typography.titleLarge,

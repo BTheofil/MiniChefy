@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,16 +29,28 @@ class CreateRecipeViewModel @Inject constructor(
     private val validateQuantityNumber: ValidateQuantityNumber
 ) : ViewModel() {
 
-    init {
-        viewModelScope.launch {
-            storageRepository.getAllFood().collect { foodList ->
-                _ingredientsPageState.update { it.copy(allIngredientList = foodList) }
-            }
-        }
-    }
+    private val _basicPageState = MutableStateFlow(Pages.BasicInformationPage())
+    val basicPageState = _basicPageState.asStateFlow()
+
+    private val _ingredientsPageState = MutableStateFlow(Pages.IngredientsPage())
+    val ingredientsPageState = _ingredientsPageState.asStateFlow()
+
+    private val _stepsPageState = MutableStateFlow(Pages.StepsPage())
+    val stepsPageState = _stepsPageState.asStateFlow()
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            storageRepository.getAllFood().collect { foodList ->
+                _ingredientsPageState.update { ingredientsPage ->
+                    ingredientsPage.copy(
+                        allIngredientList = foodList.sortedBy { it.title })
+                }
+            }
+        }
+    }
 
     data class UiState(
         val pages: List<Pages> = listOf(
@@ -49,15 +60,6 @@ class CreateRecipeViewModel @Inject constructor(
         ),
         val targetPageIndex: Int = 0
     )
-
-    private val _basicPageState = MutableStateFlow(Pages.BasicInformationPage())
-    val basicPageState = _basicPageState.asStateFlow()
-
-    private val _ingredientsPageState = MutableStateFlow(Pages.IngredientsPage())
-    val ingredientsPageState = _ingredientsPageState.asStateFlow()
-
-    private val _stepsPageState = MutableStateFlow(Pages.StepsPage())
-    val stepsPageState = _stepsPageState.asStateFlow()
 
     sealed class Pages {
         data class BasicInformationPage(
@@ -72,8 +74,9 @@ class CreateRecipeViewModel @Inject constructor(
         ) : Pages()
 
         data class IngredientsPage(
-            val selectedIngredientList: List<Food> = emptyList(),
-            val allIngredientList: List<Food> = emptyList()
+            val selectedIngredientList: MutableList<Food> = mutableListOf(),
+            val allIngredientList: List<Food> = emptyList(),
+            val searchText: String = ""
         ) : Pages()
 
         data class StepsPage(
@@ -100,6 +103,7 @@ class CreateRecipeViewModel @Inject constructor(
 
         //ingredients page
         data class IngredientAddRemove(val product: Food) : OnEvent()
+        data class OnSearchValueChange(val text: String) : OnEvent()
 
         //steps page
         data class OnStepsFieldChange(val text: String, val index: Int) : OnEvent()
@@ -146,15 +150,26 @@ class CreateRecipeViewModel @Inject constructor(
 
             //ingredients page
             is OnEvent.IngredientAddRemove -> {
-                Log.d("MYTAG", ingredientsPageState.value.allIngredientList.toString())
-                val list = ingredientsPageState.value.allIngredientList.toMutableList()
+                if (ingredientsPageState.value.selectedIngredientList.contains(event.product)){
+                    val list = ingredientsPageState.value.allIngredientList.toMutableList()
 
-                list.remove(event.product)
-                list.add(event.product)
+                    list.remove(event.product)
+                    list.add(0, event.product)
 
-                _ingredientsPageState.update { it.copy(allIngredientList = list) }
-                Log.d("MYTAG", ingredientsPageState.value.allIngredientList.toString())
+                    _ingredientsPageState.value.selectedIngredientList.remove(event.product)
+                    _ingredientsPageState.update { it.copy(allIngredientList = list) }
+                } else {
+                    val list = ingredientsPageState.value.allIngredientList.toMutableList()
+
+                    list.remove(event.product)
+                    list.add(-1, event.product)
+
+                    _ingredientsPageState.value.selectedIngredientList.add(event.product)
+                    _ingredientsPageState.update { it.copy(allIngredientList = list) }
+                }
             }
+
+            is OnEvent.OnSearchValueChange -> _ingredientsPageState.update { it.copy(searchText = event.text) }
 
             //steps page
             is OnEvent.OnStepsFieldChange -> {

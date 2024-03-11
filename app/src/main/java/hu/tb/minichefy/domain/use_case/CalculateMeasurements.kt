@@ -16,8 +16,10 @@ class CalculateMeasurements {
             productBase.unitOfMeasurement.id in liquidRange && productChanger.unitOfMeasurement.id in liquidRange
         val isMass =
             productBase.unitOfMeasurement.id in massRange && productChanger.unitOfMeasurement.id in massRange
+        val isPiece =
+            productBase.unitOfMeasurement.id == 0 && productChanger.unitOfMeasurement.id == 0
 
-        if (!isLiquid && !isMass) throw IllegalArgumentException("Not compatible unit of measurements")
+        if (!isLiquid && !isMass && !isPiece) throw IllegalArgumentException("Not compatible unit of measurements")
 
         val result = performCalculation(
             productBase.convertToSmallestUnit(),
@@ -29,6 +31,7 @@ class CalculateMeasurements {
             isLiquid -> SimpleProduct(result, UnitOfMeasurement.DL)
             result >= 1000 -> SimpleProduct(result / 1000, UnitOfMeasurement.KG)
             result >= 10 -> SimpleProduct(result / 10, UnitOfMeasurement.DKG)
+            isPiece -> SimpleProduct(result, UnitOfMeasurement.PIECE)
             else -> SimpleProduct(result, UnitOfMeasurement.G)
         }
     }

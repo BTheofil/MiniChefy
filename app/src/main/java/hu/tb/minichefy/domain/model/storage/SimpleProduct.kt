@@ -7,7 +7,7 @@ data class SimpleProduct(
     val unitOfMeasurement: UnitOfMeasurement
 ) {
     fun convertToSmallestUnit() =
-        when (this.unitOfMeasurement) {
+        when (unitOfMeasurement) {
             KG -> quantity * 1000
             DKG -> quantity * 10
             G -> quantity

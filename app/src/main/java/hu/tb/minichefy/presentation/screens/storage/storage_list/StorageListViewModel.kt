@@ -23,6 +23,9 @@ class StorageListViewModel @Inject constructor(
     private val calculateMeasurements: CalculateMeasurements
 ) : ViewModel() {
 
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState: StateFlow<UiState> = _uiState
+
     init {
         viewModelScope.launch {
             storageRepository.getAllFood().collect { foodList ->
@@ -51,9 +54,6 @@ class StorageListViewModel @Inject constructor(
         val modifiedProductIndex: Int = -1,
         val allProductIconList: List<ProductIcon> = IconManager().getAllProductIconList
     )
-
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState: StateFlow<UiState> = _uiState
 
     sealed class OnEvent {
         data object ClearSearchText : OnEvent()

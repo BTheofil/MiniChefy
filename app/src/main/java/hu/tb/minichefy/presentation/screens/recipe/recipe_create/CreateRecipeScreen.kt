@@ -63,10 +63,11 @@ fun CreateRecipe(
                 IngredientsPage(
                     allIngredients = ingredientsPageState.allIngredientList,
                     onProductClick = { viewModel.onEvent(OnEvent.IngredientAddRemove(it)) },
-                    queryText = "",
-                    onQueryChange = {},
-                    onSearchClear = { /*TODO*/ }) {
-                }
+                    queryText = ingredientsPageState.searchText,
+                    onQueryChange = { viewModel.onEvent(OnEvent.OnSearchValueChange(it)) },
+                    onSearchClear = { viewModel.onEvent(OnEvent.OnSearchValueChange("")) },
+                    onNextClick = { viewModel.onEvent(OnEvent.PageChange(2)) }
+                )
 
             is CreateRecipeViewModel.Pages.StepsPage ->
                 StepsPage(
