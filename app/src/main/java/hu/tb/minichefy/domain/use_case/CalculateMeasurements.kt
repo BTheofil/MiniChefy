@@ -27,12 +27,24 @@ class CalculateMeasurements {
         )
 
         return when {
-            isLiquid && result >= 10 -> SimpleProduct(result / 10, UnitOfMeasurement.L)
-            isLiquid -> SimpleProduct(result, UnitOfMeasurement.DL)
-            result >= 1000 -> SimpleProduct(result / 1000, UnitOfMeasurement.KG)
-            result >= 10 -> SimpleProduct(result / 10, UnitOfMeasurement.DKG)
-            isPiece -> SimpleProduct(result, UnitOfMeasurement.PIECE)
-            else -> SimpleProduct(result, UnitOfMeasurement.G)
+            isLiquid && result >= 10 -> SimpleProduct(
+                quantity = result / 10,
+                unitOfMeasurement = UnitOfMeasurement.L
+            )
+
+            isLiquid -> SimpleProduct(quantity = result, unitOfMeasurement = UnitOfMeasurement.DL)
+            result >= 1000 -> SimpleProduct(
+                quantity = result / 1000,
+                unitOfMeasurement = UnitOfMeasurement.KG
+            )
+
+            result >= 10 -> SimpleProduct(
+                quantity = result / 10,
+                unitOfMeasurement = UnitOfMeasurement.DKG
+            )
+
+            isPiece -> SimpleProduct(quantity = result, unitOfMeasurement = UnitOfMeasurement.PIECE)
+            else -> SimpleProduct(quantity = result, unitOfMeasurement = UnitOfMeasurement.G)
         }
     }
 

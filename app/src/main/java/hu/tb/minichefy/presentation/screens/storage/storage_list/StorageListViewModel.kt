@@ -95,12 +95,12 @@ class StorageListViewModel @Inject constructor(
             is OnEvent.ModifyProductQuantity -> {
                 val result = calculateMeasurements.simpleProductCalculations(
                     SimpleProduct(
-                        uiState.value.foodList[uiState.value.modifiedProductIndex].quantity,
-                        uiState.value.foodList[uiState.value.modifiedProductIndex].unitOfMeasurement
+                        quantity = uiState.value.foodList[uiState.value.modifiedProductIndex].quantity,
+                        unitOfMeasurement = uiState.value.foodList[uiState.value.modifiedProductIndex].unitOfMeasurement
                     ),
                     SimpleProduct(
-                        event.value,
-                        uiState.value.foodList[uiState.value.modifiedProductIndex].unitOfMeasurement
+                        quantity = event.value,
+                        unitOfMeasurement = uiState.value.foodList[uiState.value.modifiedProductIndex].unitOfMeasurement
                     )
                 )
                 val updatedProduct =
