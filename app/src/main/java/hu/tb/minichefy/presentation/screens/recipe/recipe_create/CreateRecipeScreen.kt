@@ -61,6 +61,7 @@ fun CreateRecipe(
 
             is CreateRecipeViewModel.Pages.IngredientsPage ->
                 IngredientsPage(
+                    selectedList = ingredientsPageState.selectedIngredientList,
                     allIngredients = ingredientsPageState.allIngredientList,
                     onProductClick = { viewModel.onEvent(OnEvent.IngredientAddRemove(it)) },
                     queryText = ingredientsPageState.searchText,

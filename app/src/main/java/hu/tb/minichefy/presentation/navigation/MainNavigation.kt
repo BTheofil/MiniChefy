@@ -13,7 +13,7 @@ fun MainNavigation(
     navController: NavHostController
 ) {
     //related docs https://developer.android.com/guide/navigation/design/nested-graphs#compose
-    NavHost(navController = navController, startDestination = STORAGE_GRAPH) {
+    NavHost(navController = navController, startDestination = RECIPE_GRAPH) {
         storageNestedGraph(navController)
 
         recipeNestedGraph(navController)

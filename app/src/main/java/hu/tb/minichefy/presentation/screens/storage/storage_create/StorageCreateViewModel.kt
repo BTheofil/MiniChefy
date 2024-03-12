@@ -22,6 +22,9 @@ class StorageCreateViewModel @Inject constructor(
     private val storageRepository: StorageRepository
 ) : ViewModel() {
 
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState = _uiState.asStateFlow()
+
     init {
         viewModelScope.launch {
             storageRepository.getAllFoodTag().collect { tags ->
@@ -51,9 +54,6 @@ class StorageCreateViewModel @Inject constructor(
         SOLID("Solid"),
         PIECE("Piece")
     }
-
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState = _uiState.asStateFlow()
 
     sealed class OnEvent {
         data object Save : OnEvent()
@@ -104,7 +104,11 @@ class StorageCreateViewModel @Inject constructor(
                         )
                     }
 
-                    FoodType.PIECE -> {}
+                    FoodType.PIECE -> {
+                        _uiState.update {
+                            it.copy(productUnitOfMeasurement = UnitOfMeasurement.PIECE)
+                        }
+                    }
                 }
 
                 _uiState.update {

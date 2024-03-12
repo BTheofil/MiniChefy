@@ -46,7 +46,8 @@ class CreateRecipeViewModel @Inject constructor(
             storageRepository.getAllFood().collect { foodList ->
                 _ingredientsPageState.update { ingredientsPage ->
                     ingredientsPage.copy(
-                        allIngredientList = foodList.sortedBy { it.title })
+                        allIngredientList = foodList.sortedBy { it.title }
+                    )
                 }
             }
         }
@@ -74,7 +75,7 @@ class CreateRecipeViewModel @Inject constructor(
         ) : Pages()
 
         data class IngredientsPage(
-            val selectedIngredientList: MutableList<Food> = mutableListOf(),
+            val selectedIngredientList: List<Food> = emptyList(),
             val allIngredientList: List<Food> = emptyList(),
             val searchText: String = ""
         ) : Pages()
@@ -150,22 +151,24 @@ class CreateRecipeViewModel @Inject constructor(
 
             //ingredients page
             is OnEvent.IngredientAddRemove -> {
-                if (ingredientsPageState.value.selectedIngredientList.contains(event.product)){
-                    val list = ingredientsPageState.value.allIngredientList.toMutableList()
+                val currentState = ingredientsPageState.value
 
-                    list.remove(event.product)
-                    list.add(0, event.product)
+                val updatedAllList = currentState.allIngredientList.toMutableList()
+                val updatedSelectedList = currentState.selectedIngredientList.toMutableList()
 
-                    _ingredientsPageState.value.selectedIngredientList.remove(event.product)
-                    _ingredientsPageState.update { it.copy(allIngredientList = list) }
+                if (currentState.selectedIngredientList.contains(event.product)) {
+                    updatedAllList.add(0, event.product)
+                    updatedSelectedList.remove(event.product)
                 } else {
-                    val list = ingredientsPageState.value.allIngredientList.toMutableList()
+                    updatedAllList.remove(event.product)
+                    updatedSelectedList.add(0, event.product)
+                }
 
-                    list.remove(event.product)
-                    list.add(-1, event.product)
-
-                    _ingredientsPageState.value.selectedIngredientList.add(event.product)
-                    _ingredientsPageState.update { it.copy(allIngredientList = list) }
+                _ingredientsPageState.update {
+                    it.copy(
+                        selectedIngredientList = updatedSelectedList,
+                        allIngredientList = updatedAllList
+                    )
                 }
             }
 
