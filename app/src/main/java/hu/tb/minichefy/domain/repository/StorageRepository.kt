@@ -14,6 +14,8 @@ interface StorageRepository {
 
     suspend fun searchFoodByDishProperties(title: String, uof: UnitOfMeasurement): Food?
 
+    suspend fun searchProductByTitle(searchText: String): List<Food>
+
     suspend fun deleteFoodById(id: Long): Int
 
     //tag

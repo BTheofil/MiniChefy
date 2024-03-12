@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.repository.RecipeRepository
+import hu.tb.minichefy.presentation.ui.theme.SEARCH_BAR_WAIT_AFTER_CHARACTER
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,9 +13,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
-
-private const val RECIPE_SEARCH_DELAY = 500L
 
 @HiltViewModel
 class RecipeListViewModel @Inject constructor(
@@ -35,10 +33,7 @@ class RecipeListViewModel @Inject constructor(
         data class OpenRecipeSettingsPanel(val recipeId: Long) : OnEvent()
         data class SearchTextChange(val text: String) : OnEvent()
         data object DeleteRecipe : OnEvent()
-        data object ClearText : OnEvent()
     }
-
-    //private val allRecipes = repository.getAllRecipe()
 
     init {
         viewModelScope.launch {
@@ -67,28 +62,15 @@ class RecipeListViewModel @Inject constructor(
 
             is OnEvent.SearchTextChange -> {
                 viewModelScope.launch {
-                    _uiState.emit(_uiState.value.copy(searchRecipeText = event.text))
+                    _uiState.update { it.copy(searchRecipeText = event.text) }
 
-                    delay(RECIPE_SEARCH_DELAY.milliseconds)
+                    delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
 
-                    _uiState.emit(
-                        _uiState.value.copy(
-                            recipeList = if (uiState.value.searchRecipeText.isNotBlank()) {
-                                repository.searchRecipeByTitle(event.text)
-                            } else {
-                                repository.searchRecipeByTitle("")
-                            }
-                        )
-                    )
-                }
-            }
-
-            OnEvent.ClearText -> {
-                viewModelScope.launch {
                     _uiState.update {
-                        it.copy(searchRecipeText = "")
+                        it.copy(
+                            recipeList = repository.searchRecipeByTitle(event.text)
+                        )
                     }
-                    _uiState.emit(_uiState.value.copy(recipeList = repository.searchRecipeByTitle("")))
                 }
             }
         }

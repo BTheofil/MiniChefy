@@ -95,7 +95,7 @@ fun RecipeListScreenContent(
                         onEvent(RecipeListViewModel.OnEvent.SearchTextChange(it))
                     },
                     clearIconButtonClick = {
-                        onEvent(RecipeListViewModel.OnEvent.ClearText)
+                        onEvent(RecipeListViewModel.OnEvent.SearchTextChange(""))
                     }
                 )
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))

@@ -13,7 +13,9 @@ import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.presentation.screens.components.icons.IconManager
 import hu.tb.minichefy.presentation.screens.components.icons.MealIcon
+import hu.tb.minichefy.presentation.ui.theme.SEARCH_BAR_WAIT_AFTER_CHARACTER
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -172,7 +174,19 @@ class CreateRecipeViewModel @Inject constructor(
                 }
             }
 
-            is OnEvent.OnSearchValueChange -> _ingredientsPageState.update { it.copy(searchText = event.text) }
+            is OnEvent.OnSearchValueChange -> {
+                viewModelScope.launch {
+                    _ingredientsPageState.update { it.copy(searchText = event.text) }
+
+                    delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
+
+                    _ingredientsPageState.update { ingredientsPage ->
+                        ingredientsPage.copy(
+                            allIngredientList = storageRepository.searchProductByTitle(event.text).sortedBy { it.title }
+                        )
+                    }
+                }
+            }
 
             //steps page
             is OnEvent.OnStepsFieldChange -> {

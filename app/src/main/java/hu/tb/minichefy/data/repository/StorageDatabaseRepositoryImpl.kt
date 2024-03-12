@@ -35,6 +35,13 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         return FoodEntityToFood().map(entity)
     }
 
+    override suspend fun searchProductByTitle(searchText: String): List<Food> {
+        val products = dao.searchProductByTitle("%$searchText%")
+        return products.map {
+            FoodEntityToFood().map(it)
+        }
+    }
+
     override suspend fun deleteFoodById(id: Long): Int =
         dao.deleteFoodEntity(id)
 
