@@ -59,7 +59,7 @@ class StorageListViewModel @Inject constructor(
         data object ClearSearchText : OnEvent()
         data object SaveEditedFood : OnEvent()
         data class SearchTextChange(val text: String) : OnEvent()
-        data class UpdateModifyProductIndex(val index: Int) : OnEvent()
+        data class OnProductClick(val index: Int) : OnEvent()
         data class FilterChipClicked(val tag: FoodTag) : OnEvent()
         data class ModifyProductTag(val tag: FoodTag) : OnEvent()
         data class ModifyProductQuantity(val value: Float) : OnEvent()
@@ -76,7 +76,7 @@ class StorageListViewModel @Inject constructor(
                 it.copy(searchText = "")
             }
 
-            is OnEvent.UpdateModifyProductIndex -> _uiState.update {
+            is OnEvent.OnProductClick -> _uiState.update {
                 it.copy(modifiedProductIndex = event.index)
             }
 

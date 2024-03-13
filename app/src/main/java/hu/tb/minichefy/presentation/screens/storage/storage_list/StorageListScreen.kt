@@ -5,6 +5,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -152,6 +153,10 @@ fun StorageScreenContent(
                             false -> {
                                 Column {
                                     ListItem(
+                                        modifier = Modifier
+                                            .clickable {
+                                                onEvent(StorageListViewModel.OnEvent.OnProductClick(index))
+                                            },
                                         leadingContent = {
                                             Image(
                                                 modifier = Modifier

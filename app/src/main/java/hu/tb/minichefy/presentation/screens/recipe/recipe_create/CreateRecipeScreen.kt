@@ -68,7 +68,7 @@ fun CreateRecipe(
                     onQueryChange = { viewModel.onEvent(OnEvent.OnSearchValueChange(it)) },
                     onSearchClear = { viewModel.onEvent(OnEvent.OnSearchValueChange("")) },
                     onNextClick = { viewModel.onEvent(OnEvent.PageChange(2)) },
-                    onDialogProceedClick = {}
+                    onDialogProceedClick = { viewModel.onEvent(OnEvent.NewIngredientAdded(it)) }
                 )
 
             is CreateRecipeViewModel.Pages.StepsPage ->

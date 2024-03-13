@@ -147,7 +147,10 @@ fun IngredientsPage(
         CreateNewIngredientDialog(
             onDismissRequest = { isCreateNewIngredientDialogVisible = false },
             onCancelClick = { isCreateNewIngredientDialogVisible = false },
-            onProceedClick = onDialogProceedClick
+            onProceedClick = {
+                onDialogProceedClick(it)
+                isCreateNewIngredientDialogVisible = false
+            }
         )
     }
 }

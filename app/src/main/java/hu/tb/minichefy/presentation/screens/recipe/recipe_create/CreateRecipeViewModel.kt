@@ -7,6 +7,7 @@ import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.domain.model.storage.Food
+import hu.tb.minichefy.domain.model.storage.SimpleProduct
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
@@ -107,6 +108,7 @@ class CreateRecipeViewModel @Inject constructor(
         //ingredients page
         data class IngredientAddRemove(val product: Food) : OnEvent()
         data class OnSearchValueChange(val text: String) : OnEvent()
+        data class NewIngredientAdded(val ingredient: SimpleProduct): OnEvent()
 
         //steps page
         data class OnStepsFieldChange(val text: String, val index: Int) : OnEvent()
@@ -185,6 +187,12 @@ class CreateRecipeViewModel @Inject constructor(
                             allIngredientList = storageRepository.searchProductByTitle(event.text).sortedBy { it.title }
                         )
                     }
+                }
+            }
+
+            is OnEvent.NewIngredientAdded -> {
+                viewModelScope.launch {
+                    storageRepository.saveOrModifyFood(event.ingredient.toProduct())
                 }
             }
 
