@@ -28,8 +28,8 @@ interface StorageDAO {
     suspend fun searchFoodByDishProperties(title: String, unitOfMeasurement: UnitOfMeasurement): FoodEntity?
 
     @Transaction
-    @Query("SELECT id, title FROM FoodEntity WHERE title LIKE :searchTitle")
-    suspend fun searchProductByTitle(searchTitle: String): List<SimplerFoodEntity>
+    @Query("SELECT * FROM FoodEntity WHERE title LIKE :searchTitle")
+    suspend fun searchProductByTitle(searchTitle: String): List<FoodEntity>
 
     @Query("DELETE FROM FoodEntity WHERE id = :id")
     suspend fun deleteFoodEntity(id: Long): Int

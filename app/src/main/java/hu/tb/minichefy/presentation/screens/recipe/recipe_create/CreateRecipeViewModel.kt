@@ -76,8 +76,8 @@ class CreateRecipeViewModel @Inject constructor(
         ) : Pages()
 
         data class IngredientsPage(
-            val selectedIngredientList: List<IngredientBase.SelectedIngredient> = emptyList(),
-            val unSelectedIngredientList: List<IngredientBase.UnSelectedIngredient> = emptyList(),
+            val selectedIngredientList: List<IngredientBase.IngredientComplete> = emptyList(),
+            val unSelectedIngredientList: List<IngredientBase.IngredientSimple> = emptyList(),
             val searchText: String = ""
         ) : Pages()
 
@@ -160,12 +160,9 @@ class CreateRecipeViewModel @Inject constructor(
                 if (currentState.selectedIngredientList.contains(event.ingredient)) {
                     unselectedMutableList.add(0, event.ingredient)
                     selectedMutableList.remove(event.ingredient)
-
-                    selectedMutableList.removeIf { event.ingredient.id == it.id }
-
                 } else {
-                    unselectedMutableList.remove(event.ingredient as IngredientBase.UnSelectedIngredient)
-                    selectedMutableList.add(0, event.ingredient as IngredientBase.SelectedIngredient)
+                    unselectedMutableList.remove(event.ingredient)
+                    selectedMutableList.add(0, event.ingredient)
                 }
 
                 _ingredientsPageState.update {

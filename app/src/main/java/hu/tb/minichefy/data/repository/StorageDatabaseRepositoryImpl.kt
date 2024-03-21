@@ -3,7 +3,6 @@ package hu.tb.minichefy.data.repository
 import hu.tb.minichefy.data.data_source.dao.StorageDAO
 import hu.tb.minichefy.data.mapper.FoodEntityToFood
 import hu.tb.minichefy.data.mapper.ProductTagEntityToTag
-import hu.tb.minichefy.domain.model.recipe.Ingredient
 import hu.tb.minichefy.domain.model.recipe.IngredientBase
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
@@ -28,14 +27,12 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllStorageFoodName(): List<> {
+    override suspend fun getAllStorageFoodName(): List<IngredientBase.IngredientSimple> {
         val entities = dao.getAllStorageFoodName()
         return entities.map {
-            IngredientBase(
+            IngredientBase.IngredientSimple(
                 id = it.id,
                 title = it.title,
-                quantity = 0f,
-                unitOfMeasurement = UnitOfMeasurement.PIECE
             )
         }
     }
@@ -52,15 +49,10 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         return FoodEntityToFood().map(entity)
     }
 
-    override suspend fun searchProductByTitle(searchText: String): List<Ingredient> {
-        val ingredientsTitle = dao.searchProductByTitle("%$searchText%")
-        return ingredientsTitle.map {
-            Ingredient(
-                id = it.id,
-                title = it.title,
-                quantity = 0f,
-                unitOfMeasurement = UnitOfMeasurement.PIECE
-            )
+    override suspend fun searchProductByTitle(searchText: String): List<Food> {
+        val products = dao.searchProductByTitle("%$searchText%")
+        return products.map {
+            FoodEntityToFood().map(it)
         }
     }
 

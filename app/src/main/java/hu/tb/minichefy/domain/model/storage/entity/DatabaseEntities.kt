@@ -20,8 +20,7 @@ data class FoodEntity(
 
 @Entity
 data class SimplerFoodEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long?,
+    val id: Long,
     val title: String,
 )
 

@@ -26,7 +26,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import hu.tb.minichefy.domain.model.recipe.Ingredient
+import hu.tb.minichefy.domain.model.recipe.IngredientSimple
+import hu.tb.minichefy.domain.model.recipe.RecipeIngredient
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.presentation.preview.ProductPreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
@@ -39,19 +40,19 @@ import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun IngredientsPage(
-    selectedList: List<Ingredient>,
-    unselectedList: List<Ingredient>,
+    selectedList: List<RecipeIngredient>,
+    unselectedList: List<IngredientSimple>,
     queryText: String,
     onQueryChange: (text: String) -> Unit,
     onSearchClear: () -> Unit,
     onNextClick: () -> Unit,
-    moveIngredientPosition: (ingredient: Ingredient) -> Unit,
+    moveIngredientPosition: (ingredient: RecipeIngredient) -> Unit,
 ) {
     var isIngredientDialogVisible by remember {
         mutableStateOf(false)
     }
     var optionalParameterPass by remember {
-        mutableStateOf<Ingredient?>(null)
+        mutableStateOf<RecipeIngredient?>(null)
     }
 
     Scaffold(
@@ -91,7 +92,6 @@ fun IngredientsPage(
                     }
                     items(
                         items = selectedList,
-                        key = { item -> item.hashCode() }
                     ) { product ->
                         ListItem(
                             modifier = Modifier.animateItemPlacement(),
@@ -142,7 +142,7 @@ fun IngredientsPage(
                     }
                     items(
                         items = unselectedList,
-                        key = { item -> item.id!! }
+                        key = { item -> item.id }
                     ) { product ->
                         ListItem(
                             modifier = Modifier.animateItemPlacement(),
