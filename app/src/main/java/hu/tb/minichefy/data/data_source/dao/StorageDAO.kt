@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.model.storage.entity.FoodTagEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
+import hu.tb.minichefy.domain.model.storage.entity.SimplerFoodEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -17,6 +18,9 @@ interface StorageDAO {
     @Query("SELECT * FROM FoodEntity")
     fun getAllStorageFood(): Flow<List<FoodEntity>>
 
+    @Query("SELECT id, title FROM FoodEntity")
+    suspend fun getAllStorageFoodName(): List<SimplerFoodEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveOrModifyFood(foodEntity: FoodEntity): Long
 
@@ -24,8 +28,8 @@ interface StorageDAO {
     suspend fun searchFoodByDishProperties(title: String, unitOfMeasurement: UnitOfMeasurement): FoodEntity?
 
     @Transaction
-    @Query("SELECT * FROM FoodEntity WHERE title LIKE :searchTitle")
-    suspend fun searchProductByTitle(searchTitle: String): List<FoodEntity>
+    @Query("SELECT id, title FROM FoodEntity WHERE title LIKE :searchTitle")
+    suspend fun searchProductByTitle(searchTitle: String): List<SimplerFoodEntity>
 
     @Query("DELETE FROM FoodEntity WHERE id = :id")
     suspend fun deleteFoodEntity(id: Long): Int

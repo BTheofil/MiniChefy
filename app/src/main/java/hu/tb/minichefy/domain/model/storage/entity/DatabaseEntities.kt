@@ -18,6 +18,13 @@ data class FoodEntity(
     val tagList: FoodTagListWrapper?
 )
 
+@Entity
+data class SimplerFoodEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long?,
+    val title: String,
+)
+
 data class FoodTagListWrapper(
     val foodTagList : List<FoodTagEntity>
 ) {

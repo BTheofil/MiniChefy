@@ -227,10 +227,10 @@ fun EditStorageItem(
 @Preview
 @Composable
 private fun EditStorageItemPreview(
-    @PreviewParameter(ProductPreviewParameterProvider::class) productList: List<Food>
+    @PreviewParameter(ProductPreviewParameterProvider::class) foodList: List<Food>
 ) {
     EditStorageItem(
-        food = productList.first(),
+        food = foodList.first(),
         {}, {}, {}, {}, {}
     )
 }

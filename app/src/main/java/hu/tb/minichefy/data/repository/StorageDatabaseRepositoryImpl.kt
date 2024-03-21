@@ -3,6 +3,8 @@ package hu.tb.minichefy.data.repository
 import hu.tb.minichefy.data.data_source.dao.StorageDAO
 import hu.tb.minichefy.data.mapper.FoodEntityToFood
 import hu.tb.minichefy.data.mapper.ProductTagEntityToTag
+import hu.tb.minichefy.domain.model.recipe.Ingredient
+import hu.tb.minichefy.domain.model.recipe.IngredientBase
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
@@ -26,19 +28,39 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getAllStorageFoodName(): List<> {
+        val entities = dao.getAllStorageFoodName()
+        return entities.map {
+            IngredientBase(
+                id = it.id,
+                title = it.title,
+                quantity = 0f,
+                unitOfMeasurement = UnitOfMeasurement.PIECE
+            )
+        }
+    }
+
     override suspend fun saveOrModifyFood(food: Food): Long =
         dao.saveOrModifyFood(food.toFoodEntity())
 
-    override suspend fun searchFoodByDishProperties(title: String, uof: UnitOfMeasurement): Food? {
+    override suspend fun searchFoodByDishProperties(
+        title: String,
+        uof: UnitOfMeasurement
+    ): Food? {
         val entity: FoodEntity = dao.searchFoodByDishProperties(title, unitOfMeasurement = uof)
             ?: return null
         return FoodEntityToFood().map(entity)
     }
 
-    override suspend fun searchProductByTitle(searchText: String): List<Food> {
-        val products = dao.searchProductByTitle("%$searchText%")
-        return products.map {
-            FoodEntityToFood().map(it)
+    override suspend fun searchProductByTitle(searchText: String): List<Ingredient> {
+        val ingredientsTitle = dao.searchProductByTitle("%$searchText%")
+        return ingredientsTitle.map {
+            Ingredient(
+                id = it.id,
+                title = it.title,
+                quantity = 0f,
+                unitOfMeasurement = UnitOfMeasurement.PIECE
+            )
         }
     }
 
@@ -57,7 +79,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
 
     override suspend fun getTagById(id: Long): FoodTag {
         val tagEntity = dao.getTagById(id)
-        return  ProductTagEntityToTag().map(tagEntity)
+        return ProductTagEntityToTag().map(tagEntity)
     }
 
     override suspend fun saveOrModifyFoodTag(tag: FoodTag): Long =
@@ -65,3 +87,5 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
 
     override suspend fun deleteFoodTag(id: Long): Int = dao.deleteFoodTag(id)
 }
+
+

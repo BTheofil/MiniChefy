@@ -1,10 +1,8 @@
 package hu.tb.minichefy.domain.model.storage
 
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement.*
-import hu.tb.minichefy.presentation.screens.components.icons.IconManager
 
-data class SimpleProduct(
-    val title: String? = null,
+data class CalculationFood(
     val quantity: Float,
     val unitOfMeasurement: UnitOfMeasurement
 ) {
@@ -17,14 +15,4 @@ data class SimpleProduct(
             DL -> quantity
             PIECE -> quantity
         }
-
-    fun toProduct() =
-        Food(
-            id = null,
-            title = title!!,
-            icon = IconManager().getRandomProduct().resource,
-            quantity = quantity,
-            unitOfMeasurement = unitOfMeasurement,
-            foodTagList = emptyList()
-        )
 }

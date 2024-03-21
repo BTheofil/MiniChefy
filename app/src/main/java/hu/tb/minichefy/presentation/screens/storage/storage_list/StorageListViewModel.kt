@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
-import hu.tb.minichefy.domain.model.storage.SimpleProduct
+import hu.tb.minichefy.domain.model.storage.CalculationFood
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.CalculateMeasurements
 import hu.tb.minichefy.presentation.screens.components.icons.IconManager
@@ -94,11 +94,11 @@ class StorageListViewModel @Inject constructor(
 
             is OnEvent.ModifyProductQuantity -> {
                 val result = calculateMeasurements.simpleProductCalculations(
-                    SimpleProduct(
+                    CalculationFood(
                         quantity = uiState.value.foodList[uiState.value.modifiedProductIndex].quantity,
                         unitOfMeasurement = uiState.value.foodList[uiState.value.modifiedProductIndex].unitOfMeasurement
                     ),
-                    SimpleProduct(
+                    CalculationFood(
                         quantity = event.value,
                         unitOfMeasurement = uiState.value.foodList[uiState.value.modifiedProductIndex].unitOfMeasurement
                     )

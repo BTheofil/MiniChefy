@@ -36,20 +36,21 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import hu.tb.minichefy.domain.model.storage.SimpleProduct
+import hu.tb.minichefy.domain.model.recipe.Ingredient
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 
 @Composable
 fun CreateNewIngredientDialog(
+    ingredient: Ingredient? = null,
     onDismissRequest: () -> Unit,
     onCancelClick: () -> Unit,
-    onProceedClick: (SimpleProduct) -> Unit
+    onProceedClick: (Ingredient) -> Unit
 ) {
-    var ingredientName by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
-    var unitOfMeasurement by remember { mutableStateOf(UnitOfMeasurement.PIECE.name) }
+    var ingredientName by remember { mutableStateOf(ingredient?.title ?: "") }
+    var amount by remember { mutableStateOf(ingredient?.quantity?.toString() ?: "") }
+    var unitOfMeasurement by remember { mutableStateOf(UnitOfMeasurement.PIECE) }
     var isDropdownMenuVisible by remember { mutableStateOf(false) }
     var unitOfMeasurementTextileWidth by remember { mutableIntStateOf(0) }
 
@@ -65,13 +66,14 @@ fun CreateNewIngredientDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Add new ingredient",
+                    text = if(ingredient == null) "Add new ingredient" else "Edit ingredient",
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
                 OutlinedTextField(
                     value = ingredientName,
                     onValueChange = { ingredientName = it },
+                    enabled = ingredient == null,
                     label = {
                         Text(
                             text = "Ingredient name",
@@ -109,7 +111,7 @@ fun CreateNewIngredientDialog(
                                 .onGloballyPositioned { coordinates ->
                                     unitOfMeasurementTextileWidth = coordinates.size.width
                                 },
-                            value = unitOfMeasurement,
+                            value = unitOfMeasurement.name,
                             onValueChange = {},
                             readOnly = true,
                             label = {
@@ -138,7 +140,7 @@ fun CreateNewIngredientDialog(
                                 DropdownMenuItem(
                                     text = { Text(text = it.name) },
                                     onClick = {
-                                        unitOfMeasurement = it.name
+                                        unitOfMeasurement = it
                                         isDropdownMenuVisible = false
                                     })
                             }
@@ -157,10 +159,11 @@ fun CreateNewIngredientDialog(
                     Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                     TextButton(onClick = {
                         onProceedClick(
-                            SimpleProduct(
+                            Ingredient(
+                                id = ingredient?.id,
                                 title = ingredientName,
                                 quantity = amount.toFloat(),
-                                unitOfMeasurement = UnitOfMeasurement.PIECE
+                                unitOfMeasurement = unitOfMeasurement
                             )
                         )
                     }) {
@@ -175,9 +178,11 @@ fun CreateNewIngredientDialog(
 @Preview
 @Composable
 private fun CreateNewIngredientDialogPreview() {
-    CreateNewIngredientDialog(
-        onDismissRequest = {},
-        onCancelClick = {},
-        onProceedClick = {}
-    )
+    Column {
+        CreateNewIngredientDialog(
+            onDismissRequest = {},
+            onCancelClick = {},
+            onProceedClick = {}
+        )
+    }
 }

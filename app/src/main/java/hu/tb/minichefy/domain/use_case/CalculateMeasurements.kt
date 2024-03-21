@@ -1,6 +1,6 @@
 package hu.tb.minichefy.domain.use_case
 
-import hu.tb.minichefy.domain.model.storage.SimpleProduct
+import hu.tb.minichefy.domain.model.storage.CalculationFood
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 
 class CalculateMeasurements {
@@ -9,9 +9,9 @@ class CalculateMeasurements {
     private val massRange = 3..5
 
     fun simpleProductCalculations(
-        productBase: SimpleProduct,
-        productChanger: SimpleProduct
-    ): SimpleProduct {
+        productBase: CalculationFood,
+        productChanger: CalculationFood
+    ): CalculationFood {
         val isLiquid =
             productBase.unitOfMeasurement.id in liquidRange && productChanger.unitOfMeasurement.id in liquidRange
         val isMass =
@@ -27,24 +27,24 @@ class CalculateMeasurements {
         )
 
         return when {
-            isLiquid && result >= 10 -> SimpleProduct(
+            isLiquid && result >= 10 -> CalculationFood(
                 quantity = result / 10,
                 unitOfMeasurement = UnitOfMeasurement.L
             )
 
-            isLiquid -> SimpleProduct(quantity = result, unitOfMeasurement = UnitOfMeasurement.DL)
-            result >= 1000 -> SimpleProduct(
+            isLiquid -> CalculationFood(quantity = result, unitOfMeasurement = UnitOfMeasurement.DL)
+            result >= 1000 -> CalculationFood(
                 quantity = result / 1000,
                 unitOfMeasurement = UnitOfMeasurement.KG
             )
 
-            result >= 10 -> SimpleProduct(
+            result >= 10 -> CalculationFood(
                 quantity = result / 10,
                 unitOfMeasurement = UnitOfMeasurement.DKG
             )
 
-            isPiece -> SimpleProduct(quantity = result, unitOfMeasurement = UnitOfMeasurement.PIECE)
-            else -> SimpleProduct(quantity = result, unitOfMeasurement = UnitOfMeasurement.G)
+            isPiece -> CalculationFood(quantity = result, unitOfMeasurement = UnitOfMeasurement.PIECE)
+            else -> CalculationFood(quantity = result, unitOfMeasurement = UnitOfMeasurement.G)
         }
     }
 

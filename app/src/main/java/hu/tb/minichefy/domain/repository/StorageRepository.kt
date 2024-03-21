@@ -1,5 +1,7 @@
 package hu.tb.minichefy.domain.repository
 
+import hu.tb.minichefy.domain.model.recipe.Ingredient
+import hu.tb.minichefy.domain.model.recipe.IngredientBase
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
@@ -10,11 +12,13 @@ interface StorageRepository {
     //food
     fun getAllFood(): Flow<List<Food>>
 
+    suspend fun getAllStorageFoodName(): List<IngredientBase>
+
     suspend fun saveOrModifyFood(food: Food): Long
 
     suspend fun searchFoodByDishProperties(title: String, uof: UnitOfMeasurement): Food?
 
-    suspend fun searchProductByTitle(searchText: String): List<Food>
+    suspend fun searchProductByTitle(searchText: String): List<Ingredient>
 
     suspend fun deleteFoodById(id: Long): Int
 

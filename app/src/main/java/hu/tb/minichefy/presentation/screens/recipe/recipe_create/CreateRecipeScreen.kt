@@ -62,13 +62,12 @@ fun CreateRecipe(
             is CreateRecipeViewModel.Pages.IngredientsPage ->
                 IngredientsPage(
                     selectedList = ingredientsPageState.selectedIngredientList,
-                    allIngredients = ingredientsPageState.allIngredientList,
-                    onProductClick = { viewModel.onEvent(OnEvent.IngredientAddRemove(it)) },
+                    unselectedList = ingredientsPageState.unSelectedIngredientList,
                     queryText = ingredientsPageState.searchText,
                     onQueryChange = { viewModel.onEvent(OnEvent.OnSearchValueChange(it)) },
                     onSearchClear = { viewModel.onEvent(OnEvent.OnSearchValueChange("")) },
                     onNextClick = { viewModel.onEvent(OnEvent.PageChange(2)) },
-                    onDialogProceedClick = { viewModel.onEvent(OnEvent.NewIngredientAdded(it)) }
+                    moveIngredientPosition = { viewModel.onEvent(OnEvent.IngredientAddRemove(it)) },
                 )
 
             is CreateRecipeViewModel.Pages.StepsPage ->

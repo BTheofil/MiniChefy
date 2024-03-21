@@ -56,7 +56,7 @@ class RecipeDetailsViewModel @Inject constructor(
                     val result = storageRepository.searchFoodByDishProperties(uiState.value.recipe!!.title, UnitOfMeasurement.PIECE)
 
                     uiState.value.recipe.also {
-                        val savedProductId = storageRepository.saveOrModifyFood(
+                        val savedFoodId = storageRepository.saveOrModifyFood(
                             Food(
                                 id = result?.id,
                                 icon = it!!.icon,
@@ -66,7 +66,7 @@ class RecipeDetailsViewModel @Inject constructor(
                                 foodTagList = listOf(dishTag)
                             )
                         )
-                        Log.i("RecipeDetailsVM", savedProductId.toString())
+                        Log.i("RecipeDetailsVM", savedFoodId.toString())
                     }
                 }
             }
