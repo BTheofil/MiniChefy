@@ -2,14 +2,15 @@ package hu.tb.minichefy.domain.model.recipe
 
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 
-data class IngredientSimple(
+data class IngredientDraft(
     val id: Long,
     val title: String
 )
 
-data class RecipeIngredient(
-    val id: Long?,
+data class IngredientRecipe(
+    val id: Long? = null,
     val title: String,
     val quantity: Float,
-    val unitOfMeasurement: UnitOfMeasurement,
+    val unitOfMeasurement: UnitOfMeasurement
 )
+

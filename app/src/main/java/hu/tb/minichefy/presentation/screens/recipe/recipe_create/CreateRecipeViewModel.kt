@@ -3,7 +3,8 @@ package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.tb.minichefy.domain.model.recipe.IngredientBase
+import hu.tb.minichefy.domain.model.recipe.IngredientDraft
+import hu.tb.minichefy.domain.model.recipe.IngredientRecipe
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
@@ -48,7 +49,6 @@ class CreateRecipeViewModel @Inject constructor(
             _ingredientsPageState.update { ingredientsPage ->
                 ingredientsPage.copy(
                     unSelectedIngredientList = storageRepository.getAllStorageFoodName()
-                        .sortedBy { it.title }
                 )
             }
         }
@@ -76,8 +76,8 @@ class CreateRecipeViewModel @Inject constructor(
         ) : Pages()
 
         data class IngredientsPage(
-            val selectedIngredientList: List<IngredientBase.IngredientComplete> = emptyList(),
-            val unSelectedIngredientList: List<IngredientBase.IngredientSimple> = emptyList(),
+            val selectedIngredientList: List<IngredientRecipe> = emptyList(),
+            val unSelectedIngredientList: List<IngredientDraft> = emptyList(),
             val searchText: String = ""
         ) : Pages()
 
@@ -103,10 +103,6 @@ class CreateRecipeViewModel @Inject constructor(
         data class OnRecipeTitleChange(val text: String) : OnEvent()
         data class OnSelectedIconChange(val icon: MealIcon) : OnEvent()
 
-        //ingredients page
-        data class IngredientAddRemove(val ingredient: IngredientBase) : OnEvent()
-        data class OnSearchValueChange(val text: String) : OnEvent()
-
         //steps page
         data class OnStepsFieldChange(val text: String, val index: Int) : OnEvent()
         data class OnAddRecipeStepToList(val stepDescription: String) : OnEvent()
@@ -114,6 +110,11 @@ class CreateRecipeViewModel @Inject constructor(
         data class RecipeItemClick(val index: Int) : OnEvent()
         data object OnRecipeSave : OnEvent()
         data object ClearStepField : OnEvent()
+    }
+
+    sealed class OnIngredientEvent{
+        data class IngredientAddRemove(val ingredient: IngredientRecipe) : OnIngredientEvent()
+        data class OnSearchValueChange(val text: String) : OnIngredientEvent()
     }
 
     fun onEvent(event: OnEvent) {
@@ -148,44 +149,6 @@ class CreateRecipeViewModel @Inject constructor(
 
             is OnEvent.OnSelectedIconChange -> _basicPageState.update {
                 it.copy(selectedMealIcon = event.icon)
-            }
-
-            //ingredients page
-            is OnEvent.IngredientAddRemove -> {
-                val currentState = ingredientsPageState.value
-
-                val unselectedMutableList = currentState.unSelectedIngredientList.toMutableList()
-                val selectedMutableList = currentState.selectedIngredientList.toMutableList()
-
-                if (currentState.selectedIngredientList.contains(event.ingredient)) {
-                    unselectedMutableList.add(0, event.ingredient)
-                    selectedMutableList.remove(event.ingredient)
-                } else {
-                    unselectedMutableList.remove(event.ingredient)
-                    selectedMutableList.add(0, event.ingredient)
-                }
-
-                _ingredientsPageState.update {
-                    it.copy(
-                        selectedIngredientList = selectedMutableList,
-                        unSelectedIngredientList = unselectedMutableList
-                    )
-                }
-            }
-
-            is OnEvent.OnSearchValueChange -> {
-                viewModelScope.launch {
-                    _ingredientsPageState.update { it.copy(searchText = event.text) }
-
-                    delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
-
-                    _ingredientsPageState.update { ingredientsPage ->
-                        ingredientsPage.copy(
-                            unSelectedIngredientList = storageRepository.searchProductByTitle(event.text)
-                                .sortedBy { it }
-                        )
-                    }
-                }
             }
 
             //steps page
@@ -246,6 +209,39 @@ class CreateRecipeViewModel @Inject constructor(
                         RecipeStep(step = stepsPageState.value.stepBoxTextField),
                         resultId
                     )
+                }
+            }
+        }
+    }
+
+    fun onIngredientPageEvent(event: OnIngredientEvent){
+        when(event){
+            is OnIngredientEvent.IngredientAddRemove -> {
+                val currentState = ingredientsPageState.value
+                val selectedMutableList = currentState.selectedIngredientList.toMutableList()
+
+                if(event.ingredient in selectedMutableList){
+                    selectedMutableList.remove(event.ingredient)
+                } else {
+                    selectedMutableList.add(0, event.ingredient)
+                }
+
+                _ingredientsPageState.value = currentState.copy(
+                    selectedIngredientList = selectedMutableList,
+                )
+            }
+
+            is OnIngredientEvent.OnSearchValueChange -> {
+                viewModelScope.launch {
+                    _ingredientsPageState.update { it.copy(searchText = event.text) }
+
+                    delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
+
+                    _ingredientsPageState.update { ingredientsPage ->
+                        ingredientsPage.copy(
+                            unSelectedIngredientList = storageRepository.searchProductByTitle(event.text)
+                        )
+                    }
                 }
             }
         }

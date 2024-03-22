@@ -11,9 +11,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages.InformationPage
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages.StepsPage
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages.IngredientsPage
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.OnIngredientEvent
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.UiEvent
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.OnEvent
-import hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages.IngredientsPage
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -64,10 +65,10 @@ fun CreateRecipe(
                     selectedList = ingredientsPageState.selectedIngredientList,
                     unselectedList = ingredientsPageState.unSelectedIngredientList,
                     queryText = ingredientsPageState.searchText,
-                    onQueryChange = { viewModel.onEvent(OnEvent.OnSearchValueChange(it)) },
-                    onSearchClear = { viewModel.onEvent(OnEvent.OnSearchValueChange("")) },
+                    onQueryChange = { viewModel.onIngredientPageEvent(OnIngredientEvent.OnSearchValueChange(it)) },
+                    onSearchClear = { viewModel.onIngredientPageEvent(OnIngredientEvent.OnSearchValueChange("")) },
                     onNextClick = { viewModel.onEvent(OnEvent.PageChange(2)) },
-                    moveIngredientPosition = { viewModel.onEvent(OnEvent.IngredientAddRemove(it)) },
+                    handleIngredientMovement = { viewModel.onIngredientPageEvent(OnIngredientEvent.IngredientAddRemove(it)) }
                 )
 
             is CreateRecipeViewModel.Pages.StepsPage ->

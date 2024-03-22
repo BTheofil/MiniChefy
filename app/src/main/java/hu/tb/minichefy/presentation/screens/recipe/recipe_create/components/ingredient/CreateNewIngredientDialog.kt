@@ -36,20 +36,21 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import hu.tb.minichefy.domain.model.recipe.RecipeIngredient
+import hu.tb.minichefy.domain.model.recipe.IngredientRecipe
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 
 @Composable
 fun CreateNewIngredientDialog(
-    ingredient: RecipeIngredient? = null,
+    ingredientId: Long? = null,
+    ingredientTitle: String? = null,
     onDismissRequest: () -> Unit,
     onCancelClick: () -> Unit,
-    onProceedClick: (RecipeIngredient) -> Unit
+    onProceedClick: (IngredientRecipe) -> Unit
 ) {
-    var ingredientName by remember { mutableStateOf(ingredient?.title ?: "") }
-    var amount by remember { mutableStateOf(ingredient?.quantity?.toString() ?: "") }
+    var ingredientName by remember { mutableStateOf(ingredientTitle ?: "") }
+    var amount by remember { mutableStateOf( "") }
     var unitOfMeasurement by remember { mutableStateOf(UnitOfMeasurement.PIECE) }
     var isDropdownMenuVisible by remember { mutableStateOf(false) }
     var unitOfMeasurementTextileWidth by remember { mutableIntStateOf(0) }
@@ -66,14 +67,14 @@ fun CreateNewIngredientDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = if(ingredient == null) "Add new ingredient" else "Edit ingredient",
+                    text = if (ingredientTitle == null) "Add new ingredient" else "Edit ingredient",
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
                 OutlinedTextField(
                     value = ingredientName,
                     onValueChange = { ingredientName = it },
-                    enabled = ingredient == null,
+                    enabled = ingredientTitle == null,
                     label = {
                         Text(
                             text = "Ingredient name",
@@ -159,8 +160,8 @@ fun CreateNewIngredientDialog(
                     Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                     TextButton(onClick = {
                         onProceedClick(
-                            RecipeIngredient(
-                                id = ingredient?.id,
+                            IngredientRecipe(
+                                id = ingredientId,
                                 title = ingredientName,
                                 quantity = amount.toFloat(),
                                 unitOfMeasurement = unitOfMeasurement

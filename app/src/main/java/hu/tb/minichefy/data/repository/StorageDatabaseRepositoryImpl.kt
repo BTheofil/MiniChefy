@@ -3,7 +3,7 @@ package hu.tb.minichefy.data.repository
 import hu.tb.minichefy.data.data_source.dao.StorageDAO
 import hu.tb.minichefy.data.mapper.FoodEntityToFood
 import hu.tb.minichefy.data.mapper.ProductTagEntityToTag
-import hu.tb.minichefy.domain.model.recipe.IngredientBase
+import hu.tb.minichefy.domain.model.recipe.IngredientDraft
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
@@ -27,14 +27,14 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllStorageFoodName(): List<IngredientBase.IngredientSimple> {
+    override suspend fun getAllStorageFoodName(): List<IngredientDraft> {
         val entities = dao.getAllStorageFoodName()
         return entities.map {
-            IngredientBase.IngredientSimple(
+            IngredientDraft(
                 id = it.id,
                 title = it.title,
             )
-        }
+        }.sortedBy { it.title }
     }
 
     override suspend fun saveOrModifyFood(food: Food): Long =
@@ -49,11 +49,14 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         return FoodEntityToFood().map(entity)
     }
 
-    override suspend fun searchProductByTitle(searchText: String): List<Food> {
+    override suspend fun searchProductByTitle(searchText: String): List<IngredientDraft> {
         val products = dao.searchProductByTitle("%$searchText%")
         return products.map {
-            FoodEntityToFood().map(it)
-        }
+            IngredientDraft(
+                id = it.id,
+                title = it.title,
+            )
+        }.sortedBy { it.title }
     }
 
     override suspend fun deleteFoodById(id: Long): Int =
