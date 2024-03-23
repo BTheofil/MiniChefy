@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
+import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
 
 @Entity
 data class RecipeEntity(
@@ -15,6 +16,7 @@ data class RecipeEntity(
     val quantity: Int,
     val timeToCreate: Float,
     val timeUnit: TimeUnit,
+    val ingredientList: FoodEntityWrapper
 )
 
 @Entity
@@ -35,4 +37,7 @@ data class RecipeWithSteps(
     val recipeSteps: List<RecipeStepEntity>
 )
 
+data class FoodEntityWrapper(
+    val ingredients: List<FoodEntity>
+)
 

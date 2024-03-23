@@ -62,9 +62,7 @@ fun CreateRecipe(
 
             is CreateRecipeViewModel.Pages.IngredientsPage ->
                 IngredientsPage(
-                    selectedList = ingredientsPageState.selectedIngredientList,
-                    unselectedList = ingredientsPageState.unSelectedIngredientList,
-                    queryText = ingredientsPageState.searchText,
+                    uiState = ingredientsPageState,
                     onQueryChange = { viewModel.onIngredientPageEvent(OnIngredientEvent.OnSearchValueChange(it)) },
                     onSearchClear = { viewModel.onIngredientPageEvent(OnIngredientEvent.OnSearchValueChange("")) },
                     onNextClick = { viewModel.onEvent(OnEvent.PageChange(2)) },

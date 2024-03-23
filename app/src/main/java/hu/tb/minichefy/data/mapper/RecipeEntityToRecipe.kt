@@ -19,7 +19,10 @@ class RecipeEntityToRecipe {
                 )
             },
             timeToCreate = recipeEntity.timeToCreate,
-            timeUnit = recipeEntity.timeUnit
+            timeUnit = recipeEntity.timeUnit,
+            ingredientList = recipeEntity.ingredientList.ingredients.map {
+                FoodEntityToFood().map(it)
+            }
         )
     }
 }

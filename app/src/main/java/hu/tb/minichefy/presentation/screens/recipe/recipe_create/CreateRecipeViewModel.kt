@@ -8,9 +8,11 @@ import hu.tb.minichefy.domain.model.recipe.IngredientRecipe
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
+import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
+import hu.tb.minichefy.domain.use_case.ValidateTextField
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.presentation.screens.components.icons.IconManager
 import hu.tb.minichefy.presentation.screens.components.icons.MealIcon
@@ -29,7 +31,8 @@ import kotlin.random.Random
 class CreateRecipeViewModel @Inject constructor(
     private val recipeRepository: RecipeRepository,
     private val storageRepository: StorageRepository,
-    private val validateQuantityNumber: ValidateQuantityNumber
+    private val validateQuantityNumber: ValidateQuantityNumber,
+    private val validateTextField: ValidateTextField,
 ) : ViewModel() {
 
     private val _basicPageState = MutableStateFlow(Pages.BasicInformationPage())
@@ -78,7 +81,9 @@ class CreateRecipeViewModel @Inject constructor(
         data class IngredientsPage(
             val selectedIngredientList: List<IngredientRecipe> = emptyList(),
             val unSelectedIngredientList: List<IngredientDraft> = emptyList(),
-            val searchText: String = ""
+            val searchText: String = "",
+            val isIngredientTitleHasError: Boolean = false,
+            val isIngredientQuantityHasError: Boolean = false
         ) : Pages()
 
         data class StepsPage(
@@ -112,7 +117,7 @@ class CreateRecipeViewModel @Inject constructor(
         data object ClearStepField : OnEvent()
     }
 
-    sealed class OnIngredientEvent{
+    sealed class OnIngredientEvent {
         data class IngredientAddRemove(val ingredient: IngredientRecipe) : OnIngredientEvent()
         data class OnSearchValueChange(val text: String) : OnIngredientEvent()
     }
@@ -198,7 +203,17 @@ class CreateRecipeViewModel @Inject constructor(
                     quantity = basicPageState.value.quantityCounter,
                     howToSteps = stepsPageState.value.recipeSteps,
                     timeToCreate = 0f,
-                    timeUnit = TimeUnit.MINUTES
+                    timeUnit = TimeUnit.MINUTES,
+                    ingredientList = ingredientsPageState.value.selectedIngredientList.map {
+                        Food(
+                            id = it.id,
+                            icon = IconManager().getDefaultIcon.resource,
+                            title = it.title,
+                            quantity = it.quantity,
+                            unitOfMeasurement = it.unitOfMeasurement,
+                            foodTagList = null
+                        )
+                    }
                 )
                 val resultId = recipeRepository.saveRecipe(createdRecipe)
                 _stepsPageState.value.recipeSteps.forEach {
@@ -214,20 +229,34 @@ class CreateRecipeViewModel @Inject constructor(
         }
     }
 
-    fun onIngredientPageEvent(event: OnIngredientEvent){
-        when(event){
+    fun onIngredientPageEvent(event: OnIngredientEvent) {
+        when (event) {
             is OnIngredientEvent.IngredientAddRemove -> {
                 val currentState = ingredientsPageState.value
+
+                if(validateTextField(event.ingredient.title) == ValidationResult.ERROR){
+                    _ingredientsPageState.value = currentState.copy(
+                        isIngredientTitleHasError = true,
+                    )
+                    return
+                }
+                if (event.ingredient.quantity == 0f || event.ingredient.quantity.isNaN()){
+                    _ingredientsPageState.value = currentState.copy(
+                        isIngredientQuantityHasError = true,
+                    )
+                    return
+                }
+
                 val selectedMutableList = currentState.selectedIngredientList.toMutableList()
 
-                if(event.ingredient in selectedMutableList){
-                    selectedMutableList.remove(event.ingredient)
-                } else {
+                if (event.ingredient !in selectedMutableList) {
                     selectedMutableList.add(0, event.ingredient)
                 }
 
                 _ingredientsPageState.value = currentState.copy(
                     selectedIngredientList = selectedMutableList,
+                    isIngredientTitleHasError = false,
+                    isIngredientQuantityHasError = false
                 )
             }
 

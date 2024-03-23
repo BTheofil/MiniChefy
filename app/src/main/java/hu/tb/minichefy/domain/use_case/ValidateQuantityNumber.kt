@@ -10,6 +10,15 @@ class ValidateQuantityNumber {
         }
 }
 
+class ValidateTextField {
+    operator fun invoke(text: String?): ValidationResult =
+        if (text.isNullOrEmpty() || text.isBlank()){
+            ValidationResult.ERROR
+        } else {
+            ValidationResult.SUCCESS
+        }
+}
+
 enum class ValidationResult {
     SUCCESS,
     ERROR
