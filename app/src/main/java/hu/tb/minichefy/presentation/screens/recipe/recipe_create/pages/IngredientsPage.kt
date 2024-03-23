@@ -48,7 +48,10 @@ import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.domain.model.recipe.IngredientDraft
 import hu.tb.minichefy.domain.model.recipe.IngredientRecipe
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.domain.use_case.ValidateTextField
+import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.Red400
@@ -59,9 +62,7 @@ import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun IngredientsPage(
-    selectedList: List<IngredientRecipe>,
-    unselectedList: List<IngredientDraft>,
-    queryText: String,
+    uiState: CreateRecipeViewModel.Pages.IngredientsPage,
     handleIngredientMovement: (IngredientRecipe) -> Unit,
     onQueryChange: (text: String) -> Unit,
     onSearchClear: () -> Unit,
@@ -73,18 +74,15 @@ fun IngredientsPage(
     var unitOfMeasurementTextileWidth by remember { mutableIntStateOf(0) }
     var isDropdownMenuVisible by remember { mutableStateOf(false) }
 
-    var isIngredientTitleHasError by remember { mutableStateOf(false) }
-    var isIngredientQuantityHasError by remember { mutableStateOf(false) }
-
     val focusManager = LocalFocusManager.current
 
     Scaffold(
         modifier = Modifier
             .clickableWithoutRipple { focusManager.clearFocus() },
-        content = {
+        content = { paddingValues ->
             Column(
                 modifier = Modifier
-                    .padding(it)
+                    .padding(paddingValues)
                     .fillMaxSize()
                     .padding(
                         horizontal = SCREEN_HORIZONTAL_PADDING,
@@ -92,10 +90,10 @@ fun IngredientsPage(
                     )
             ) {
                 SearchItemBar(
-                    queryText = queryText,
+                    queryText = uiState.searchText,
                     onQueryChange = onQueryChange,
                     clearIconButtonClick = {
-                        if (queryText.isBlank()) {
+                        if (uiState.searchText.isBlank()) {
                             focusManager.clearFocus()
                         }
                         onSearchClear()
@@ -116,21 +114,23 @@ fun IngredientsPage(
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    if (selectedList.isEmpty()) {
+                    if (uiState.selectedIngredientList.isEmpty()) {
                         item(
                             key = "empty_ingredient_list_title_key"
                         ) {
-                            ListItem(headlineContent = {
-                                Text(
-                                    text = "No ingredients...",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            })
+                            ListItem(
+                                modifier = Modifier.animateItemPlacement(),
+                                headlineContent = {
+                                    Text(
+                                        text = "No ingredients...",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                })
                         }
                     }
                     items(
-                        items = selectedList,
+                        items = uiState.selectedIngredientList,
                         key = { item -> item.id ?: item.hashCode() },
                     ) { product ->
                         ListItem(
@@ -184,7 +184,7 @@ fun IngredientsPage(
                         }
                     }
                     items(
-                        items = unselectedList,
+                        items = uiState.unSelectedIngredientList,
                         key = { item -> item.id }
                     ) { ingredient ->
                         ListItem(
@@ -234,7 +234,7 @@ fun IngredientsPage(
                             },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                            isError = isIngredientTitleHasError
+                            isError = uiState.isIngredientTitleHasError
                         )
                         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
                         Row(
@@ -259,7 +259,7 @@ fun IngredientsPage(
                                     )
                                 },
                                 singleLine = true,
-                                isError = isIngredientQuantityHasError
+                                isError = uiState.isIngredientQuantityHasError
                             )
                             Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                             Box(
@@ -314,24 +314,18 @@ fun IngredientsPage(
                         onClick = {
                             focusManager.clearFocus()
 
-                            if (ingredientTitle.isBlank()) {
-                                isIngredientTitleHasError = true
-                                return@Button
-                            }
-                            isIngredientTitleHasError = false
-                            if (ingredientQuantity.isBlank()) {
-                                isIngredientQuantityHasError = true
-                                return@Button
-                            }
-                            isIngredientQuantityHasError = false
+                            if (ValidateTextField().invoke(ingredientTitle) == ValidationResult.ERROR) return@Button
+                            if (ingredientQuantity.toFloat() == 0f || ingredientQuantity.toFloat().isNaN()) return@Button
 
-                            handleIngredientMovement(
-                                IngredientRecipe(
-                                    title = ingredientTitle,
-                                    quantity = ingredientQuantity.toFloat(),
-                                    unitOfMeasurement = ingredientUnitOfMeasurement
+                                handleIngredientMovement(
+                                    IngredientRecipe(
+                                        title = ingredientTitle,
+                                        quantity = ingredientQuantity.toFloat(),
+                                        unitOfMeasurement = ingredientUnitOfMeasurement
+                                    )
                                 )
-                            )
+                            ingredientTitle = ""
+                            ingredientQuantity = ""
                         }) {
                         Text(text = "add")
                     }
@@ -365,11 +359,23 @@ private fun IngredientsPagePreview() {
     }
 
     IngredientsPage(
-        queryText = queryText,
+        uiState = CreateRecipeViewModel.Pages.IngredientsPage(
+            selectedIngredientList = listOf(
+                IngredientRecipe(
+                    null,
+                    "lemon",
+                    1f,
+                    UnitOfMeasurement.PIECE
+                )
+            ),
+            unSelectedIngredientList = listOf(
+                IngredientDraft(0, "apple"),
+                IngredientDraft(1, "banana")
+            ),
+            searchText = queryText,
+        ),
         onQueryChange = { queryText = it },
         onSearchClear = { queryText = "" },
-        unselectedList = listOf(IngredientDraft(0, "apple"), IngredientDraft(1, "banana")),
-        selectedList = listOf(IngredientRecipe(null, "lemon", 1f, UnitOfMeasurement.PIECE)),
         onNextClick = {},
         handleIngredientMovement = {},
     )

@@ -23,6 +23,8 @@ class IconManager {
         ProductIcon.CHEESE
     )
 
+    val getDefaultIcon: AppWideIcon = AppWideIcon.DEFAULT_EMPTY_ICON
+
     fun getRandomProduct(): ProductIcon{
         return  getAllProductIconList[Random.nextInt(0, getAllProductIconList.size)]
     }

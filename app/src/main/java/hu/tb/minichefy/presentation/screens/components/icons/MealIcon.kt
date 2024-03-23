@@ -17,3 +17,7 @@ enum class ProductIcon(override val resource: Int): IconResource {
     BREAD(R.drawable.bread_icon),
     CHEESE(R.drawable.cheese_icon)
 }
+
+enum class AppWideIcon(override val resource: Int): IconResource{
+    DEFAULT_EMPTY_ICON(R.drawable.default_empty_icon),
+}

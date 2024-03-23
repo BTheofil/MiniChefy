@@ -1,6 +1,8 @@
 package hu.tb.minichefy.domain.model.recipe
 
+import hu.tb.minichefy.domain.model.recipe.entity.FoodEntityWrapper
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
+import hu.tb.minichefy.domain.model.storage.Food
 
 data class Recipe(
     val id: Long? = null,
@@ -9,7 +11,8 @@ data class Recipe(
     val quantity: Int,
     val timeToCreate: Float,
     val timeUnit: TimeUnit,
-    val howToSteps: List<RecipeStep>
+    val howToSteps: List<RecipeStep>,
+    val ingredientList: List<Food>
 ) {
     fun toRecipeEntity() = run {
         RecipeEntity(
@@ -18,7 +21,12 @@ data class Recipe(
             quantity = quantity,
             recipeId = id,
             timeToCreate = timeToCreate,
-            timeUnit = timeUnit
+            timeUnit = timeUnit,
+            ingredientList = FoodEntityWrapper(
+                ingredients = ingredientList.map {
+                    it.toFoodEntity()
+                }
+            )
         )
     }
 }
