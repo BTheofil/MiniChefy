@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.recipe.Recipe
-import hu.tb.minichefy.domain.model.recipe.SimpleQuickRecipeInfo
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.RecipeRepository
@@ -37,7 +36,6 @@ class RecipeDetailsViewModel @Inject constructor(
 
     data class UiState(
         val recipe: Recipe? = null,
-        val recipeQuickInfoList: List<SimpleQuickRecipeInfo> = emptyList(),
         val isInformDialogShouldShow: Boolean = true
     )
 
@@ -84,15 +82,9 @@ class RecipeDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             val recipe = recipeRepository.getRecipeById(recipeId.toLong())
 
-            val quickInfoList = listOf(
-                SimpleQuickRecipeInfo(recipe.quantity.toString(), "serve"),
-                SimpleQuickRecipeInfo(recipe.timeToCreate.toString(), recipe.timeUnit.toString())
-            )
-
             _uiState.update {
                 it.copy(
-                    recipe = recipe,
-                    recipeQuickInfoList = quickInfoList
+                    recipe = recipe
                 )
             }
         }

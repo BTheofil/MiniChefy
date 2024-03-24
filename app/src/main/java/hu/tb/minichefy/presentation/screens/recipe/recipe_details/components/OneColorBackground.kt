@@ -11,24 +11,41 @@ import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.tooling.preview.Preview
 import hu.tb.minichefy.presentation.ui.theme.Pink50
 
 @Composable
-fun OneColorBackground() {
-    Canvas(Modifier.fillMaxSize()) {
-        val cornerRadius = CornerRadius(64f, 64f)
+fun OneColorBackground(
+    heightSize: Float = 1f,
+    topLeftCorner: CornerRadius = CornerRadius.Zero,
+    topRightCorner: CornerRadius = CornerRadius.Zero,
+    bottomLeft: CornerRadius = CornerRadius.Zero,
+    bottomRight: CornerRadius = CornerRadius.Zero,
+) {
+    Canvas(
+        Modifier
+            .fillMaxSize()
+    ) {
         val path = Path().apply {
             addRoundRect(
                 RoundRect(
                     rect = Rect(
                         offset = Offset(0f, 0f),
-                        size = Size(size.width, size.height / 3f),
+                        size = Size(size.width, size.height / heightSize),
                     ),
-                    bottomLeft = cornerRadius,
-                    bottomRight = cornerRadius,
+                    bottomLeft = bottomLeft,
+                    bottomRight = bottomRight,
+                    topLeft = topLeftCorner,
+                    topRight = topRightCorner
                 )
             )
         }
         drawPath(path, color = Color(Pink50.value))
     }
+}
+
+@Preview
+@Composable
+fun OneColorBackgroundPreview() {
+    OneColorBackground()
 }
