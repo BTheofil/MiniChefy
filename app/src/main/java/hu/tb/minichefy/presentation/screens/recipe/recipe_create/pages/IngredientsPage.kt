@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircle
@@ -45,11 +46,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hu.tb.minichefy.domain.model.recipe.IngredientDraft
-import hu.tb.minichefy.domain.model.recipe.IngredientRecipe
+import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.domain.use_case.ValidateTextField
-import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
@@ -63,14 +61,15 @@ import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 @Composable
 fun IngredientsPage(
     uiState: CreateRecipeViewModel.Pages.IngredientsPage,
-    handleIngredientMovement: (IngredientRecipe) -> Unit,
+    onIngredientTitleChange: (String) -> Unit,
+    onIngredientQuantityChange: (String) -> Unit,
+    onIngredientUnitOfMeasurementChange: (UnitOfMeasurement) -> Unit,
+    onAddIngredientClick: () -> Unit,
+    onRemoveIngredientClick: (Int) -> Unit,
     onQueryChange: (text: String) -> Unit,
     onSearchClear: () -> Unit,
-    onNextClick: () -> Unit,
+    onNextButtonClick: () -> Unit,
 ) {
-    var ingredientTitle by remember { mutableStateOf("") }
-    var ingredientQuantity by remember { mutableStateOf("") }
-    var ingredientUnitOfMeasurement by remember { mutableStateOf(UnitOfMeasurement.PIECE) }
     var unitOfMeasurementTextileWidth by remember { mutableIntStateOf(0) }
     var isDropdownMenuVisible by remember { mutableStateOf(false) }
 
@@ -129,10 +128,10 @@ fun IngredientsPage(
                                 })
                         }
                     }
-                    items(
+                    itemsIndexed(
                         items = uiState.selectedIngredientList,
-                        key = { item -> item.id ?: item.hashCode() },
-                    ) { product ->
+                        key = { _, item -> item.id ?: item.hashCode() },
+                    ) { index, product ->
                         ListItem(
                             modifier = Modifier.animateItemPlacement(),
                             headlineContent = {
@@ -159,7 +158,7 @@ fun IngredientsPage(
                             },
                             trailingContent = {
                                 IconButton(onClick = {
-                                    handleIngredientMovement(product)
+                                    onRemoveIngredientClick(index)
                                 }) {
                                     Icon(
                                         imageVector = Icons.Outlined.Delete,
@@ -198,7 +197,7 @@ fun IngredientsPage(
                             },
                             trailingContent = {
                                 IconButton(onClick = {
-                                    ingredientTitle = ingredient.title
+                                    onIngredientTitleChange(ingredient.title)
                                 }) {
                                     Icon(
                                         imageVector = Icons.Outlined.AddCircle,
@@ -223,8 +222,8 @@ fun IngredientsPage(
                         OutlinedTextField(
                             modifier = Modifier
                                 .fillMaxWidth(),
-                            value = ingredientTitle,
-                            onValueChange = { value -> ingredientTitle = value },
+                            value = uiState.ingredientTitleDraft,
+                            onValueChange = onIngredientTitleChange,
                             label = {
                                 Text(
                                     text = "Ingredient name",
@@ -245,8 +244,8 @@ fun IngredientsPage(
                             OutlinedTextField(
                                 modifier = Modifier
                                     .weight(1f),
-                                value = ingredientQuantity,
-                                onValueChange = { value -> ingredientQuantity = value },
+                                value = uiState.ingredientQuantityDraft,
+                                onValueChange = onIngredientQuantityChange,
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done
@@ -271,7 +270,7 @@ fun IngredientsPage(
                                         .onGloballyPositioned { coordinates ->
                                             unitOfMeasurementTextileWidth = coordinates.size.width
                                         },
-                                    value = ingredientUnitOfMeasurement.name,
+                                    value = uiState.ingredientUnitOfMeasurementDraft.name,
                                     onValueChange = {},
                                     readOnly = true,
                                     label = {
@@ -300,7 +299,7 @@ fun IngredientsPage(
                                         DropdownMenuItem(
                                             text = { Text(text = it.name) },
                                             onClick = {
-                                                ingredientUnitOfMeasurement = it
+                                                onIngredientUnitOfMeasurementChange(it)
                                                 isDropdownMenuVisible = false
                                             })
                                     }
@@ -313,19 +312,7 @@ fun IngredientsPage(
                         modifier = Modifier,
                         onClick = {
                             focusManager.clearFocus()
-
-                            if (ValidateTextField().invoke(ingredientTitle) == ValidationResult.ERROR) return@Button
-                            if (ingredientQuantity.toFloat() == 0f || ingredientQuantity.toFloat().isNaN()) return@Button
-
-                                handleIngredientMovement(
-                                    IngredientRecipe(
-                                        title = ingredientTitle,
-                                        quantity = ingredientQuantity.toFloat(),
-                                        unitOfMeasurement = ingredientUnitOfMeasurement
-                                    )
-                                )
-                            ingredientTitle = ""
-                            ingredientQuantity = ""
+                            onAddIngredientClick()
                         }) {
                         Text(text = "add")
                     }
@@ -337,7 +324,7 @@ fun IngredientsPage(
                 ) {
                     OutlinedButton(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = onNextClick
+                        onClick = onNextButtonClick
                     ) {
                         Text(
                             text = "Next",
@@ -360,23 +347,20 @@ private fun IngredientsPagePreview() {
 
     IngredientsPage(
         uiState = CreateRecipeViewModel.Pages.IngredientsPage(
-            selectedIngredientList = listOf(
-                IngredientRecipe(
-                    null,
-                    "lemon",
-                    1f,
-                    UnitOfMeasurement.PIECE
-                )
-            ),
+            selectedIngredientList = listOf(),
             unSelectedIngredientList = listOf(
-                IngredientDraft(0, "apple"),
-                IngredientDraft(1, "banana")
+                FoodSummary(0, "apple"),
+                FoodSummary(1, "banana")
             ),
             searchText = queryText,
         ),
         onQueryChange = { queryText = it },
         onSearchClear = { queryText = "" },
-        onNextClick = {},
-        handleIngredientMovement = {},
+        onNextButtonClick = {},
+        onAddIngredientClick = {},
+        onRemoveIngredientClick = {},
+        onIngredientQuantityChange = {},
+        onIngredientTitleChange = {},
+        onIngredientUnitOfMeasurementChange = {}
     )
 }

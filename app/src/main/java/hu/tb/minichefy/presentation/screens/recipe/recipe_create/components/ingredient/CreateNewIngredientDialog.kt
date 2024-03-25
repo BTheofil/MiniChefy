@@ -36,8 +36,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import hu.tb.minichefy.domain.model.recipe.IngredientRecipe
+import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 
@@ -47,7 +48,7 @@ fun CreateNewIngredientDialog(
     ingredientTitle: String? = null,
     onDismissRequest: () -> Unit,
     onCancelClick: () -> Unit,
-    onProceedClick: (IngredientRecipe) -> Unit
+    onProceedClick: (Food) -> Unit
 ) {
     var ingredientName by remember { mutableStateOf(ingredientTitle ?: "") }
     var amount by remember { mutableStateOf( "") }
@@ -160,11 +161,13 @@ fun CreateNewIngredientDialog(
                     Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                     TextButton(onClick = {
                         onProceedClick(
-                            IngredientRecipe(
+                            Food(
                                 id = ingredientId,
                                 title = ingredientName,
                                 quantity = amount.toFloat(),
-                                unitOfMeasurement = unitOfMeasurement
+                                unitOfMeasurement = unitOfMeasurement,
+                                icon = IconManager().getDefaultIcon.resource,
+                                foodTagList = emptyList()
                             )
                         )
                     }) {

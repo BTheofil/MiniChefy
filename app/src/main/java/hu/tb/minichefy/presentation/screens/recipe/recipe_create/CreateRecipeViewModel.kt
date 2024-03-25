@@ -3,12 +3,12 @@ package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.tb.minichefy.domain.model.recipe.IngredientDraft
-import hu.tb.minichefy.domain.model.recipe.IngredientRecipe
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.domain.model.storage.Food
+import hu.tb.minichefy.domain.model.storage.FoodSummary
+import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
@@ -79,11 +79,14 @@ class CreateRecipeViewModel @Inject constructor(
         ) : Pages()
 
         data class IngredientsPage(
-            val selectedIngredientList: List<IngredientRecipe> = emptyList(),
-            val unSelectedIngredientList: List<IngredientDraft> = emptyList(),
+            val selectedIngredientList: List<Food> = emptyList(),
+            val unSelectedIngredientList: List<FoodSummary> = emptyList(),
             val searchText: String = "",
             val isIngredientTitleHasError: Boolean = false,
-            val isIngredientQuantityHasError: Boolean = false
+            val isIngredientQuantityHasError: Boolean = false,
+            val ingredientTitleDraft: String = "",
+            val ingredientQuantityDraft: String = "",
+            val ingredientUnitOfMeasurementDraft: UnitOfMeasurement = UnitOfMeasurement.PIECE
         ) : Pages()
 
         data class StepsPage(
@@ -100,26 +103,33 @@ class CreateRecipeViewModel @Inject constructor(
     }
 
     sealed class OnEvent {
-        //all pages event
         data class PageChange(val pageIndex: Int) : OnEvent()
+    }
 
-        //basic page
-        data class OnQuantityChange(val value: Int) : OnEvent()
-        data class OnRecipeTitleChange(val text: String) : OnEvent()
-        data class OnSelectedIconChange(val icon: MealIcon) : OnEvent()
-
-        //steps page
-        data class OnStepsFieldChange(val text: String, val index: Int) : OnEvent()
-        data class OnAddRecipeStepToList(val stepDescription: String) : OnEvent()
-        data class OnDeleteRecipeStep(val index: Int) : OnEvent()
-        data class RecipeItemClick(val index: Int) : OnEvent()
-        data object OnRecipeSave : OnEvent()
-        data object ClearStepField : OnEvent()
+    sealed class OnBasicInformationPageEvent {
+        data class OnQuantityChange(val value: Int) : OnBasicInformationPageEvent()
+        data class OnRecipeTitleChange(val text: String) : OnBasicInformationPageEvent()
+        data class OnSelectedIconChange(val icon: MealIcon) : OnBasicInformationPageEvent()
     }
 
     sealed class OnIngredientEvent {
-        data class IngredientAddRemove(val ingredient: IngredientRecipe) : OnIngredientEvent()
         data class OnSearchValueChange(val text: String) : OnIngredientEvent()
+        data class OnIngredientTitleChange(val text: String) : OnIngredientEvent()
+        data class OnIngredientQuantityChange(val quantityString: String) : OnIngredientEvent()
+        data class OnIngredientUnitOfMeasurementChange(val unitOfMeasurement: UnitOfMeasurement) :
+            OnIngredientEvent()
+
+        data class IngredientRemove(val itemPos: Int) : OnIngredientEvent()
+        data object IngredientAdd : OnIngredientEvent()
+    }
+
+    sealed class OnStepsPageEvent {
+        data class OnStepsFieldChange(val text: String, val index: Int) : OnStepsPageEvent()
+        data class OnAddRecipeStepToList(val stepDescription: String) : OnStepsPageEvent()
+        data class OnDeleteRecipeStep(val index: Int) : OnStepsPageEvent()
+        data class RecipeItemClick(val index: Int) : OnStepsPageEvent()
+        data object OnRecipeSave : OnStepsPageEvent()
+        data object ClearStepField : OnStepsPageEvent()
     }
 
     fun onEvent(event: OnEvent) {
@@ -131,10 +141,13 @@ class CreateRecipeViewModel @Inject constructor(
                 }
                 _uiEvent.send(UiEvent.PageChange)
             }
+        }
+    }
 
-            //basic page
-            is OnEvent.OnQuantityChange -> {
-                when (validateQuantityNumber(basicPageState.value.quantityCounter + event.value)) {
+    fun onBasicInformationPageEvent(event: OnBasicInformationPageEvent) {
+        when (event) {
+            is OnBasicInformationPageEvent.OnQuantityChange -> {
+                when (validateQuantityNumber((basicPageState.value.quantityCounter + event.value).toFloat())) {
                     ValidationResult.SUCCESS -> _basicPageState.update {
                         it.copy(
                             quantityCounter = it.quantityCounter + event.value,
@@ -148,25 +161,124 @@ class CreateRecipeViewModel @Inject constructor(
                 }
             }
 
-            is OnEvent.OnRecipeTitleChange -> _basicPageState.update {
+            is OnBasicInformationPageEvent.OnRecipeTitleChange -> _basicPageState.update {
                 it.copy(recipeName = event.text)
             }
 
-            is OnEvent.OnSelectedIconChange -> _basicPageState.update {
+            is OnBasicInformationPageEvent.OnSelectedIconChange -> _basicPageState.update {
                 it.copy(selectedMealIcon = event.icon)
             }
+        }
+    }
 
-            //steps page
-            is OnEvent.OnStepsFieldChange -> {
-                val updatedRecipeSteps = stepsPageState.value.recipeSteps.toMutableList().apply {
-                    this[event.index] = RecipeStep(step = event.text)
+    fun onIngredientPageEvent(event: OnIngredientEvent) {
+        when (event) {
+            OnIngredientEvent.IngredientAdd -> {
+                val currentState = ingredientsPageState.value
+
+                val titleResult =
+                    validateTextField(currentState.ingredientTitleDraft) == ValidationResult.ERROR
+                val quantityResult =
+                    currentState.ingredientQuantityDraft.isBlank() || validateQuantityNumber(
+                        currentState.ingredientQuantityDraft.toFloat()
+                    ) == ValidationResult.ERROR
+
+                val hasError = listOf(
+                    titleResult, quantityResult
+                ).any { it }
+
+                if (hasError) {
+                    _ingredientsPageState.value = currentState.copy(
+                        isIngredientTitleHasError = titleResult,
+                        isIngredientQuantityHasError = quantityResult
+                    )
+                    return
                 }
+
+                val selectedMutableList = currentState.selectedIngredientList.toMutableList()
+
+                val temp = Food(
+                    title = currentState.ingredientTitleDraft,
+                    quantity = currentState.ingredientQuantityDraft.toFloat(),
+                    unitOfMeasurement = currentState.ingredientUnitOfMeasurementDraft,
+                    icon = IconManager().getDefaultIcon.resource,
+                    foodTagList = emptyList()
+                )
+
+                if (temp !in selectedMutableList) {
+                    selectedMutableList.add(0, temp)
+                }
+
+                _ingredientsPageState.value = currentState.copy(
+                    selectedIngredientList = selectedMutableList,
+                    isIngredientTitleHasError = false,
+                    isIngredientQuantityHasError = false,
+                    ingredientTitleDraft = "",
+                    ingredientQuantityDraft = "",
+
+                    )
+            }
+
+            is OnIngredientEvent.IngredientRemove -> {
+                val updatedList = ingredientsPageState.value.selectedIngredientList.toMutableList()
+                updatedList.removeAt(event.itemPos)
+
+                _ingredientsPageState.update {
+                    it.copy(
+                        selectedIngredientList = updatedList
+                    )
+                }
+            }
+
+            is OnIngredientEvent.OnSearchValueChange -> {
+                viewModelScope.launch {
+                    _ingredientsPageState.update { it.copy(searchText = event.text) }
+
+                    delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
+
+                    _ingredientsPageState.update { ingredientsPage ->
+                        ingredientsPage.copy(
+                            unSelectedIngredientList = storageRepository.searchProductByTitle(
+                                event.text
+                            )
+                        )
+                    }
+                }
+            }
+
+            is OnIngredientEvent.OnIngredientQuantityChange -> _ingredientsPageState.update {
+                it.copy(
+                    ingredientQuantityDraft = event.quantityString
+                )
+            }
+
+            is OnIngredientEvent.OnIngredientTitleChange -> _ingredientsPageState.update {
+                it.copy(
+                    ingredientTitleDraft = event.text
+                )
+            }
+
+            is OnIngredientEvent.OnIngredientUnitOfMeasurementChange -> _ingredientsPageState.update {
+                it.copy(
+                    ingredientUnitOfMeasurementDraft = event.unitOfMeasurement
+                )
+            }
+        }
+    }
+
+    fun onStepsPageEvent(event: OnStepsPageEvent) {
+        when (event) {
+            is OnStepsPageEvent.OnStepsFieldChange -> {
+                val updatedRecipeSteps =
+                    stepsPageState.value.recipeSteps.toMutableList().apply {
+                        this[event.index] = RecipeStep(step = event.text)
+                    }
                 _stepsPageState.update {
                     it.copy(recipeSteps = updatedRecipeSteps)
                 }
             }
 
-            is OnEvent.RecipeItemClick -> {
+            is OnStepsPageEvent.RecipeItemClick -> {
                 val selectedRecipeStep = stepsPageState.value.recipeSteps[event.index]
                 _stepsPageState.update {
                     it.copy(
@@ -175,16 +287,17 @@ class CreateRecipeViewModel @Inject constructor(
                 }
             }
 
-            is OnEvent.OnDeleteRecipeStep -> {
-                val removedRecipeStepList = stepsPageState.value.recipeSteps.toMutableList().apply {
-                    removeAt(event.index)
-                }
+            is OnStepsPageEvent.OnDeleteRecipeStep -> {
+                val removedRecipeStepList =
+                    stepsPageState.value.recipeSteps.toMutableList().apply {
+                        removeAt(event.index)
+                    }
                 _stepsPageState.update {
                     it.copy(recipeSteps = removedRecipeStepList)
                 }
             }
 
-            is OnEvent.OnAddRecipeStepToList -> {
+            is OnStepsPageEvent.OnAddRecipeStepToList -> {
                 val recipeStepsPlusEmptyField =
                     stepsPageState.value.recipeSteps.toMutableList().apply {
                         add(RecipeStep(step = ""))
@@ -194,9 +307,9 @@ class CreateRecipeViewModel @Inject constructor(
                 }
             }
 
-            OnEvent.ClearStepField -> _stepsPageState.update { it.copy(stepBoxTextField = "") }
+            OnStepsPageEvent.ClearStepField -> _stepsPageState.update { it.copy(stepBoxTextField = "") }
 
-            OnEvent.OnRecipeSave -> viewModelScope.launch {
+            OnStepsPageEvent.OnRecipeSave -> viewModelScope.launch {
                 val createdRecipe = Recipe(
                     icon = basicPageState.value.selectedMealIcon.resource,
                     title = basicPageState.value.recipeName,
@@ -224,53 +337,6 @@ class CreateRecipeViewModel @Inject constructor(
                         RecipeStep(step = stepsPageState.value.stepBoxTextField),
                         resultId
                     )
-                }
-            }
-        }
-    }
-
-    fun onIngredientPageEvent(event: OnIngredientEvent) {
-        when (event) {
-            is OnIngredientEvent.IngredientAddRemove -> {
-                val currentState = ingredientsPageState.value
-
-                if(validateTextField(event.ingredient.title) == ValidationResult.ERROR){
-                    _ingredientsPageState.value = currentState.copy(
-                        isIngredientTitleHasError = true,
-                    )
-                    return
-                }
-                if (event.ingredient.quantity == 0f || event.ingredient.quantity.isNaN()){
-                    _ingredientsPageState.value = currentState.copy(
-                        isIngredientQuantityHasError = true,
-                    )
-                    return
-                }
-
-                val selectedMutableList = currentState.selectedIngredientList.toMutableList()
-
-                if (event.ingredient !in selectedMutableList) {
-                    selectedMutableList.add(0, event.ingredient)
-                }
-
-                _ingredientsPageState.value = currentState.copy(
-                    selectedIngredientList = selectedMutableList,
-                    isIngredientTitleHasError = false,
-                    isIngredientQuantityHasError = false
-                )
-            }
-
-            is OnIngredientEvent.OnSearchValueChange -> {
-                viewModelScope.launch {
-                    _ingredientsPageState.update { it.copy(searchText = event.text) }
-
-                    delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
-
-                    _ingredientsPageState.update { ingredientsPage ->
-                        ingredientsPage.copy(
-                            unSelectedIngredientList = storageRepository.searchProductByTitle(event.text)
-                        )
-                    }
                 }
             }
         }

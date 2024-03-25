@@ -1,7 +1,7 @@
 package hu.tb.minichefy.domain.repository
 
-import hu.tb.minichefy.domain.model.recipe.IngredientDraft
 import hu.tb.minichefy.domain.model.storage.Food
+import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import kotlinx.coroutines.flow.Flow
@@ -11,13 +11,13 @@ interface StorageRepository {
     //food
     fun getAllFood(): Flow<List<Food>>
 
-    suspend fun getAllStorageFoodName(): List<IngredientDraft>
+    suspend fun getAllStorageFoodName(): List<FoodSummary>
 
     suspend fun saveOrModifyFood(food: Food): Long
 
     suspend fun searchFoodByDishProperties(title: String, uof: UnitOfMeasurement): Food?
 
-    suspend fun searchProductByTitle(searchText: String): List<IngredientDraft>
+    suspend fun searchProductByTitle(searchText: String): List<FoodSummary>
 
     suspend fun deleteFoodById(id: Long): Int
 
