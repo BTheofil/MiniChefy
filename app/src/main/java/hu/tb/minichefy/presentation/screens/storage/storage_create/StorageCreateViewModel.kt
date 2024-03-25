@@ -7,8 +7,8 @@ import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
-import hu.tb.minichefy.presentation.screens.components.icons.IconManager
-import hu.tb.minichefy.presentation.screens.components.icons.ProductIcon
+import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
+import hu.tb.minichefy.presentation.screens.manager.icons.ProductIcon
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

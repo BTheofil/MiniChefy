@@ -1,6 +1,5 @@
 package hu.tb.minichefy.domain.use_case
 
-import hu.tb.minichefy.domain.model.storage.CalculationFood
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import org.junit.Assert
 import org.junit.Test

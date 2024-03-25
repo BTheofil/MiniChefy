@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.screens.components.icons
+package hu.tb.minichefy.presentation.screens.manager.icons
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -25,7 +25,7 @@ class IconManager {
 
     val getDefaultIcon: AppWideIcon = AppWideIcon.DEFAULT_EMPTY_ICON
 
-    fun getRandomProduct(): ProductIcon{
+    fun getRandomProduct(): ProductIcon {
         return  getAllProductIconList[Random.nextInt(0, getAllProductIconList.size)]
     }
 

@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.presentation.screens.components.CircleImage
-import hu.tb.minichefy.presentation.screens.components.icons.MealIcon
+import hu.tb.minichefy.presentation.screens.manager.icons.MealIcon
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info.QuestionForm

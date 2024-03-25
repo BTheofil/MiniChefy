@@ -1,6 +1,5 @@
 package hu.tb.minichefy.domain.use_case
 
-import hu.tb.minichefy.domain.model.storage.CalculationFood
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 
 class CalculateMeasurements {
@@ -52,4 +51,19 @@ class CalculateMeasurements {
         numberOne: Float,
         numberTwo: Float,
     ): Float = if ((numberOne + numberTwo) < 0) 0f else numberOne + numberTwo
+}
+
+data class CalculationFood(
+    val quantity: Float,
+    val unitOfMeasurement: UnitOfMeasurement
+) {
+    fun convertToSmallestUnit() =
+        when (unitOfMeasurement) {
+            UnitOfMeasurement.KG -> quantity * 1000
+            UnitOfMeasurement.DKG -> quantity * 10
+            UnitOfMeasurement.G -> quantity
+            UnitOfMeasurement.L -> quantity * 10
+            UnitOfMeasurement.DL -> quantity
+            UnitOfMeasurement.PIECE -> quantity
+        }
 }

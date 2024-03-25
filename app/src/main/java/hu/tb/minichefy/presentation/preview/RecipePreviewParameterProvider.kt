@@ -7,7 +7,7 @@ import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.presentation.screens.components.icons.IconManager
+import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 
 class RecipePreviewParameterProvider : PreviewParameterProvider<Recipe> {
     override val values: Sequence<Recipe> = sequenceOf(
