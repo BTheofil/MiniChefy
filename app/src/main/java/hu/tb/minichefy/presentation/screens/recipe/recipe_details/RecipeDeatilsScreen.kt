@@ -2,18 +2,24 @@ package hu.tb.minichefy.presentation.screens.recipe.recipe_details
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -27,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -38,6 +45,7 @@ import hu.tb.minichefy.domain.model.recipe.SimpleQuickRecipeInfo
 import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.icons.iconVectorResource
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.ConfirmRecipeAddToStorageDialog
+import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.DetailsRecipeStepItem
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.OneColorBackground
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.QuickInfoBox
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
@@ -158,7 +166,14 @@ fun DetailsBottomContent(
         OneColorBackground()
         Column {
             TabRow(
-                modifier = Modifier,
+                modifier = Modifier
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 22.dp,
+                            topEnd = 22.dp
+                        )
+                    )
+                    .fillMaxWidth(),
                 selectedTabIndex = pagerState.settledPage
             ) {
                 Tab(selected = pagerState.settledPage == 0, onClick = {
@@ -186,28 +201,65 @@ fun DetailsBottomContent(
                         )
                     })
             }
+            Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
             HorizontalPager(
                 modifier = Modifier
                     .fillMaxWidth(),
                 state = pagerState
             ) { pageIndex ->
-                when (pageIndex) {
-                    0 -> {
-                        LazyColumn {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = SCREEN_HORIZONTAL_PADDING),
+                    verticalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS)
+                ) {
+                    when (pageIndex) {
+                        0 -> {
                             items(
                                 items = recipe.ingredientList
-                            ) {
-                                ListItem(headlineContent = { Text(text = it.title) })
+                            ) { food ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .background(Color.Black, CircleShape)
+                                    )
+                                    Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
+                                    Text(
+                                        modifier = Modifier
+                                            .weight(1f),
+                                        text = food.title,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Text(
+                                        text = food.quantity.toString(),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                    Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
+                                    Text(
+                                        text = food.unitOfMeasurement.toString(),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
                             }
                         }
-                    }
 
-                    1 -> {
-                        LazyColumn {
-                            items(
-                                items = recipe.howToSteps
-                            ) {
-                                ListItem(headlineContent = { Text(text = it.step) })
+                        1 -> {
+                            itemsIndexed(
+                                items = recipe.howToSteps,
+                                key = { _, item -> item.id!! }
+                            ) { index, step ->
+                                DetailsRecipeStepItem(
+                                    stepNumber = index,
+                                    stepTextDescription = step.step
+                                )
                             }
                         }
                     }
