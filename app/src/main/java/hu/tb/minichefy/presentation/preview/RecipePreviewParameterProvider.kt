@@ -4,6 +4,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
+import hu.tb.minichefy.domain.model.storage.Food
+import hu.tb.minichefy.domain.model.storage.FoodTag
+import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.components.icons.IconManager
 
 class RecipePreviewParameterProvider : PreviewParameterProvider<Recipe> {
@@ -26,6 +29,14 @@ private object MockRecipeDomain {
         ),
         timeUnit = TimeUnit.MINUTES,
         timeToCreate = 30f,
-        ingredientList = emptyList()
+        ingredientList = listOf(
+            Food(
+                0, IconManager().getDefaultIcon.resource,
+                "apple",
+                quantity = 1f,
+                unitOfMeasurement = UnitOfMeasurement.PIECE,
+                listOf(FoodTag(0, "fruit"))
+            )
+        )
     )
 }
