@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.screens.components.icons
+package hu.tb.minichefy.presentation.screens.manager.icons
 
 import hu.tb.minichefy.R
 
@@ -18,6 +18,6 @@ enum class ProductIcon(override val resource: Int): IconResource {
     CHEESE(R.drawable.cheese_icon)
 }
 
-enum class AppWideIcon(override val resource: Int): IconResource{
+enum class AppWideIcon(override val resource: Int): IconResource {
     DEFAULT_EMPTY_ICON(R.drawable.default_empty_icon),
 }
