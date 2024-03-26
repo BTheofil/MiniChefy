@@ -36,10 +36,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import hu.tb.minichefy.domain.model.recipe.IngredientRecipe
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
+
+data class IngredientDialogArgs(
+    val id: Long? = null,
+    val title: String,
+    val quantity: String,
+    val unitOfMeasurement: UnitOfMeasurement,
+)
 
 @Composable
 fun CreateNewIngredientDialog(
@@ -47,10 +53,10 @@ fun CreateNewIngredientDialog(
     ingredientTitle: String? = null,
     onDismissRequest: () -> Unit,
     onCancelClick: () -> Unit,
-    onProceedClick: (IngredientRecipe) -> Unit
+    onProceedClick: (IngredientDialogArgs) -> Unit
 ) {
     var ingredientName by remember { mutableStateOf(ingredientTitle ?: "") }
-    var amount by remember { mutableStateOf( "") }
+    var quantity by remember { mutableStateOf( "") }
     var unitOfMeasurement by remember { mutableStateOf(UnitOfMeasurement.PIECE) }
     var isDropdownMenuVisible by remember { mutableStateOf(false) }
     var unitOfMeasurementTextileWidth by remember { mutableIntStateOf(0) }
@@ -91,8 +97,8 @@ fun CreateNewIngredientDialog(
                     OutlinedTextField(
                         modifier = Modifier
                             .weight(1f),
-                        value = amount,
-                        onValueChange = { amount = it },
+                        value = quantity,
+                        onValueChange = { quantity = it },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         label = {
                             Text(
@@ -160,10 +166,10 @@ fun CreateNewIngredientDialog(
                     Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                     TextButton(onClick = {
                         onProceedClick(
-                            IngredientRecipe(
+                            IngredientDialogArgs(
                                 id = ingredientId,
                                 title = ingredientName,
-                                quantity = amount.toFloat(),
+                                quantity = quantity,
                                 unitOfMeasurement = unitOfMeasurement
                             )
                         )

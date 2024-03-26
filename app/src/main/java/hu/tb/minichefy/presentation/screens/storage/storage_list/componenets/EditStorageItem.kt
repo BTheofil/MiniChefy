@@ -22,7 +22,6 @@ import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -43,12 +42,10 @@ import androidx.constraintlayout.compose.Dimension
 import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
-import hu.tb.minichefy.presentation.preview.ProductPreviewParameterProvider
+import hu.tb.minichefy.presentation.preview.FoodPreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
-import hu.tb.minichefy.presentation.ui.theme.Green500
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
-import hu.tb.minichefy.presentation.ui.theme.Red400
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 import kotlin.math.min
 
@@ -60,7 +57,7 @@ fun EditStorageItem(
     onCloseClick: () -> Unit,
     onAddTagClick: () -> Unit,
     onDeleteTagClick: (tag: FoodTag) -> Unit,
-    onChangeQuantity: (value: Float) -> Unit
+    //onChangeQuantity: (value: Int) -> Unit
 ) {
     OutlinedCard(
         modifier = Modifier
@@ -171,16 +168,16 @@ fun EditStorageItem(
                         .fillMaxWidth(0.8f),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(
+                    /*IconButton(
                         modifier = Modifier,
-                        onClick = { onChangeQuantity(-1f) }
+                        onClick = { onChangeQuantity(-1) }
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_remove_24),
                             contentDescription = "Decrease quantity",
                             tint = Color(Red400.value)
                         )
-                    }
+                    }*/
                     Text(
                         modifier = Modifier
                             .weight(1f),
@@ -189,13 +186,13 @@ fun EditStorageItem(
                         color = MaterialTheme.colorScheme.secondary,
                         textAlign = TextAlign.Center
                     )
-                    IconButton(onClick = { onChangeQuantity(1f) }) {
+                    /*IconButton(onClick = { onChangeQuantity(1) }) {
                         Icon(
                             painter = painterResource(id = R.drawable.baseline_add_24),
                             contentDescription = "Increase quantity",
                             tint = Color(Green500.value)
                         )
-                    }
+                    }*/
                 }
 
             }
@@ -227,10 +224,10 @@ fun EditStorageItem(
 @Preview
 @Composable
 private fun EditStorageItemPreview(
-    @PreviewParameter(ProductPreviewParameterProvider::class) foodList: List<Food>
+    @PreviewParameter(FoodPreviewParameterProvider::class) foodList: List<Food>
 ) {
     EditStorageItem(
         food = foodList.first(),
-        {}, {}, {}, {}, {}
+        {}, {}, {}, {},
     )
 }

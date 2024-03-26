@@ -3,8 +3,8 @@ package hu.tb.minichefy.data.repository
 import hu.tb.minichefy.data.data_source.dao.StorageDAO
 import hu.tb.minichefy.data.mapper.FoodEntityToFood
 import hu.tb.minichefy.data.mapper.ProductTagEntityToTag
-import hu.tb.minichefy.domain.model.recipe.IngredientDraft
 import hu.tb.minichefy.domain.model.storage.Food
+import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
@@ -27,10 +27,10 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllStorageFoodName(): List<IngredientDraft> {
+    override suspend fun getAllStorageFoodName(): List<FoodSummary> {
         val entities = dao.getAllStorageFoodName()
         return entities.map {
-            IngredientDraft(
+            FoodSummary(
                 id = it.id,
                 title = it.title,
             )
@@ -49,10 +49,10 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         return FoodEntityToFood().map(entity)
     }
 
-    override suspend fun searchProductByTitle(searchText: String): List<IngredientDraft> {
+    override suspend fun searchProductByTitle(searchText: String): List<FoodSummary> {
         val products = dao.searchProductByTitle("%$searchText%")
         return products.map {
-            IngredientDraft(
+            FoodSummary(
                 id = it.id,
                 title = it.title,
             )

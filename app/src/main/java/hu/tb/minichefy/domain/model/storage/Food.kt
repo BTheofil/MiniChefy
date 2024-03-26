@@ -4,6 +4,11 @@ import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodTagEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodTagListWrapper
 
+data class FoodSummary(
+    val id: Long,
+    val title: String
+)
+
 data class Food(
     val id: Long? = null,
     val icon: Int,

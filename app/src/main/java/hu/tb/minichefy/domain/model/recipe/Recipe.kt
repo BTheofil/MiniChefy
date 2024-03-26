@@ -9,7 +9,7 @@ data class Recipe(
     val icon: Int,
     val title: String,
     val quantity: Int,
-    val timeToCreate: Float,
+    val timeToCreate: Int,
     val timeUnit: TimeUnit,
     val howToSteps: List<RecipeStep>,
     val ingredientList: List<Food>

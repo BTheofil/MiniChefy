@@ -48,10 +48,11 @@ class RecipeDetailsViewModel @Inject constructor(
         when (event) {
             is OnEvent.MakeRecipe -> {
                 viewModelScope.launch {
-
                     val dishTag = storageRepository.getTagById(3)
-
-                    val result = storageRepository.searchFoodByDishProperties(uiState.value.recipe!!.title, UnitOfMeasurement.PIECE)
+                    val result = storageRepository.searchFoodByDishProperties(
+                        uiState.value.recipe!!.title,
+                        UnitOfMeasurement.PIECE
+                    )
 
                     uiState.value.recipe.also {
                         val savedFoodId = storageRepository.saveOrModifyFood(
@@ -59,7 +60,7 @@ class RecipeDetailsViewModel @Inject constructor(
                                 id = result?.id,
                                 icon = it!!.icon,
                                 title = it.title,
-                                quantity = it.quantity.toFloat() + (result?.quantity ?: 0f),
+                                quantity = it.quantity + (result?.quantity ?: 0f),
                                 unitOfMeasurement = UnitOfMeasurement.PIECE,
                                 foodTagList = listOf(dishTag)
                             )

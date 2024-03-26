@@ -30,7 +30,7 @@ import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info.QuestionForm
 
 @Composable
-fun InformationPage(
+fun BasicInformationPage(
     uiState: CreateRecipeViewModel.Pages.BasicInformationPage,
     onTitleValueChange: (String) -> Unit,
     onRemoveQuantityClick: () -> Unit,
@@ -113,5 +113,5 @@ fun InformationPage(
 @Preview
 @Composable
 fun InformationPagePreview() {
-    InformationPage(CreateRecipeViewModel.Pages.BasicInformationPage(), {}, {}, {}, {}, {})
+    BasicInformationPage(CreateRecipeViewModel.Pages.BasicInformationPage(), {}, {}, {}, {}, {})
 }
