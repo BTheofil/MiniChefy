@@ -2,6 +2,7 @@ package hu.tb.minichefy.domain.model.recipe.entity
 
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
@@ -19,7 +20,16 @@ data class RecipeEntity(
     val ingredientList: FoodEntityWrapper
 )
 
-@Entity
+@Entity(
+    foreignKeys = [
+        ForeignKey(
+            entity = RecipeEntity::class,
+            parentColumns = arrayOf("recipeId"),
+            childColumns = arrayOf("recipeEntityId"),
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
 data class RecipeStepEntity(
     @PrimaryKey(autoGenerate = true)
     val recipeStepId: Long?,
