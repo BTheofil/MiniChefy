@@ -147,7 +147,7 @@ class CreateRecipeViewModel @Inject constructor(
     fun onBasicInformationPageEvent(event: OnBasicInformationPageEvent) {
         when (event) {
             is OnBasicInformationPageEvent.OnQuantityChange -> {
-                when (validateQuantityNumber((basicPageState.value.quantityCounter + event.value).toFloat())) {
+                when (validateQuantityNumber((basicPageState.value.quantityCounter + event.value))) {
                     ValidationResult.SUCCESS -> _basicPageState.update {
                         it.copy(
                             quantityCounter = it.quantityCounter + event.value,
@@ -180,7 +180,7 @@ class CreateRecipeViewModel @Inject constructor(
                     validateTextField(currentState.ingredientTitleDraft) == ValidationResult.ERROR
                 val quantityResult =
                     currentState.ingredientQuantityDraft.isBlank() || validateQuantityNumber(
-                        currentState.ingredientQuantityDraft.toFloat()
+                        currentState.ingredientQuantityDraft.toInt()
                     ) == ValidationResult.ERROR
 
                 val hasError = listOf(
@@ -315,7 +315,7 @@ class CreateRecipeViewModel @Inject constructor(
                     title = basicPageState.value.recipeName,
                     quantity = basicPageState.value.quantityCounter,
                     howToSteps = stepsPageState.value.recipeSteps,
-                    timeToCreate = 0f,
+                    timeToCreate = 0,
                     timeUnit = TimeUnit.MINUTES,
                     ingredientList = ingredientsPageState.value.selectedIngredientList.map {
                         Food(

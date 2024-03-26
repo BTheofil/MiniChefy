@@ -1,8 +1,8 @@
 package hu.tb.minichefy.domain.use_case
 
 class ValidateQuantityNumber {
-    operator fun invoke(quantityNumber: Float): ValidationResult =
-        if (quantityNumber == 0f || quantityNumber.isNaN()) {
+    operator fun invoke(quantityNumber: Int): ValidationResult =
+        if (quantityNumber <= 0) {
             ValidationResult.ERROR
         } else {
             ValidationResult.SUCCESS

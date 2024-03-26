@@ -50,7 +50,7 @@ class CalculateMeasurements {
     private fun performCalculation(
         numberOne: Float,
         numberTwo: Float,
-    ): Float = if ((numberOne + numberTwo) < 0) 0f else numberOne + numberTwo
+    ): Float = if ((numberOne + numberTwo) < 0f) 0f else numberOne + numberTwo
 }
 
 data class CalculationFood(

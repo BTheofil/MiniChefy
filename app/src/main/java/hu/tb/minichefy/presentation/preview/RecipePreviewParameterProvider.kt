@@ -28,7 +28,7 @@ private object MockRecipeDomain {
             RecipeStep(2, "enjoy")
         ),
         timeUnit = TimeUnit.MINUTES,
-        timeToCreate = 30f,
+        timeToCreate = 30,
         ingredientList = listOf(
             Food(
                 0, IconManager().getDefaultIcon.resource,

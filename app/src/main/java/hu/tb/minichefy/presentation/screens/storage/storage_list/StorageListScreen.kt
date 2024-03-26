@@ -37,12 +37,13 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
-import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.presentation.preview.FoodPreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
@@ -143,11 +144,11 @@ fun StorageScreenContent(
                                 onAddTagClick = {
                                     isEditProductTagSelectorOpen = true
                                 },
-                                onChangeQuantity = { value ->
+                                /*onChangeQuantity = { value ->
                                     onEvent(
                                         StorageListViewModel.OnEvent.ModifyProductQuantity(value)
                                     )
-                                },
+                                },*/
                             )
 
                             false -> {
@@ -228,31 +229,13 @@ fun StorageScreenContent(
 
 @Preview
 @Composable
-fun MainScreenContentPreview() {
-
-    val testIcon = IconManager().getRandomProduct()
-
+fun StorageScreenContentPreview(
+    @PreviewParameter(FoodPreviewParameterProvider::class) mockProductList: List<Food>
+) {
     StorageScreenContent(
         StorageListViewModel.UiState(
             foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
-            foodList = listOf(
-                Food(
-                    id = 1,
-                    icon = testIcon.resource,
-                    title = "apple",
-                    quantity = 2f,
-                    unitOfMeasurement = UnitOfMeasurement.KG,
-                    foodTagList = null
-                ),
-                Food(
-                    id = 2,
-                    icon = testIcon.resource,
-                    title = "banana",
-                    quantity = 4f,
-                    unitOfMeasurement = UnitOfMeasurement.DKG,
-                    foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(2, "fruit"))
-                )
-            )
+            foodList = mockProductList
         ),
         onEvent = {},
         onFABClick = {}
