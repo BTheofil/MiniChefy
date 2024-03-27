@@ -3,10 +3,12 @@ package hu.tb.minichefy.domain.model.recipe.entity
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
+import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
 
 @Entity
 data class RecipeEntity(
@@ -17,15 +19,14 @@ data class RecipeEntity(
     val quantity: Int,
     val timeToCreate: Int,
     val timeUnit: TimeUnit,
-    val ingredientList: FoodEntityWrapper
 )
 
 @Entity(
     foreignKeys = [
         ForeignKey(
             entity = RecipeEntity::class,
-            parentColumns = arrayOf("recipeId"),
-            childColumns = arrayOf("recipeEntityId"),
+            parentColumns = ["recipeId"],
+            childColumns = ["recipeEntityId"],
             onDelete = ForeignKey.CASCADE
         )
     ]
@@ -37,17 +38,29 @@ data class RecipeStepEntity(
     val step: String
 )
 
-data class RecipeWithSteps(
+@Entity(primaryKeys = ["recipeId", "foodId"])
+data class RecipeFoodCrossRef(
+    val recipeId: Long,
+    val foodId: Long
+)
+
+data class RecipeBlock(
     @Embedded
     val recipeEntity: RecipeEntity,
+
     @Relation(
+        entity = RecipeStepEntity::class,
         parentColumn = "recipeId",
         entityColumn = "recipeEntityId"
     )
-    val recipeSteps: List<RecipeStepEntity>
-)
+    val recipeSteps: List<RecipeStepEntity>,
 
-data class FoodEntityWrapper(
-    val ingredients: List<FoodEntity>
+    @Relation(
+        entity = FoodEntity::class,
+        parentColumn = "recipeId",
+        entityColumn = "foodId",
+        associateBy = Junction(RecipeFoodCrossRef::class)
+    )
+    val ingredients: List<FoodWithTags>
 )
 

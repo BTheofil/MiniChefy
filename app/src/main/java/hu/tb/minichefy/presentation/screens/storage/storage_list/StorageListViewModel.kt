@@ -103,12 +103,12 @@ class StorageListViewModel @Inject constructor(
                         unitOfMeasurement = uiState.value.foodList[uiState.value.modifiedProductIndex].unitOfMeasurement
                     )
                 )
-                val updatedProduct =
+                val updatedFood =
                     uiState.value.foodList[uiState.value.modifiedProductIndex].copy(
                         quantity = result.quantity,
                         unitOfMeasurement = result.unitOfMeasurement
                     )
-                saveEditedFood(updatedProduct)
+                saveEditedFood(updatedFood)
             }
 
             is OnEvent.ModifyProductTag -> {
@@ -145,7 +145,14 @@ class StorageListViewModel @Inject constructor(
 
     private fun saveEditedFood(updatedFood: Food) {
         viewModelScope.launch {
-            storageRepository.saveOrModifyFood(updatedFood)
+            storageRepository.saveOrModifyFood(
+                id = updatedFood.id,
+                title = updatedFood.title,
+                icon = updatedFood.icon,
+                quantity = updatedFood.quantity,
+                unitOfMeasurement = updatedFood.unitOfMeasurement,
+                tagListId = updatedFood.foodTagList?.map { it.id!! }
+            )
         }
     }
 }

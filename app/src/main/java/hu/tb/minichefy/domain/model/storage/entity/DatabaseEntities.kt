@@ -1,62 +1,48 @@
 package hu.tb.minichefy.domain.model.storage.entity
 
+import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.Junction
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
-import com.google.gson.Gson
-import hu.tb.minichefy.domain.model.recipe.entity.FoodEntityWrapper
-import hu.tb.minichefy.domain.model.storage.FoodTag
+import androidx.room.Relation
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 
 @Entity
 data class FoodEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long?,
+    val foodId: Long?,
     val icon: Int,
     val title: String,
     val quantity: Float,
-    val unitOfMeasurement: UnitOfMeasurement,
-    val tagList: FoodTagListWrapper?
+    val unitOfMeasurement: UnitOfMeasurement
 )
 
 @Entity
 data class SimplerFoodEntity(
-    val id: Long,
+    val foodId: Long,
     val title: String,
 )
 
-data class FoodTagListWrapper(
-    val foodTagList: List<FoodTagEntity>
-) {
-    fun toFoodTag(): List<FoodTag> =
-        foodTagList.map {
-            FoodTag(
-                it.id,
-                it.tag
-            )
-        }
-}
-
 @Entity
-data class FoodTagEntity(
+data class TagEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long?,
+    val tagId: Long?,
     val tag: String
 )
 
-class RoomTypeConverters {
-    @TypeConverter
-    fun convertTagListToJSONString(tagList: FoodTagListWrapper): String = Gson().toJson(tagList)
+@Entity(primaryKeys = ["foodId", "tagId"])
+data class FoodAndTagsCrossRef(
+    val foodId: Long,
+    val tagId: Long
+)
 
-    @TypeConverter
-    fun convertJSONStringToTagList(jsonString: String): FoodTagListWrapper =
-        Gson().fromJson(jsonString, FoodTagListWrapper::class.java)
-
-    @TypeConverter
-    fun convertFoodEntityListToJSONString(ingredientList: FoodEntityWrapper): String = Gson().toJson(ingredientList)
-
-    @TypeConverter
-    fun convertJSONStringToFoodEntityList(jsonString: String): FoodEntityWrapper =
-        Gson().fromJson(jsonString, FoodEntityWrapper::class.java)
-}
+data class FoodWithTags(
+    @Embedded val foodEntity: FoodEntity,
+    @Relation(
+        parentColumn = "foodId",
+        entityColumn = "tagId",
+        associateBy = Junction(FoodAndTagsCrossRef::class)
+    )
+    val tags: List<TagEntity>
+)
 

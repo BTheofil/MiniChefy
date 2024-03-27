@@ -2,7 +2,7 @@ package hu.tb.minichefy.data.repository
 
 import hu.tb.minichefy.data.data_source.dao.StorageDAO
 import hu.tb.minichefy.data.mapper.FoodEntityToFood
-import hu.tb.minichefy.data.mapper.ProductTagEntityToTag
+import hu.tb.minichefy.data.mapper.TagEntityToTag
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.FoodTag
@@ -31,21 +31,33 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         val entities = dao.getAllStorageFoodName()
         return entities.map {
             FoodSummary(
-                id = it.id,
+                id = it.foodId,
                 title = it.title,
             )
         }.sortedBy { it.title }
     }
 
-    override suspend fun saveOrModifyFood(food: Food): Long =
-        dao.saveOrModifyFood(food.toFoodEntity())
-
-    override suspend fun searchFoodByDishProperties(
+    override suspend fun saveOrModifyFood(
+        id: Long?,
         title: String,
-        uof: UnitOfMeasurement
-    ): Food? {
-        val entity: FoodEntity = dao.searchFoodByDishProperties(title, unitOfMeasurement = uof)
-            ?: return null
+        icon: Int,
+        quantity: Float,
+        unitOfMeasurement: UnitOfMeasurement,
+        tagListId: List<Long>?
+    ): Long {
+        val temp = FoodEntity(
+            foodId = id,
+            title = title,
+            icon = icon,
+            quantity = quantity,
+            unitOfMeasurement = unitOfMeasurement
+        )
+
+        return dao.saveOrModifyFood(temp)
+    }
+
+    override suspend fun searchFoodByTitle(title: String): Food? {
+        val entity = dao.searchFoodByTitle(title) ?: return null
         return FoodEntityToFood().map(entity)
     }
 
@@ -53,7 +65,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         val products = dao.searchProductByTitle("%$searchText%")
         return products.map {
             FoodSummary(
-                id = it.id,
+                id = it.foodId,
                 title = it.title,
             )
         }.sortedBy { it.title }
@@ -64,17 +76,17 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
 
     //tag
     override fun getAllFoodTag(): Flow<List<FoodTag>> {
-        val tagEntities = dao.getAllFoodTag()
+        val tagEntities = dao.getAllFoodTagFlow()
         return tagEntities.map { entities ->
             entities.map {
-                ProductTagEntityToTag().map(it)
+                TagEntityToTag().map(it)
             }
         }
     }
 
     override suspend fun getTagById(id: Long): FoodTag {
         val tagEntity = dao.getTagById(id)
-        return ProductTagEntityToTag().map(tagEntity)
+        return TagEntityToTag().map(tagEntity)
     }
 
     override suspend fun saveOrModifyFoodTag(tag: FoodTag): Long =

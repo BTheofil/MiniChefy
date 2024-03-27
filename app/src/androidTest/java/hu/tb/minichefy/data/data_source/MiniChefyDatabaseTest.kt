@@ -6,7 +6,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import hu.tb.minichefy.data.data_source.dao.RecipeDAO
 import hu.tb.minichefy.data.data_source.db.MiniChefyDatabase
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
-import hu.tb.minichefy.domain.model.recipe.entity.FoodEntityWrapper
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -44,9 +43,6 @@ class MiniChefyDatabaseTest {
             quantity = 2,
             timeUnit = TimeUnit.MINUTES,
             timeToCreate = 30,
-            ingredientList = FoodEntityWrapper(
-                emptyList()
-            )
         )
 
         val recipeId = recipeDao.insertRecipe(recipeEntity)

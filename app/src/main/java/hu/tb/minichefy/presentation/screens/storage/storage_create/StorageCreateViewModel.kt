@@ -3,7 +3,6 @@ package hu.tb.minichefy.presentation.screens.storage.storage_create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
@@ -128,13 +127,11 @@ class StorageCreateViewModel @Inject constructor(
                 viewModelScope.launch {
                     uiState.value.also {
                         storageRepository.saveOrModifyFood(
-                            Food(
-                                icon = it.productIcon.resource,
-                                title = it.productTitleText,
-                                quantity = it.quantity.toFloat(),
-                                unitOfMeasurement = it.productUnitOfMeasurement,
-                                foodTagList = it.selectedTagList
-                            )
+                            icon = it.productIcon.resource,
+                            title = it.productTitleText,
+                            quantity = it.quantity.toFloat(),
+                            unitOfMeasurement = it.productUnitOfMeasurement,
+                            tagListId = it.selectedTagList.map { it.id!! }
                         )
                     }
                     _uiEvent.send(UiEvent.SaveSuccess)
@@ -151,11 +148,12 @@ class StorageCreateViewModel @Inject constructor(
             }
 
             is OnEvent.FoodQuantityChange -> {
-                val value = if(event.quantity.isEmpty() || event.quantity.isBlank() || event.quantity == "-"){
-                    ""
-                } else {
-                    event.quantity
-                }
+                val value =
+                    if (event.quantity.isEmpty() || event.quantity.isBlank() || event.quantity == "-") {
+                        ""
+                    } else {
+                        event.quantity
+                    }
 
                 _uiState.update {
                     it.copy(

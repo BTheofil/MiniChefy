@@ -1,18 +1,18 @@
 package hu.tb.minichefy.data.mapper
 
 import hu.tb.minichefy.domain.model.storage.Food
-import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
+import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
 
 class FoodEntityToFood {
 
-    fun map(from: FoodEntity): Food = from.run {
+    fun map(from: FoodWithTags): Food = from.run {
         Food(
-            id = id,
-            icon = icon,
-            title = title,
-            quantity = quantity,
-            unitOfMeasurement = unitOfMeasurement,
-            foodTagList = tagList?.toFoodTag()
+            id = foodEntity.foodId,
+            icon = foodEntity.icon,
+            title = foodEntity.title,
+            quantity = foodEntity.quantity,
+            unitOfMeasurement = foodEntity.unitOfMeasurement,
+            foodTagList = tags.map { TagEntityToTag().map(it) }
         )
     }
 }
