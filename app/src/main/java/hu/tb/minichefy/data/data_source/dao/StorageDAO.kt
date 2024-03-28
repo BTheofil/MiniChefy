@@ -40,7 +40,7 @@ interface StorageDAO {
 
     @Transaction
     @Query("DELETE FROM FoodAndTagsCrossRef WHERE foodId = :foodId AND tagId = :tagId")
-    suspend fun deleteFoodTagCrossRed(foodId: Long, tagId: Long): Int
+    suspend fun deleteFoodTagCrossRef(foodId: Long, tagId: Long): Int
 
     @Transaction
     @Query("DELETE FROM FoodEntity WHERE foodId = :id")
