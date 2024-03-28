@@ -9,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import hu.tb.minichefy.data.data_source.db.MiniChefyDatabase
 import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
 import hu.tb.minichefy.data.repository.StorageDatabaseRepositoryImpl
-import hu.tb.minichefy.domain.model.storage.entity.FoodTagEntity
+import hu.tb.minichefy.domain.model.storage.entity.TagEntity
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.CalculateMeasurements
@@ -39,14 +39,17 @@ object AppModule {
         val dbFile = app.applicationContext.getDatabasePath(MiniChefyDatabase.DATABASE_NAME)
         if (!dbFile.exists()) {
             CoroutineScope(Dispatchers.IO).launch {
-                db.storageDao.saveOrModifyFoodTag(
-                    FoodTagEntity(id = null, tag = "fruit")
+                db.storageDao.insertTagEntity(
+                    TagEntity(tagId = null, tag = "fruit")
                 )
-                db.storageDao.saveOrModifyFoodTag(
-                    FoodTagEntity(id = null, tag = "vegetable")
+                db.storageDao.insertTagEntity(
+                    TagEntity(tagId = null, tag = "vegetable")
                 )
-                db.storageDao.saveOrModifyFoodTag(
-                    FoodTagEntity(id = null, tag = "dish")
+                db.storageDao.insertTagEntity(
+                    TagEntity(tagId = null, tag = "dish")
+                )
+                db.storageDao.insertTagEntity(
+                    TagEntity(tagId = null, tag = "unknown")
                 )
             }
         }

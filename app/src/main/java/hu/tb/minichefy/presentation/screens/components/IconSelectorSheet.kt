@@ -39,7 +39,7 @@ import hu.tb.minichefy.presentation.screens.manager.icons.MealIcon
 @Composable
 fun IconSelectorSheet(
     allIconList: List<IconResource>,
-    selectedIcon: IconResource,
+    selectedIcon: IconResource?,
     onItemClick: (icon: IconResource) -> Unit,
     onDismissRequest: () -> Unit
 ) {

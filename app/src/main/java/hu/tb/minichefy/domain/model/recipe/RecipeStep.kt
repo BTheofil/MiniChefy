@@ -8,8 +8,8 @@ data class RecipeStep(
 ){
     fun toRecipeStepEntity(recipeEntityId: Long) =
         RecipeStepEntity(
-            step = this.step,
+            step = step,
             recipeEntityId = recipeEntityId,
-            recipeStepId = this.id
+            recipeStepId = id
         )
 }

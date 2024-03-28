@@ -4,6 +4,9 @@ import hu.tb.minichefy.data.data_source.dao.RecipeDAO
 import hu.tb.minichefy.data.mapper.RecipeEntityToRecipe
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
+import hu.tb.minichefy.domain.model.recipe.TimeUnit
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeFoodCrossRef
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -20,14 +23,32 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
             }
         }
 
+
     override suspend fun getRecipeById(id: Long): Recipe =
         RecipeEntityToRecipe().map(dao.getRecipeById(id))
 
-    override suspend fun saveRecipe(recipe: Recipe): Long =
-        dao.insertRecipe(recipe.toRecipeEntity())
+    override suspend fun saveOrModifyRecipe(
+        id: Long?,
+        icon: Int,
+        title: String,
+        quantity: Int,
+        timeToCreate: Int,
+        timeUnit: TimeUnit,
+    ): Long {
+        val temp = RecipeEntity(
+            recipeId = id,
+            icon = icon,
+            title = title,
+            quantity = quantity,
+            timeToCreate = timeToCreate,
+            timeUnit = timeUnit
+        )
+
+        return dao.insertRecipeEntity(temp)
+    }
 
     override suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long =
-        dao.insertStep(step.toRecipeStepEntity(recipeEntityId))
+        dao.insertStepEntity(step.toRecipeStepEntity(recipeEntityId))
 
     override suspend fun deleteRecipe(id: Long): Int = dao.deleteRecipe(id)
 
@@ -37,5 +58,9 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
             RecipeEntityToRecipe().map(it)
         }
     }
+
+    override suspend fun saveRecipeIngredientCrossRef(recipeId: Long, foodId: Long): Long =
+        dao.insertRecipeIngredientCrossRef(crossRef = RecipeFoodCrossRef(recipeId, foodId))
+
 
 }

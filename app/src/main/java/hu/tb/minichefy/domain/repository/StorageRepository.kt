@@ -13,11 +13,21 @@ interface StorageRepository {
 
     suspend fun getAllStorageFoodName(): List<FoodSummary>
 
-    suspend fun saveOrModifyFood(food: Food): Long
-
-    suspend fun searchFoodByDishProperties(title: String, uof: UnitOfMeasurement): Food?
+    suspend fun searchFoodByTitle(title: String): Food?
 
     suspend fun searchProductByTitle(searchText: String): List<FoodSummary>
+
+    suspend fun saveOrModifyFood(
+        id: Long? = null,
+        title: String,
+        icon: Int,
+        quantity: Float,
+        unitOfMeasurement: UnitOfMeasurement
+    ): Long
+
+    suspend fun saveFoodAndTag(foodId: Long, tagId: Long): Long
+
+    suspend fun deleteFoodAndTag(foodId: Long, tagId: Long): Int
 
     suspend fun deleteFoodById(id: Long): Int
 

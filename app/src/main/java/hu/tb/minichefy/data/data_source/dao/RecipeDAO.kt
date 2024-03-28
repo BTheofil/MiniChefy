@@ -6,7 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
-import hu.tb.minichefy.domain.model.recipe.entity.RecipeWithSteps
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeBlock
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeFoodCrossRef
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeStepEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -15,23 +16,26 @@ interface RecipeDAO {
 
     @Transaction
     @Query("SELECT * FROM RecipeEntity")
-    fun getAllRecipe(): Flow<List<RecipeWithSteps>>
+    fun getAllRecipe(): Flow<List<RecipeBlock>>
 
     @Transaction
     @Query("SELECT * FROM RecipeEntity WHERE recipeId = :recipeId")
-    suspend fun getRecipeById(recipeId: Long): RecipeWithSteps
+    suspend fun getRecipeById(recipeId: Long): RecipeBlock
+
+    @Transaction
+    @Query("SELECT * FROM RecipeEntity WHERE title LIKE :searchTitle")
+    suspend fun searchRecipeByTitle(searchTitle: String): List<RecipeBlock>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRecipe(recipeEntity: RecipeEntity): Long
+    suspend fun insertRecipeEntity(recipeEntity: RecipeEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertStep(stepEntity: RecipeStepEntity): Long
+    suspend fun insertStepEntity(stepEntity: RecipeStepEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRecipeIngredientCrossRef(crossRef: RecipeFoodCrossRef): Long
 
     @Transaction
     @Query("DELETE FROM RecipeEntity WHERE recipeId = :id")
     suspend fun deleteRecipe(id: Long): Int
-
-    @Transaction
-    @Query("SELECT * FROM RecipeEntity WHERE title LIKE :searchTitle")
-    suspend fun searchRecipeByTitle(searchTitle: String): List<RecipeWithSteps>
 }

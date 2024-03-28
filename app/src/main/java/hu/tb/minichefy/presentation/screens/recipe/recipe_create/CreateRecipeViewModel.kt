@@ -1,9 +1,9 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.domain.model.storage.Food
@@ -215,8 +215,7 @@ class CreateRecipeViewModel @Inject constructor(
                     isIngredientQuantityHasError = false,
                     ingredientTitleDraft = "",
                     ingredientQuantityDraft = "",
-
-                    )
+                )
             }
 
             is OnIngredientEvent.IngredientRemove -> {
@@ -310,33 +309,39 @@ class CreateRecipeViewModel @Inject constructor(
             OnStepsPageEvent.ClearStepField -> _stepsPageState.update { it.copy(stepBoxTextField = "") }
 
             OnStepsPageEvent.OnRecipeSave -> viewModelScope.launch {
-                val createdRecipe = Recipe(
+                //save recipe
+                val recipeId = recipeRepository.saveOrModifyRecipe(
                     icon = basicPageState.value.selectedMealIcon.resource,
                     title = basicPageState.value.recipeName,
                     quantity = basicPageState.value.quantityCounter,
-                    howToSteps = stepsPageState.value.recipeSteps,
-                    timeToCreate = 0,
-                    timeUnit = TimeUnit.MINUTES,
-                    ingredientList = ingredientsPageState.value.selectedIngredientList.map {
-                        Food(
-                            id = it.id,
-                            icon = IconManager().getDefaultIcon.resource,
-                            title = it.title,
-                            quantity = it.quantity,
-                            unitOfMeasurement = it.unitOfMeasurement,
-                            foodTagList = null
-                        )
-                    }
+                    timeToCreate = 0, //todo
+                    timeUnit = TimeUnit.MINUTES, //todo
                 )
-                val resultId = recipeRepository.saveRecipe(createdRecipe)
-                _stepsPageState.value.recipeSteps.forEach {
-                    recipeRepository.saveStep(it, resultId)
-                }
-                if (_stepsPageState.value.stepBoxTextField.isNotBlank()) {
-                    recipeRepository.saveStep(
-                        RecipeStep(step = stepsPageState.value.stepBoxTextField),
-                        resultId
+                Log.i("CreateRecipeVM", "RecipeId: $recipeId")
+
+                //save ingredients
+                ingredientsPageState.value.selectedIngredientList.map { food ->
+                    val foodId = storageRepository.saveOrModifyFood(
+                        id = food.id,
+                        title = food.title,
+                        icon = food.icon,
+                        quantity = food.quantity,
+                        unitOfMeasurement = food.unitOfMeasurement,
                     )
+                    food.foodTagList?.map { tag ->
+                        storageRepository.saveFoodAndTag(foodId, tag.id!!)
+                    }
+
+                    Log.i("CreateRecipeVM", "FoodId: $foodId")
+
+                    val crossRefId = recipeRepository.saveRecipeIngredientCrossRef(recipeId, foodId)
+                    Log.i("CreateRecipeVM", "CrossRefId: $crossRefId")
+                }
+
+                //save steps
+                stepsPageState.value.recipeSteps.forEach { step ->
+                    val stepId = recipeRepository.saveStep(step, recipeId)
+                    Log.i("CreateRecipeVM", "StepId: $stepId")
                 }
             }
         }

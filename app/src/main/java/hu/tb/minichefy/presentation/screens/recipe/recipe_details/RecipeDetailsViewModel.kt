@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.recipe.Recipe
-import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
@@ -49,22 +48,18 @@ class RecipeDetailsViewModel @Inject constructor(
             is OnEvent.MakeRecipe -> {
                 viewModelScope.launch {
                     val dishTag = storageRepository.getTagById(3)
-                    val result = storageRepository.searchFoodByDishProperties(
-                        uiState.value.recipe!!.title,
-                        UnitOfMeasurement.PIECE
-                    )
+                    val result = storageRepository.searchFoodByTitle(uiState.value.recipe!!.title)
 
-                    uiState.value.recipe.also {
+                    uiState.value.recipe.also { recipe ->
                         val savedFoodId = storageRepository.saveOrModifyFood(
-                            Food(
-                                id = result?.id,
-                                icon = it!!.icon,
-                                title = it.title,
-                                quantity = it.quantity + (result?.quantity ?: 0f),
-                                unitOfMeasurement = UnitOfMeasurement.PIECE,
-                                foodTagList = listOf(dishTag)
-                            )
+                            id = result?.id,
+                            icon = recipe!!.icon,
+                            title = recipe.title,
+                            quantity = recipe.quantity + (result?.quantity ?: 0f),
+                            unitOfMeasurement = UnitOfMeasurement.PIECE,
                         )
+                        storageRepository.saveFoodAndTag(savedFoodId, dishTag.id!!)
+
                         Log.i("RecipeDetailsVM", savedFoodId.toString())
                     }
                 }

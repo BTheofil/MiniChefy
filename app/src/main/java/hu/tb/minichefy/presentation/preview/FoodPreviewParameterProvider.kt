@@ -9,41 +9,41 @@ import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 class FoodPreviewParameterProvider : PreviewParameterProvider<List<Food>> {
 
     override val values: Sequence<List<Food>> = sequenceOf(
-        MockProductDomain.mockFoodLists
+        MockFoodDomain.mockFoodLists
     )
 }
 
-private object MockProductDomain {
+object MockFoodDomain {
 
     val mockFoodLists = listOf(
         Food(
-            0,
+            id = 0,
             icon = IconManager().getRandomProduct().resource,
-            "Apple",
-            3f,
+            title = "Apple",
+            quantity = 3f,
             unitOfMeasurement = UnitOfMeasurement.PIECE,
-            listOf(
+            foodTagList = listOf(
                 FoodTag(0, "fruit")
             )
         ),
         Food(
-            1,
+            id = 1,
             icon = IconManager().getRandomProduct().resource,
-            "Milk",
-            1f,
+            title = "Milk",
+            quantity = 1f,
             unitOfMeasurement = UnitOfMeasurement.L,
-            listOf(
+            foodTagList = listOf(
                 FoodTag(0, "milk"),
                 FoodTag(1, "liquid")
             )
         ),
         Food(
-            2,
+            id = 2,
             icon = IconManager().getRandomProduct().resource,
-            "Carrot",
-            2f,
+            title = "Carrot",
+            quantity = 2f,
             unitOfMeasurement = UnitOfMeasurement.KG,
-            listOf(
+            foodTagList = listOf(
                 FoodTag(0, "solid"),
                 FoodTag(1, "vegetable")
             )
