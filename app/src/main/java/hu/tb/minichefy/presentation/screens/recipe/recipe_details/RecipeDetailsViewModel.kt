@@ -57,8 +57,9 @@ class RecipeDetailsViewModel @Inject constructor(
                             title = recipe.title,
                             quantity = recipe.quantity + (result?.quantity ?: 0f),
                             unitOfMeasurement = UnitOfMeasurement.PIECE,
-                            tagListId = listOf(dishTag.id!!),
                         )
+                        storageRepository.saveFoodAndTag(savedFoodId, dishTag.id!!)
+
                         Log.i("RecipeDetailsVM", savedFoodId.toString())
                     }
                 }

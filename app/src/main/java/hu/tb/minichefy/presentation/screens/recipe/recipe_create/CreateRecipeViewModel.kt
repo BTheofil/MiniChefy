@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
-import hu.tb.minichefy.domain.model.recipe.entity.RecipeFoodCrossRef
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
@@ -311,34 +310,38 @@ class CreateRecipeViewModel @Inject constructor(
 
             OnStepsPageEvent.OnRecipeSave -> viewModelScope.launch {
                 //save recipe
-                val resultId = recipeRepository.saveOrModifyRecipe(
+                val recipeId = recipeRepository.saveOrModifyRecipe(
                     icon = basicPageState.value.selectedMealIcon.resource,
                     title = basicPageState.value.recipeName,
                     quantity = basicPageState.value.quantityCounter,
                     timeToCreate = 0, //todo
                     timeUnit = TimeUnit.MINUTES, //todo
                 )
+                Log.i("CreateRecipeVM", "RecipeId: $recipeId")
 
                 //save ingredients
                 ingredientsPageState.value.selectedIngredientList.map { food ->
-                    val result = storageRepository.saveOrModifyFood(
+                    val foodId = storageRepository.saveOrModifyFood(
                         id = food.id,
                         title = food.title,
                         icon = food.icon,
                         quantity = food.quantity,
                         unitOfMeasurement = food.unitOfMeasurement,
-                        tagListId = food.foodTagList?.map { it.id!! }
                     )
+                    food.foodTagList?.map { tag ->
+                        storageRepository.saveFoodAndTag(foodId, tag.id!!)
+                    }
 
-                    val asd = recipeRepository.testing(RecipeFoodCrossRef(resultId, result))
+                    Log.i("CreateRecipeVM", "FoodId: $foodId")
 
-                    //Log.d("MYTAG", result.toString())
-                    Log.d("MYTAG", asd.toString())
+                    val crossRefId = recipeRepository.saveRecipeIngredientCrossRef(recipeId, foodId)
+                    Log.i("CreateRecipeVM", "CrossRefId: $crossRefId")
                 }
 
                 //save steps
                 stepsPageState.value.recipeSteps.forEach { step ->
-                    recipeRepository.saveStep(step, resultId)
+                    val stepId = recipeRepository.saveStep(step, recipeId)
+                    Log.i("CreateRecipeVM", "StepId: $stepId")
                 }
             }
         }

@@ -7,6 +7,7 @@ import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.domain.model.storage.entity.FoodAndTagsCrossRef
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
 import hu.tb.minichefy.domain.repository.StorageRepository
 import kotlinx.coroutines.flow.Flow
@@ -37,25 +38,6 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }.sortedBy { it.title }
     }
 
-    override suspend fun saveOrModifyFood(
-        id: Long?,
-        title: String,
-        icon: Int,
-        quantity: Float,
-        unitOfMeasurement: UnitOfMeasurement,
-        tagListId: List<Long>?
-    ): Long {
-        val temp = FoodEntity(
-            foodId = id,
-            title = title,
-            icon = icon,
-            quantity = quantity,
-            unitOfMeasurement = unitOfMeasurement
-        )
-
-        return dao.saveOrModifyFood(temp)
-    }
-
     override suspend fun searchFoodByTitle(title: String): Food? {
         val entity = dao.searchFoodByTitle(title) ?: return null
         return FoodEntityToFood().map(entity)
@@ -70,6 +52,30 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
             )
         }.sortedBy { it.title }
     }
+
+    override suspend fun saveOrModifyFood(
+        id: Long?,
+        title: String,
+        icon: Int,
+        quantity: Float,
+        unitOfMeasurement: UnitOfMeasurement
+    ): Long {
+        val temp = FoodEntity(
+            foodId = id,
+            title = title,
+            icon = icon,
+            quantity = quantity,
+            unitOfMeasurement = unitOfMeasurement
+        )
+
+        return dao.insertFoodEntity(temp)
+    }
+
+    override suspend fun saveFoodAndTag(foodId: Long, tagId: Long): Long =
+        dao.insertFoodTagCrossRef(FoodAndTagsCrossRef(foodId, tagId))
+
+    override suspend fun deleteFoodAndTag(foodId: Long, tagId: Long): Int =
+        dao.deleteFoodTagCrossRed(foodId, tagId)
 
     override suspend fun deleteFoodById(id: Long): Int =
         dao.deleteFoodEntity(id)
@@ -90,7 +96,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveOrModifyFoodTag(tag: FoodTag): Long =
-        dao.saveOrModifyFoodTag(tag.toFoodTagEntity())
+        dao.insertTagEntity(tag.toFoodTagEntity())
 
     override suspend fun deleteFoodTag(id: Long): Int = dao.deleteFoodTag(id)
 }

@@ -44,11 +44,11 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
             timeUnit = timeUnit
         )
 
-        return dao.insertRecipe(temp)
+        return dao.insertRecipeEntity(temp)
     }
 
     override suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long =
-        dao.insertStep(step.toRecipeStepEntity(recipeEntityId))
+        dao.insertStepEntity(step.toRecipeStepEntity(recipeEntityId))
 
     override suspend fun deleteRecipe(id: Long): Int = dao.deleteRecipe(id)
 
@@ -59,8 +59,8 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun testing(asd: RecipeFoodCrossRef): Long =
-        dao.insertCross(crossRef = asd)
+    override suspend fun saveRecipeIngredientCrossRef(recipeId: Long, foodId: Long): Long =
+        dao.insertRecipeIngredientCrossRef(crossRef = RecipeFoodCrossRef(recipeId, foodId))
 
 
 }

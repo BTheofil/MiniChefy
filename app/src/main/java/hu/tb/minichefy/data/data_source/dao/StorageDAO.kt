@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import hu.tb.minichefy.domain.model.storage.entity.FoodAndTagsCrossRef
 import hu.tb.minichefy.domain.model.storage.entity.TagEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
@@ -23,9 +24,6 @@ interface StorageDAO {
     @Query("SELECT foodId, title FROM FoodEntity")
     suspend fun getAllStorageFoodName(): List<SimplerFoodEntity>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveOrModifyFood(foodEntity: FoodEntity): Long
-
     @Transaction
     @Query("SELECT * FROM FoodEntity WHERE title = :title")
     suspend fun searchFoodByTitle(title: String): FoodWithTags?
@@ -33,6 +31,16 @@ interface StorageDAO {
     @Transaction
     @Query("SELECT foodId, title FROM FoodEntity WHERE title LIKE :searchTitle")
     suspend fun searchProductByTitle(searchTitle: String): List<SimplerFoodEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFoodEntity(foodEntity: FoodEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFoodTagCrossRef(crossRef: FoodAndTagsCrossRef): Long
+
+    @Transaction
+    @Query("DELETE FROM FoodAndTagsCrossRef WHERE foodId = :foodId AND tagId = :tagId")
+    suspend fun deleteFoodTagCrossRed(foodId: Long, tagId: Long): Int
 
     @Transaction
     @Query("DELETE FROM FoodEntity WHERE foodId = :id")
@@ -42,14 +50,11 @@ interface StorageDAO {
     @Query("SELECT * FROM TagEntity")
     fun getAllFoodTagFlow(): Flow<List<TagEntity>>
 
-    @Query("SELECT * FROM TagEntity")
-    suspend fun getAllFoodTag(): List<TagEntity>
-
     @Query("SELECT * FROM TagEntity WHERE tagId = :id")
     suspend fun getTagById(id: Long): TagEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveOrModifyFoodTag(tagEntity: TagEntity): Long
+    suspend fun insertTagEntity(tagEntity: TagEntity): Long
 
     @Query("DELETE FROM TagEntity WHERE tagId = :id")
     suspend fun deleteFoodTag(id: Long): Int

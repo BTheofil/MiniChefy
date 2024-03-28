@@ -61,8 +61,8 @@ class StorageListViewModel @Inject constructor(
         data class SearchTextChange(val text: String) : OnEvent()
         data class OnProductClick(val index: Int) : OnEvent()
         data class FilterChipClicked(val tag: FoodTag) : OnEvent()
-        data class ModifyProductTag(val tag: FoodTag) : OnEvent()
-        data class ModifyProductQuantity(val value: Float) : OnEvent()
+        data class ModifyFoodTags(val tag: FoodTag) : OnEvent()
+        data class ModifyFoodQuantity(val value: Float) : OnEvent()
         data class ModifyProductIcon(val icon: IconResource) : OnEvent()
     }
 
@@ -92,7 +92,7 @@ class StorageListViewModel @Inject constructor(
                 }
             }
 
-            is OnEvent.ModifyProductQuantity -> {
+            is OnEvent.ModifyFoodQuantity -> {
                 val result = calculateMeasurements.simpleProductCalculations(
                     CalculationFood(
                         quantity = uiState.value.foodList[uiState.value.modifiedProductIndex].quantity,
@@ -111,23 +111,20 @@ class StorageListViewModel @Inject constructor(
                 saveEditedFood(updatedFood)
             }
 
-            is OnEvent.ModifyProductTag -> {
-                val foodTagList =
-                    if (uiState.value.foodList[uiState.value.modifiedProductIndex].foodTagList.isNullOrEmpty()) {
-                        listOf(event.tag)
+            is OnEvent.ModifyFoodTags -> {
+
+                viewModelScope.launch {
+                    val modifyFood = uiState.value.foodList[uiState.value.modifiedProductIndex]
+                    if (modifyFood.foodTagList == null) {
+                        storageRepository.saveFoodAndTag(modifyFood.id!!, event.tag.id!!)
                     } else {
-                        val temp =
-                            uiState.value.foodList[uiState.value.modifiedProductIndex].foodTagList!!.toMutableList()
-                        if (temp.contains(event.tag)) temp.remove(event.tag) else temp.add(
-                            event.tag
-                        )
-                        temp
+                        if (modifyFood.foodTagList.contains(event.tag)) {
+                            storageRepository.deleteFoodAndTag(modifyFood.id!!, event.tag.id!!)
+                        } else {
+                            storageRepository.saveFoodAndTag(modifyFood.id!!, event.tag.id!!)
+                        }
                     }
-                saveEditedFood(
-                    uiState.value.foodList[uiState.value.modifiedProductIndex].copy(
-                        foodTagList = foodTagList
-                    )
-                )
+                }
             }
 
             OnEvent.SaveEditedFood -> {
@@ -139,20 +136,22 @@ class StorageListViewModel @Inject constructor(
                     icon = event.icon.resource
                 )
             )
-
         }
     }
 
     private fun saveEditedFood(updatedFood: Food) {
         viewModelScope.launch {
-            storageRepository.saveOrModifyFood(
+            val foodId = storageRepository.saveOrModifyFood(
                 id = updatedFood.id,
                 title = updatedFood.title,
                 icon = updatedFood.icon,
                 quantity = updatedFood.quantity,
                 unitOfMeasurement = updatedFood.unitOfMeasurement,
-                tagListId = updatedFood.foodTagList?.map { it.id!! }
             )
+
+            updatedFood.foodTagList?.map { tag ->
+                storageRepository.saveFoodAndTag(foodId, tag.id!!)
+            }
         }
     }
 }

@@ -3,7 +3,6 @@ package hu.tb.minichefy.domain.repository
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
-import hu.tb.minichefy.domain.model.recipe.entity.RecipeFoodCrossRef
 import kotlinx.coroutines.flow.Flow
 
 interface RecipeRepository {
@@ -27,5 +26,5 @@ interface RecipeRepository {
 
     suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe>
 
-    suspend fun testing(asd: RecipeFoodCrossRef): Long
+    suspend fun saveRecipeIngredientCrossRef(recipeId: Long, foodId: Long): Long
 }

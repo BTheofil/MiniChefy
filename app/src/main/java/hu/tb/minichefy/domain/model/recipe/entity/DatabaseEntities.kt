@@ -1,5 +1,6 @@
 package hu.tb.minichefy.domain.model.recipe.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -21,6 +22,7 @@ data class RecipeEntity(
     val timeUnit: TimeUnit,
 )
 
+//one to many recipe & step
 @Entity(
     foreignKeys = [
         ForeignKey(
@@ -34,13 +36,16 @@ data class RecipeEntity(
 data class RecipeStepEntity(
     @PrimaryKey(autoGenerate = true)
     val recipeStepId: Long?,
+    @ColumnInfo(index = true)
     val recipeEntityId: Long,
     val step: String
 )
 
+// connection between recipe & food many to many
 @Entity(primaryKeys = ["recipeId", "foodId"])
 data class RecipeFoodCrossRef(
     val recipeId: Long,
+    @ColumnInfo(index = true)
     val foodId: Long
 )
 

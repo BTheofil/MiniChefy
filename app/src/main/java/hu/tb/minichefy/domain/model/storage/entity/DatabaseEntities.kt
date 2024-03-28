@@ -1,5 +1,6 @@
 package hu.tb.minichefy.domain.model.storage.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Junction
@@ -33,9 +34,11 @@ data class TagEntity(
 @Entity(primaryKeys = ["foodId", "tagId"])
 data class FoodAndTagsCrossRef(
     val foodId: Long,
+    @ColumnInfo(index = true)
     val tagId: Long
 )
 
+//many to many food & tags
 data class FoodWithTags(
     @Embedded val foodEntity: FoodEntity,
     @Relation(

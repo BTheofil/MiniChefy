@@ -22,20 +22,20 @@ interface RecipeDAO {
     @Query("SELECT * FROM RecipeEntity WHERE recipeId = :recipeId")
     suspend fun getRecipeById(recipeId: Long): RecipeBlock
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRecipe(recipeEntity: RecipeEntity): Long
+    @Transaction
+    @Query("SELECT * FROM RecipeEntity WHERE title LIKE :searchTitle")
+    suspend fun searchRecipeByTitle(searchTitle: String): List<RecipeBlock>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertStep(stepEntity: RecipeStepEntity): Long
+    suspend fun insertRecipeEntity(recipeEntity: RecipeEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCross(crossRef: RecipeFoodCrossRef): Long
+    suspend fun insertStepEntity(stepEntity: RecipeStepEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRecipeIngredientCrossRef(crossRef: RecipeFoodCrossRef): Long
 
     @Transaction
     @Query("DELETE FROM RecipeEntity WHERE recipeId = :id")
     suspend fun deleteRecipe(id: Long): Int
-
-    @Transaction
-    @Query("SELECT * FROM RecipeEntity WHERE title LIKE :searchTitle")
-    suspend fun searchRecipeByTitle(searchTitle: String): List<RecipeBlock>
 }

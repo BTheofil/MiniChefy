@@ -138,7 +138,7 @@ fun StorageScreenContent(
                                 onCloseClick = { onEvent(StorageListViewModel.OnEvent.SaveEditedFood) },
                                 onDeleteTagClick = { tag ->
                                     onEvent(
-                                        StorageListViewModel.OnEvent.ModifyProductTag(tag)
+                                        StorageListViewModel.OnEvent.ModifyFoodTags(tag)
                                     )
                                 },
                                 onAddTagClick = {
@@ -205,7 +205,7 @@ fun StorageScreenContent(
     if (isIconSelectorOpen) {
         IconSelectorSheet(
             allIconList = uiState.allProductIconList,
-            selectedIcon = IconManager().convertIntToProductIcon(uiState.foodList[uiState.modifiedProductIndex].icon)!!,
+            selectedIcon = IconManager().convertIntToProductIcon(uiState.foodList[uiState.modifiedProductIndex].icon),
             onItemClick = { onEvent(StorageListViewModel.OnEvent.ModifyProductIcon(it)) },
             onDismissRequest = { isIconSelectorOpen = false }
         )
@@ -218,7 +218,7 @@ fun StorageScreenContent(
             },
             onTagClick = {
                 onEvent(
-                    StorageListViewModel.OnEvent.ModifyProductTag(it)
+                    StorageListViewModel.OnEvent.ModifyFoodTags(it)
                 )
             },
             allTagList = uiState.foodTagList,

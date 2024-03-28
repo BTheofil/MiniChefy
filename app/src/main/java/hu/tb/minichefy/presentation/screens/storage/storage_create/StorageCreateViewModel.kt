@@ -126,13 +126,15 @@ class StorageCreateViewModel @Inject constructor(
             OnEvent.Save -> {
                 viewModelScope.launch {
                     uiState.value.also {
-                        storageRepository.saveOrModifyFood(
+                        val foodId = storageRepository.saveOrModifyFood(
                             icon = it.productIcon.resource,
                             title = it.productTitleText,
                             quantity = it.quantity.toFloat(),
-                            unitOfMeasurement = it.productUnitOfMeasurement,
-                            tagListId = it.selectedTagList.map { it.id!! }
+                            unitOfMeasurement = it.productUnitOfMeasurement
                         )
+                        it.selectedTagList.map { tag ->
+                            storageRepository.saveFoodAndTag(foodId, tag.id!!)
+                        }
                     }
                     _uiEvent.send(UiEvent.SaveSuccess)
                 }

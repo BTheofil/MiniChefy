@@ -39,16 +39,16 @@ object AppModule {
         val dbFile = app.applicationContext.getDatabasePath(MiniChefyDatabase.DATABASE_NAME)
         if (!dbFile.exists()) {
             CoroutineScope(Dispatchers.IO).launch {
-                db.storageDao.saveOrModifyFoodTag(
+                db.storageDao.insertTagEntity(
                     TagEntity(tagId = null, tag = "fruit")
                 )
-                db.storageDao.saveOrModifyFoodTag(
+                db.storageDao.insertTagEntity(
                     TagEntity(tagId = null, tag = "vegetable")
                 )
-                db.storageDao.saveOrModifyFoodTag(
+                db.storageDao.insertTagEntity(
                     TagEntity(tagId = null, tag = "dish")
                 )
-                db.storageDao.saveOrModifyFoodTag(
+                db.storageDao.insertTagEntity(
                     TagEntity(tagId = null, tag = "unknown")
                 )
             }

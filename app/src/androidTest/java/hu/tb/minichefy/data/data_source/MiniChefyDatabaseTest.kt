@@ -45,7 +45,7 @@ class MiniChefyDatabaseTest {
             timeToCreate = 30,
         )
 
-        val recipeId = recipeDao.insertRecipe(recipeEntity)
+        val recipeId = recipeDao.insertRecipeEntity(recipeEntity)
 
         val recipeWithSteps = recipeDao.getRecipeById(recipeId)
         assertEquals("Pasta", recipeWithSteps.recipeEntity.title)
