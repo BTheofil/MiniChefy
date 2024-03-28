@@ -75,7 +75,9 @@ class CreateRecipeViewModel @Inject constructor(
             val selectedMealIcon: MealIcon = defaultIconCollection[Random.nextInt(
                 0,
                 defaultIconCollection.size
-            )]
+            )],
+            val timeField: String = "",
+            val timeUnit: TimeUnit = TimeUnit.MINUTES,
         ) : Pages()
 
         data class IngredientsPage(
@@ -110,6 +112,8 @@ class CreateRecipeViewModel @Inject constructor(
         data class OnQuantityChange(val value: Int) : OnBasicInformationPageEvent()
         data class OnRecipeTitleChange(val text: String) : OnBasicInformationPageEvent()
         data class OnSelectedIconChange(val icon: MealIcon) : OnBasicInformationPageEvent()
+        data class OnTimeChange(val text: String) : OnBasicInformationPageEvent()
+        data class OnTimeUnitChange(val unit: TimeUnit) : OnBasicInformationPageEvent()
     }
 
     sealed class OnIngredientEvent {
@@ -167,6 +171,14 @@ class CreateRecipeViewModel @Inject constructor(
 
             is OnBasicInformationPageEvent.OnSelectedIconChange -> _basicPageState.update {
                 it.copy(selectedMealIcon = event.icon)
+            }
+
+            is OnBasicInformationPageEvent.OnTimeChange -> _basicPageState.update {
+                it.copy(timeField = event.text)
+            }
+
+            is OnBasicInformationPageEvent.OnTimeUnitChange -> _basicPageState.update {
+                it.copy(timeUnit = event.unit)
             }
         }
     }
@@ -314,8 +326,8 @@ class CreateRecipeViewModel @Inject constructor(
                     icon = basicPageState.value.selectedMealIcon.resource,
                     title = basicPageState.value.recipeName,
                     quantity = basicPageState.value.quantityCounter,
-                    timeToCreate = 0, //todo
-                    timeUnit = TimeUnit.MINUTES, //todo
+                    timeToCreate = basicPageState.value.timeField.toInt(),
+                    timeUnit = basicPageState.value.timeUnit,
                 )
                 Log.i("CreateRecipeVM", "RecipeId: $recipeId")
 

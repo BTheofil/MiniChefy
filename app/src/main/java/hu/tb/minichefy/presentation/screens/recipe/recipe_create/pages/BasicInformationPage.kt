@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,11 +21,16 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.manager.icons.MealIcon
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.PageNextButton
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info.QuestionForm
+import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
+import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
+import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 
 @Composable
 fun BasicInformationPage(
@@ -36,7 +39,9 @@ fun BasicInformationPage(
     onRemoveQuantityClick: () -> Unit,
     onAddQuantityClick: () -> Unit,
     onNextPageClick: () -> Unit,
-    onSelectedIconClick: (icon: MealIcon) -> Unit
+    onSelectedIconClick: (icon: MealIcon) -> Unit,
+    onTimeFieldValueChange: (String) -> Unit,
+    onTimeUnitValueChange: (TimeUnit) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -52,8 +57,10 @@ fun BasicInformationPage(
                     focusManager.clearFocus()
                 })
             }
-            .padding(horizontal = 22.dp)
-            .padding(top = 22.dp)
+            .padding(
+                horizontal = SCREEN_HORIZONTAL_PADDING,
+                vertical = SCREEN_VERTICAL_PADDING
+            )
     ) {
         CircleImage(
             image = uiState.selectedMealIcon.resource,
@@ -62,7 +69,7 @@ fun BasicInformationPage(
             borderShape = CircleShape,
             onClick = { showIconPicker = true }
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         QuestionForm(
             uiState.recipeName,
             onTitleValueChange,
@@ -75,27 +82,26 @@ fun BasicInformationPage(
                 onRemoveQuantityClick()
             },
             quantityContent = uiState.quantityCounter,
-            isErrorHappened = uiState.isQuantityHasError
+            isErrorHappened = uiState.isQuantityHasError,
+            timeFieldValue = uiState.timeField,
+            timeFieldValueChange = onTimeFieldValueChange,
+            timeUnitValue = uiState.timeUnit,
+            timeUnitValueChange = onTimeUnitValueChange
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         Box(
             modifier = Modifier
+                .weight(1f)
                 .fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.BottomCenter
         ) {
-            OutlinedButton(
-                modifier = Modifier,
+            PageNextButton(
+                text = "Next page",
                 onClick = {
                     focusManager.clearFocus()
                     onNextPageClick()
                 }
-            ) {
-                Text(
-                    text = "Next page",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+            )
         }
         if (showIconPicker) {
             IconSelectorSheet(
@@ -113,5 +119,14 @@ fun BasicInformationPage(
 @Preview
 @Composable
 fun InformationPagePreview() {
-    BasicInformationPage(CreateRecipeViewModel.Pages.BasicInformationPage(), {}, {}, {}, {}, {})
+    BasicInformationPage(
+        CreateRecipeViewModel.Pages.BasicInformationPage(),
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+    )
 }

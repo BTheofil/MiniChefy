@@ -10,13 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.AlertDialogDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -24,19 +18,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.TextFieldWithDropdownMenu
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 
@@ -58,8 +50,6 @@ fun CreateNewIngredientDialog(
     var ingredientName by remember { mutableStateOf(ingredientTitle ?: "") }
     var quantity by remember { mutableStateOf( "") }
     var unitOfMeasurement by remember { mutableStateOf(UnitOfMeasurement.PIECE) }
-    var isDropdownMenuVisible by remember { mutableStateOf(false) }
-    var unitOfMeasurementTextileWidth by remember { mutableIntStateOf(0) }
 
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(
@@ -113,45 +103,12 @@ fun CreateNewIngredientDialog(
                         modifier = Modifier
                             .weight(1f)
                     ) {
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .onGloballyPositioned { coordinates ->
-                                    unitOfMeasurementTextileWidth = coordinates.size.width
-                                },
-                            value = unitOfMeasurement.name,
-                            onValueChange = {},
-                            readOnly = true,
-                            label = {
-                                Text(
-                                    text = "Measurement",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            trailingIcon = {
-                                IconButton(onClick = { isDropdownMenuVisible = true }) {
-                                    Icon(
-                                        modifier = Modifier,
-                                        imageVector = Icons.Rounded.MoreVert,
-                                        contentDescription = "measurements menu icon"
-                                    )
-                                }
-                            },
+                        TextFieldWithDropdownMenu(
+                            textFieldValue = unitOfMeasurement.name,
+                            labelFieldText = "Measurement",
+                            menuItemList = UnitOfMeasurement.entries,
+                            onMenuItemClick = { unitOfMeasurement = it }
                         )
-                        DropdownMenu(
-                            modifier = Modifier
-                                .width(with(LocalDensity.current) { unitOfMeasurementTextileWidth.toDp() }),
-                            expanded = isDropdownMenuVisible,
-                            onDismissRequest = { isDropdownMenuVisible = false }) {
-                            UnitOfMeasurement.entries.forEach {
-                                DropdownMenuItem(
-                                    text = { Text(text = it.name) },
-                                    onClick = {
-                                        unitOfMeasurement = it
-                                        isDropdownMenuVisible = false
-                                    })
-                            }
-                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))

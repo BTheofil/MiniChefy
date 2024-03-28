@@ -17,30 +17,23 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -50,6 +43,8 @@ import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.PageNextButton
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.TextFieldWithDropdownMenu
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.Red400
@@ -70,9 +65,6 @@ fun IngredientsPage(
     onSearchClear: () -> Unit,
     onNextButtonClick: () -> Unit,
 ) {
-    var unitOfMeasurementTextileWidth by remember { mutableIntStateOf(0) }
-    var isDropdownMenuVisible by remember { mutableStateOf(false) }
-
     val focusManager = LocalFocusManager.current
 
     Scaffold(
@@ -265,72 +257,32 @@ fun IngredientsPage(
                                 modifier = Modifier
                                     .weight(1f)
                             ) {
-                                OutlinedTextField(
-                                    modifier = Modifier
-                                        .onGloballyPositioned { coordinates ->
-                                            unitOfMeasurementTextileWidth = coordinates.size.width
-                                        },
-                                    value = uiState.ingredientUnitOfMeasurementDraft.name,
-                                    onValueChange = {},
-                                    readOnly = true,
-                                    label = {
-                                        Text(
-                                            text = "Measurement",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
-                                    },
-                                    trailingIcon = {
-                                        IconButton(onClick = { isDropdownMenuVisible = true }) {
-                                            Icon(
-                                                modifier = Modifier,
-                                                imageVector = Icons.Rounded.MoreVert,
-                                                contentDescription = "measurements menu icon"
-                                            )
-                                        }
-                                    },
+                                TextFieldWithDropdownMenu(
+                                    textFieldValue = uiState.ingredientUnitOfMeasurementDraft.name,
+                                    labelFieldText = "Measurement",
+                                    menuItemList = UnitOfMeasurement.entries,
+                                    onMenuItemClick = { onIngredientUnitOfMeasurementChange(it) }
                                 )
-                                DropdownMenu(
-                                    modifier = Modifier
-                                        .width(with(LocalDensity.current) { unitOfMeasurementTextileWidth.toDp() }),
-                                    expanded = isDropdownMenuVisible,
-                                    onDismissRequest = { isDropdownMenuVisible = false }) {
-                                    UnitOfMeasurement.entries.forEach {
-                                        DropdownMenuItem(
-                                            text = { Text(text = it.name) },
-                                            onClick = {
-                                                onIngredientUnitOfMeasurementChange(it)
-                                                isDropdownMenuVisible = false
-                                            })
-                                    }
-                                }
                             }
                         }
-                    }
-                    Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
-                    Button(
-                        modifier = Modifier,
-                        onClick = {
-                            focusManager.clearFocus()
-                            onAddIngredientClick()
-                        }) {
-                        Text(text = "add")
+                        Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            onClick = {
+                                focusManager.clearFocus()
+                                onAddIngredientClick()
+                            }) {
+                            Text(text = "Add ingredient")
+                        }
                     }
                 }
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.BottomCenter
                 ) {
-                    OutlinedButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = onNextButtonClick
-                    ) {
-                        Text(
-                            text = "Next",
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
+                    PageNextButton(text = "Next page", onClick = onNextButtonClick)
                 }
             }
         }

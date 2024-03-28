@@ -75,6 +75,16 @@ fun CreateRecipe(
                             OnBasicInformationPageEvent.OnSelectedIconChange(it)
                         )
                     },
+                    onTimeFieldValueChange = {
+                        viewModel.onBasicInformationPageEvent(
+                            OnBasicInformationPageEvent.OnTimeChange(it)
+                        )
+                    },
+                    onTimeUnitValueChange = {
+                        viewModel.onBasicInformationPageEvent(
+                            OnBasicInformationPageEvent.OnTimeUnitChange(it)
+                        )
+                    },
                     onNextPageClick = { viewModel.onEvent(OnEvent.PageChange(1)) }
                 )
 
