@@ -26,12 +26,11 @@ class StorageCreateViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            storageRepository.getAllFoodTag().collect { tags ->
-                _uiState.update {
-                    it.copy(
-                        allProductTagList = tags
-                    )
-                }
+            val tags = storageRepository.getFilterableTagList()
+            _uiState.update {
+                it.copy(
+                    labelFilterTagList = tags
+                )
             }
         }
     }
@@ -44,7 +43,7 @@ class StorageCreateViewModel @Inject constructor(
         val availableUnitOfMeasurementList: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
         val quantity: String = "",
         val selectedTagList: List<FoodTag> = emptyList(),
-        val allProductTagList: List<FoodTag> = emptyList(),
+        val labelFilterTagList: List<FoodTag> = emptyList(),
         val tagDialogValue: String = ""
     )
 

@@ -9,8 +9,10 @@ import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.model.storage.entity.FoodAndTagsCrossRef
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
+import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
 import hu.tb.minichefy.domain.repository.StorageRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -25,6 +27,17 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
             storageFoodEntities.map {
                 FoodEntityToFood().map(it)
             }
+        }
+    }
+
+    override fun getKnowFoods(): Flow<List<Food>> {
+        val foodIds: Flow<List<Long>> = dao.getUnknownTagFoodIds()
+        val allFoods: Flow<List<FoodWithTags>> = dao.getAllStorageFood()
+
+        return foodIds.combine(allFoods) { ids, foods ->
+            foods.filter { foodWithTags ->
+                !ids.contains(foodWithTags.foodEntity.foodId)
+            }.map { FoodEntityToFood().map(it) }
         }
     }
 
@@ -89,6 +102,11 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getFilterableTagList(): List<FoodTag> =
+        dao.getTagsExceptUnknown().map {
+            TagEntityToTag().map(it)
+        }
 
     override suspend fun getTagById(id: Long): FoodTag {
         val tagEntity = dao.getTagById(id)

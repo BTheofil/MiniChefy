@@ -28,7 +28,7 @@ class StorageListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            storageRepository.getAllFood().collect { foodList ->
+            storageRepository.getKnowFoods().collect { foodList ->
                 _uiState.update {
                     it.copy(
                         foodList = foodList
@@ -37,13 +37,11 @@ class StorageListViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            storageRepository.getAllFoodTag().collect { tagList ->
-                _uiState.update {
-                    it.copy(foodTagList = tagList)
-                }
+            val tags = storageRepository.getFilterableTagList()
+            _uiState.update {
+                it.copy(foodTagList = tags)
             }
         }
-
     }
 
     data class UiState(
