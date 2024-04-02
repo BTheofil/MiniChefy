@@ -11,7 +11,7 @@ interface StorageRepository {
     //food
     fun getAllFood(): Flow<List<Food>>
 
-    fun getKnowFoods(): Flow<List<Food>>
+    fun getKnownFoods(): Flow<List<Food>>
 
     suspend fun getAllStorageFoodName(): List<FoodSummary>
 

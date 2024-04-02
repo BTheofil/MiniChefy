@@ -30,7 +30,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getKnowFoods(): Flow<List<Food>> {
+    override fun getKnownFoods(): Flow<List<Food>> {
         val foodIds: Flow<List<Long>> = dao.getUnknownTagFoodIds()
         val allFoods: Flow<List<FoodWithTags>> = dao.getAllStorageFood()
 

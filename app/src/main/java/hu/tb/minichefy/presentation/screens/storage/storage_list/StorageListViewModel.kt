@@ -28,7 +28,7 @@ class StorageListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            storageRepository.getKnowFoods().collect { foodList ->
+            storageRepository.getKnownFoods().collect { foodList ->
                 _uiState.update {
                     it.copy(
                         foodList = foodList
