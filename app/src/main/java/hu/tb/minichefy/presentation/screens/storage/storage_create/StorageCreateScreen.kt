@@ -262,7 +262,7 @@ fun StorageCreateContent(
             onTagClick = {
                 onEvent(StorageCreateViewModel.OnEvent.DialogChipTouched(it))
             },
-            allTagList = uiState.allProductTagList,
+            allTagList = uiState.labelFilterTagList,
             selectedTagList = uiState.selectedTagList
         )
     }
@@ -273,7 +273,7 @@ fun StorageCreateContent(
 fun StorageCreateContentPreview() {
     StorageCreateContent(
         StorageCreateViewModel.UiState(
-            allProductTagList = listOf(
+            labelFilterTagList = listOf(
                 FoodTag(0, "fruit"),
                 FoodTag(2, "vegetable"),
             )

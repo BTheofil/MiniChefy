@@ -11,6 +11,8 @@ interface StorageRepository {
     //food
     fun getAllFood(): Flow<List<Food>>
 
+    fun getKnowFoods(): Flow<List<Food>>
+
     suspend fun getAllStorageFoodName(): List<FoodSummary>
 
     suspend fun searchFoodByTitle(title: String): Food?
@@ -33,6 +35,8 @@ interface StorageRepository {
 
     //tag
     fun getAllFoodTag(): Flow<List<FoodTag>>
+
+    suspend fun getFilterableTagList(): List<FoodTag>
 
     suspend fun getTagById(id: Long): FoodTag
 

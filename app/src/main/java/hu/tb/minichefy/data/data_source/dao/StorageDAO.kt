@@ -20,6 +20,9 @@ interface StorageDAO {
     @Query("SELECT * FROM FoodEntity")
     fun getAllStorageFood(): Flow<List<FoodWithTags>>
 
+    @Query("SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId = (4)")
+    fun getUnknownTagFoodIds(): Flow<List<Long>>
+
     @Transaction
     @Query("SELECT foodId, title FROM FoodEntity")
     suspend fun getAllStorageFoodName(): List<SimplerFoodEntity>
@@ -49,6 +52,9 @@ interface StorageDAO {
     //tag
     @Query("SELECT * FROM TagEntity")
     fun getAllFoodTagFlow(): Flow<List<TagEntity>>
+
+    @Query("SELECT * FROM TagEntity WHERE tagId NOT IN (4)")
+    suspend fun getTagsExceptUnknown(): List<TagEntity>
 
     @Query("SELECT * FROM TagEntity WHERE tagId = :id")
     suspend fun getTagById(id: Long): TagEntity

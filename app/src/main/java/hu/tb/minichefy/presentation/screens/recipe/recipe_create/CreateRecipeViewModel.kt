@@ -8,6 +8,7 @@ import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodSummary
+import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
@@ -209,25 +210,33 @@ class CreateRecipeViewModel @Inject constructor(
 
                 val selectedMutableList = currentState.selectedIngredientList.toMutableList()
 
-                val temp = Food(
-                    title = currentState.ingredientTitleDraft,
-                    quantity = currentState.ingredientQuantityDraft.toFloat(),
-                    unitOfMeasurement = currentState.ingredientUnitOfMeasurementDraft,
-                    icon = IconManager().getDefaultIcon.resource,
-                    foodTagList = emptyList()
-                )
+                viewModelScope.launch {
+                    val foodTagList = mutableListOf<FoodTag>()
+                    if (currentState.unSelectedIngredientList.find { it.title == currentState.ingredientTitleDraft } == null) {
+                        val unknownTag = storageRepository.getTagById(4)
+                        foodTagList.add(unknownTag)
+                    }
 
-                if (temp !in selectedMutableList) {
-                    selectedMutableList.add(0, temp)
+                    val temp = Food(
+                        title = currentState.ingredientTitleDraft,
+                        quantity = currentState.ingredientQuantityDraft.toFloat(),
+                        unitOfMeasurement = currentState.ingredientUnitOfMeasurementDraft,
+                        icon = IconManager().getDefaultIcon.resource,
+                        foodTagList = foodTagList
+                    )
+
+                    if (temp !in selectedMutableList) {
+                        selectedMutableList.add(0, temp)
+                    }
+
+                    _ingredientsPageState.value = currentState.copy(
+                        selectedIngredientList = selectedMutableList,
+                        isIngredientTitleHasError = false,
+                        isIngredientQuantityHasError = false,
+                        ingredientTitleDraft = "",
+                        ingredientQuantityDraft = "",
+                    )
                 }
-
-                _ingredientsPageState.value = currentState.copy(
-                    selectedIngredientList = selectedMutableList,
-                    isIngredientTitleHasError = false,
-                    isIngredientQuantityHasError = false,
-                    ingredientTitleDraft = "",
-                    ingredientQuantityDraft = "",
-                )
             }
 
             is OnIngredientEvent.IngredientRemove -> {
@@ -332,7 +341,11 @@ class CreateRecipeViewModel @Inject constructor(
                 Log.i("CreateRecipeVM", "RecipeId: $recipeId")
 
                 //save ingredients
-                ingredientsPageState.value.selectedIngredientList.map { food ->
+                val notCommonFoods = ingredientsPageState.value.selectedIngredientList.filter { food ->
+                    ingredientsPageState.value.unSelectedIngredientList.none { it.title == food.title }
+                }
+
+                notCommonFoods.forEach { food ->
                     val foodId = storageRepository.saveOrModifyFood(
                         id = food.id,
                         title = food.title,
