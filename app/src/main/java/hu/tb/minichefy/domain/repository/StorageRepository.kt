@@ -29,6 +29,8 @@ interface StorageRepository {
 
     suspend fun saveFoodAndTag(foodId: Long, tagId: Long): Long
 
+    suspend fun deleteFoodAndTagsByFoodId(foodId: Long): Int
+
     suspend fun deleteFoodAndTag(foodId: Long, tagId: Long): Int
 
     suspend fun deleteFoodById(id: Long): Int

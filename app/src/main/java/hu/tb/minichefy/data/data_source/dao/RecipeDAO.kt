@@ -36,6 +36,10 @@ interface RecipeDAO {
     suspend fun insertRecipeIngredientCrossRef(crossRef: RecipeFoodCrossRef): Long
 
     @Transaction
+    @Query("DELETE FROM RecipeFoodCrossRef WHERE recipeId = :recipeId")
+    suspend fun deleteRecipeIngredientConnectionByRecipeId(recipeId: Long): Int
+
+    @Transaction
     @Query("DELETE FROM RecipeEntity WHERE recipeId = :id")
     suspend fun deleteRecipe(id: Long): Int
 }

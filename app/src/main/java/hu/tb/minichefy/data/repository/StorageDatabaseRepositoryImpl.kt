@@ -87,6 +87,9 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
     override suspend fun saveFoodAndTag(foodId: Long, tagId: Long): Long =
         dao.insertFoodTagCrossRef(FoodAndTagsCrossRef(foodId, tagId))
 
+    override suspend fun deleteFoodAndTagsByFoodId(foodId: Long): Int =
+        dao.deleteFoodWithTagsConnectionByFoodId(foodId)
+
     override suspend fun deleteFoodAndTag(foodId: Long, tagId: Long): Int =
         dao.deleteFoodTagCrossRef(foodId, tagId)
 

@@ -11,19 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -33,13 +28,12 @@ import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
+import hu.tb.minichefy.presentation.screens.components.SettingsPanel
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
-import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.SettingsPanel
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
-import kotlinx.coroutines.launch
 
 @Composable
 fun RecipeListScreen(
@@ -57,7 +51,7 @@ fun RecipeListScreen(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecipeListScreenContent(
     uiState: RecipeListViewModel.UiState,
@@ -65,14 +59,9 @@ fun RecipeListScreenContent(
     onFloatingButtonClick: () -> Unit,
     onRecipeItemClick: (Long) -> Unit
 ) {
-    val haptics =
-        LocalHapticFeedback.current //docs related https://developer.android.com/jetpack/compose/touch-input/pointer-input/tap-and-press
-
     var settingPanelVisible by remember {
         mutableStateOf(false)
     }
-    val scope = rememberCoroutineScope()
-    val modalSheetState = rememberModalBottomSheetState()
 
     val focusManager = LocalFocusManager.current
 
@@ -118,7 +107,6 @@ fun RecipeListScreenContent(
                                 .combinedClickable(
                                     onClick = { onRecipeItemClick(recipe.id!!) },
                                     onLongClick = {
-                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                         onEvent(
                                             RecipeListViewModel.OnEvent.OpenRecipeSettingsPanel(
                                                 recipe.id!!
@@ -135,17 +123,13 @@ fun RecipeListScreenContent(
 
             if (settingPanelVisible) {
                 SettingsPanel(
-                    modalSheetState = modalSheetState,
                     dismissSettingPanel = {
-                        scope.launch {
-                            modalSheetState.hide()
-                        }.invokeOnCompletion {
-                            if (!modalSheetState.isVisible) {
-                                settingPanelVisible = false
-                            }
-                        }
+                        settingPanelVisible = false
                     },
-                    onEvent = onEvent
+                    onDeleteItemClick = {
+                        onEvent(RecipeListViewModel.OnEvent.DeleteRecipe)
+                        settingPanelVisible = false
+                    }
                 )
             }
         })

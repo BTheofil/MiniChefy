@@ -122,7 +122,6 @@ fun IngredientsPage(
                     }
                     itemsIndexed(
                         items = uiState.selectedIngredientList,
-                        key = { _, item -> item.id ?: item.hashCode() },
                     ) { index, product ->
                         ListItem(
                             modifier = Modifier.animateItemPlacement(),

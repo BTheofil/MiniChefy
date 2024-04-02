@@ -4,8 +4,9 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -47,6 +48,7 @@ import hu.tb.minichefy.presentation.preview.FoodPreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
+import hu.tb.minichefy.presentation.screens.components.SettingsPanel
 import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
@@ -68,6 +70,7 @@ fun StorageListScreen(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StorageScreenContent(
     uiState: StorageListViewModel.UiState,
@@ -80,6 +83,12 @@ fun StorageScreenContent(
 
     var isIconSelectorOpen by remember {
         mutableStateOf(false)
+    }
+    var isSettingPanelOpen by remember {
+        mutableStateOf(false)
+    }
+    var settingPanelFoodId by remember {
+        mutableStateOf<Long?>(null)
     }
 
     Scaffold(
@@ -155,9 +164,19 @@ fun StorageScreenContent(
                                 Column {
                                     ListItem(
                                         modifier = Modifier
-                                            .clickable {
-                                                onEvent(StorageListViewModel.OnEvent.OnProductClick(index))
-                                            },
+                                            .combinedClickable(
+                                                onClick = {
+                                                    onEvent(
+                                                        StorageListViewModel.OnEvent.OnProductClick(
+                                                            index
+                                                        )
+                                                    )
+                                                },
+                                                onLongClick = {
+                                                    settingPanelFoodId = food.id
+                                                    isSettingPanelOpen = true
+                                                }
+                                            ),
                                         leadingContent = {
                                             Image(
                                                 modifier = Modifier
@@ -211,6 +230,17 @@ fun StorageScreenContent(
         )
     }
 
+    if (isSettingPanelOpen) {
+        SettingsPanel(
+            dismissSettingPanel = { isSettingPanelOpen = false },
+            onDeleteItemClick = {
+                onEvent(StorageListViewModel.OnEvent.DeleteFood(settingPanelFoodId!!))
+                isSettingPanelOpen = false
+                settingPanelFoodId = null
+            }
+        )
+    }
+
     if (isEditProductTagSelectorOpen) {
         ProductTagSelectorDialog(
             dismissAndCloseAction = {
@@ -235,7 +265,8 @@ fun StorageScreenContentPreview(
     StorageScreenContent(
         StorageListViewModel.UiState(
             foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
-            foodList = mockProductList
+            foodList = mockProductList,
+            filterFoodList = mockProductList
         ),
         onEvent = {},
         onFABClick = {}

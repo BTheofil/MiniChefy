@@ -22,7 +22,6 @@ class RecipeListViewModel @Inject constructor(
     data class UiState(
         val recipeList: List<Recipe> = emptyList(),
         val selectedRecipeId: Long? = null,
-        val showSettingsPanel: Boolean = false,
         val searchRecipeText: String = ""
     )
 
@@ -48,14 +47,14 @@ class RecipeListViewModel @Inject constructor(
     fun onEvent(event: OnEvent) {
         when (event) {
             OnEvent.DeleteRecipe -> viewModelScope.launch {
+                repository.deleteRecipeIngredientsConnectionByRecipeId(uiState.value.selectedRecipeId!!)
                 repository.deleteRecipe(uiState.value.selectedRecipeId!!)
             }
 
             is OnEvent.OpenRecipeSettingsPanel -> {
                 _uiState.update {
                     it.copy(
-                        selectedRecipeId = event.recipeId,
-                        showSettingsPanel = true
+                        selectedRecipeId = event.recipeId
                     )
                 }
             }

@@ -22,9 +22,11 @@ interface RecipeRepository {
 
     suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long
 
-    suspend fun deleteRecipe(id: Long): Int
-
     suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe>
 
     suspend fun saveRecipeIngredientCrossRef(recipeId: Long, foodId: Long): Long
+
+    suspend fun deleteRecipeIngredientsConnectionByRecipeId(recipeId: Long): Int
+
+    suspend fun deleteRecipe(id: Long): Int
 }

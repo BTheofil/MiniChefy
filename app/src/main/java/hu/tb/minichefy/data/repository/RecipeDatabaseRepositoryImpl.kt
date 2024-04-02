@@ -50,8 +50,6 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
     override suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long =
         dao.insertStepEntity(step.toRecipeStepEntity(recipeEntityId))
 
-    override suspend fun deleteRecipe(id: Long): Int = dao.deleteRecipe(id)
-
     override suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe> {
         val recipes = dao.searchRecipeByTitle("%$searchTitle%")
         return recipes.map {
@@ -62,5 +60,8 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
     override suspend fun saveRecipeIngredientCrossRef(recipeId: Long, foodId: Long): Long =
         dao.insertRecipeIngredientCrossRef(crossRef = RecipeFoodCrossRef(recipeId, foodId))
 
+    override suspend fun deleteRecipeIngredientsConnectionByRecipeId(recipeId: Long): Int =
+        dao.deleteRecipeIngredientConnectionByRecipeId(recipeId)
 
+    override suspend fun deleteRecipe(id: Long): Int = dao.deleteRecipe(id)
 }

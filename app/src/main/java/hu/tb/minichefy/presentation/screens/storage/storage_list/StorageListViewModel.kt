@@ -58,6 +58,7 @@ class StorageListViewModel @Inject constructor(
     sealed class OnEvent {
         data object ClearSearchText : OnEvent()
         data object SaveEditedFood : OnEvent()
+        data class DeleteFood(val foodId: Long) : OnEvent()
         data class SearchTextChange(val text: String) : OnEvent()
         data class OnProductClick(val index: Int) : OnEvent()
         data class FilterChipClicked(val tag: FoodTag) : OnEvent()
@@ -116,7 +117,6 @@ class StorageListViewModel @Inject constructor(
             }
 
             is OnEvent.ModifyFoodTags -> {
-
                 viewModelScope.launch {
                     val modifyFood = uiState.value.foodList[uiState.value.modifiedProductIndex]
                     if (modifyFood.foodTagList == null) {
@@ -140,6 +140,13 @@ class StorageListViewModel @Inject constructor(
                     icon = event.icon.resource
                 )
             )
+
+            is OnEvent.DeleteFood -> {
+                viewModelScope.launch {
+                    storageRepository.deleteFoodById(event.foodId)
+                    storageRepository.deleteFoodAndTagsByFoodId(event.foodId)
+                }
+            }
         }
     }
 

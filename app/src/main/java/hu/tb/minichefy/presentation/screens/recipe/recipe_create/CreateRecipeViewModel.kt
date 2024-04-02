@@ -218,6 +218,7 @@ class CreateRecipeViewModel @Inject constructor(
                     }
 
                     val temp = Food(
+                        id = currentState.unSelectedIngredientList.find { it.title == currentState.ingredientTitleDraft }?.id,
                         title = currentState.ingredientTitleDraft,
                         quantity = currentState.ingredientQuantityDraft.toFloat(),
                         unitOfMeasurement = currentState.ingredientUnitOfMeasurementDraft,
@@ -341,9 +342,10 @@ class CreateRecipeViewModel @Inject constructor(
                 Log.i("CreateRecipeVM", "RecipeId: $recipeId")
 
                 //save ingredients
-                val notCommonFoods = ingredientsPageState.value.selectedIngredientList.filter { food ->
-                    ingredientsPageState.value.unSelectedIngredientList.none { it.title == food.title }
-                }
+                val notCommonFoods =
+                    ingredientsPageState.value.selectedIngredientList.filter { food ->
+                        ingredientsPageState.value.unSelectedIngredientList.none { it.title == food.title }
+                    }
 
                 notCommonFoods.forEach { food ->
                     val foodId = storageRepository.saveOrModifyFood(
@@ -360,6 +362,15 @@ class CreateRecipeViewModel @Inject constructor(
                     Log.i("CreateRecipeVM", "FoodId: $foodId")
 
                     val crossRefId = recipeRepository.saveRecipeIngredientCrossRef(recipeId, foodId)
+                    Log.i("CreateRecipeVM", "CrossRefId: $crossRefId")
+                }
+
+                val commonFoods = ingredientsPageState.value.selectedIngredientList.filter { food ->
+                    ingredientsPageState.value.unSelectedIngredientList.any { it.title == food.title }
+                }
+
+                commonFoods.forEach {
+                    val crossRefId = recipeRepository.saveRecipeIngredientCrossRef(recipeId, it.id!!)
                     Log.i("CreateRecipeVM", "CrossRefId: $crossRefId")
                 }
 
