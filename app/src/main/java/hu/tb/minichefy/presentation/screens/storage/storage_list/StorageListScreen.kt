@@ -121,7 +121,7 @@ fun StorageScreenContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 itemsIndexed(
-                    items = uiState.foodList,
+                    items = uiState.filterFoodList,
                     key = { _, item -> item.id!! },
                     contentType = { _, item -> item }
                 ) { index, food ->
