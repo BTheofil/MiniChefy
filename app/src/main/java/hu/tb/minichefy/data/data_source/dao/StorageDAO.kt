@@ -28,12 +28,23 @@ interface StorageDAO {
     suspend fun getAllStorageFoodName(): List<SimplerFoodEntity>
 
     @Transaction
+    @Query("SELECT * FROM FoodEntity WHERE foodId IN (SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId != (4))")
+    fun getKnownFoodsFlow(): Flow<List<FoodWithTags>>
+
+    @Transaction
+    @Query("SELECT * FROM FoodEntity WHERE foodId IN (SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId != (4))")
+    suspend fun getKnownFoodsList(): List<FoodWithTags>
+
+    @Transaction
     @Query("SELECT * FROM FoodEntity WHERE title = :title")
     suspend fun searchFoodByTitle(title: String): FoodWithTags?
 
     @Transaction
     @Query("SELECT foodId, title FROM FoodEntity WHERE title LIKE :searchTitle")
-    suspend fun searchProductByTitle(searchTitle: String): List<SimplerFoodEntity>
+    suspend fun searchSimpleFoodsByTitle(searchTitle: String): List<SimplerFoodEntity>
+
+    @Query("SELECT * FROM FoodEntity WHERE foodId IN (SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId IN (:tagIds))")
+    suspend fun searchFoodsByTag(tagIds: List<Long>): List<FoodWithTags>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFoodEntity(foodEntity: FoodEntity): Long

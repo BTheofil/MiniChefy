@@ -9,10 +9,8 @@ import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.model.storage.entity.FoodAndTagsCrossRef
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
-import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
 import hu.tb.minichefy.domain.repository.StorageRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -21,7 +19,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
 ) : StorageRepository {
 
     //food
-    override fun getAllFood(): Flow<List<Food>> {
+    override fun getAllFood(): Flow<List<Food>> { //unused
         val foodsEntities = dao.getAllStorageFood()
         return foodsEntities.map { storageFoodEntities ->
             storageFoodEntities.map {
@@ -30,14 +28,12 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getKnownFoods(): Flow<List<Food>> {
-        val foodIds: Flow<List<Long>> = dao.getUnknownTagFoodIds()
-        val allFoods: Flow<List<FoodWithTags>> = dao.getAllStorageFood()
-
-        return foodIds.combine(allFoods) { ids, foods ->
-            foods.filter { foodWithTags ->
-                !ids.contains(foodWithTags.foodEntity.foodId)
-            }.map { FoodEntityToFood().map(it) }
+    override fun getKnownFoodsFlow(): Flow<List<Food>> {
+        val entities = dao.getKnownFoodsFlow()
+        return entities.map {
+            it.map { foodWithTags ->
+                FoodEntityToFood().map(foodWithTags)
+            }
         }
     }
 
@@ -51,19 +47,33 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }.sortedBy { it.title }
     }
 
+    override suspend fun getKnownFoodList(): List<Food> {
+        val entities = dao.getKnownFoodsList()
+        return entities.map {
+            FoodEntityToFood().map(it)
+        }
+    }
+
     override suspend fun searchFoodByTitle(title: String): Food? {
         val entity = dao.searchFoodByTitle(title) ?: return null
         return FoodEntityToFood().map(entity)
     }
 
     override suspend fun searchProductByTitle(searchText: String): List<FoodSummary> {
-        val products = dao.searchProductByTitle("%$searchText%")
+        val products = dao.searchSimpleFoodsByTitle("%$searchText%")
         return products.map {
             FoodSummary(
                 id = it.foodId,
                 title = it.title,
             )
         }.sortedBy { it.title }
+    }
+
+    override suspend fun searchFoodsByTag(tagIds: List<Long>): List<Food> {
+        val foodEntity = dao.searchFoodsByTag(tagIds)
+        return foodEntity.map {
+            FoodEntityToFood().map(it)
+        }
     }
 
     override suspend fun saveOrModifyFood(

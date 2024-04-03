@@ -28,11 +28,10 @@ class StorageListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            storageRepository.getKnownFoods().collect { foodList ->
+            storageRepository.getKnownFoodsFlow().collect { foodList ->
                 _uiState.update {
                     it.copy(
                         foodList = foodList,
-                        filterFoodList = foodList
                     )
                 }
             }
@@ -50,7 +49,6 @@ class StorageListViewModel @Inject constructor(
         val foodTagList: List<FoodTag> = emptyList(),
         val activeFilter: List<FoodTag> = emptyList(),
         val foodList: List<Food> = emptyList(),
-        val filterFoodList: List<Food> = emptyList(),
         val modifiedProductIndex: Int = -1,
         val allProductIconList: List<ProductIcon> = IconManager().getAllProductIconList
     )
@@ -69,8 +67,10 @@ class StorageListViewModel @Inject constructor(
 
     fun onEvent(event: OnEvent) {
         when (event) {
-            is OnEvent.SearchTextChange -> _uiState.update {
-                it.copy(searchText = event.text)
+            is OnEvent.SearchTextChange -> {
+                _uiState.update {
+                    it.copy(searchText = event.text)
+                }
             }
 
             OnEvent.ClearSearchText -> _uiState.update {
@@ -89,11 +89,19 @@ class StorageListViewModel @Inject constructor(
                     temp.add(event.tag)
                 }
 
-                _uiState.update {
-                    it.copy(
-                        activeFilter = temp,
-                        filterFoodList = filterFoodsByTags(uiState.value.foodList, temp)
-                    )
+                viewModelScope.launch {
+                    val filteredFoodList = if (temp.isNotEmpty()){
+                        storageRepository.searchFoodsByTag(temp.map { it.id!! })
+                    } else {
+                        storageRepository.getKnownFoodList()
+                    }
+
+                    _uiState.update {
+                        it.copy(
+                            activeFilter = temp,
+                            foodList = filteredFoodList
+                        )
+                    }
                 }
             }
 
@@ -162,18 +170,6 @@ class StorageListViewModel @Inject constructor(
 
             updatedFood.foodTagList?.map { tag ->
                 storageRepository.saveFoodAndTag(foodId, tag.id!!)
-            }
-        }
-    }
-
-    private fun filterFoodsByTags(foods: List<Food>, desiredTags: List<FoodTag>): List<Food> {
-        if (desiredTags.isEmpty()) {
-            return foods
-        }
-
-        return foods.filter { food ->
-            desiredTags.all { desiredTag ->
-                food.foodTagList?.any { foodTag -> foodTag == desiredTag } ?: false
             }
         }
     }
