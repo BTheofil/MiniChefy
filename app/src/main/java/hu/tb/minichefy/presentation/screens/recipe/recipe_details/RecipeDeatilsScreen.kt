@@ -20,10 +20,17 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +72,7 @@ fun RecipeDetailsScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailsContent(
     uiState: RecipeDetailsViewModel.UiState,
@@ -75,18 +83,38 @@ fun RecipeDetailsContent(
     }
 
     uiState.recipe?.let { recipe ->
-        Column {
-            DetailsTopContent(
-                modifier = Modifier
-                    .weight(1f),
-                recipe = recipe
-            )
-            Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-            DetailsBottomContent(
-                modifier = Modifier
-                    .weight(1f),
-                recipe = recipe
-            )
+        Scaffold(
+            topBar = {
+                TopAppBar(title = {}, actions = {
+                    IconButton(onClick = {
+                        isConfirmDialogVisible = uiState.isInformDialogShouldShow
+                        if (!uiState.isInformDialogShouldShow) {
+                            onEvent(RecipeDetailsViewModel.OnEvent.MakeRecipe)
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                })
+            }
+        ) {
+            Column {
+                DetailsTopContent(
+                    modifier = Modifier
+                        .padding(it)
+                        .weight(1f),
+                    recipe = recipe
+                )
+                Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
+                DetailsBottomContent(
+                    modifier = Modifier
+                        .weight(1f),
+                    recipe = recipe
+                )
+            }
         }
     }
 

@@ -30,7 +30,7 @@ class RecipeDetailsViewModel @Inject constructor(
 
     init {
         loadRecipe()
-        loadInformDialogShouldShowValue()
+        loadInformationDialogShouldShow()
     }
 
     data class UiState(
@@ -48,14 +48,16 @@ class RecipeDetailsViewModel @Inject constructor(
             is OnEvent.MakeRecipe -> {
                 viewModelScope.launch {
                     val dishTag = storageRepository.getTagById(3)
-                    val isDishAlreadyInTheStorage = storageRepository.searchExactlyOneFoodByTitle(uiState.value.recipe!!.title)
+                    val isDishAlreadyInTheStorage =
+                        storageRepository.searchExactlyOneFoodByTitle(uiState.value.recipe!!.title)
 
                     uiState.value.recipe.also { recipe ->
                         val savedDishId = storageRepository.saveOrModifyFood(
                             id = isDishAlreadyInTheStorage?.id,
                             icon = recipe!!.icon,
                             title = recipe.title,
-                            quantity = recipe.quantity + (isDishAlreadyInTheStorage?.quantity ?: 0f),
+                            quantity = recipe.quantity + (isDishAlreadyInTheStorage?.quantity
+                                ?: 0f),
                             unitOfMeasurement = UnitOfMeasurement.PIECE,
                         )
                         storageRepository.saveFoodAndTag(savedDishId, dishTag.id!!)
@@ -86,7 +88,7 @@ class RecipeDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun loadInformDialogShouldShowValue() {
+    private fun loadInformationDialogShouldShow() {
         viewModelScope.launch {
             dataStoreManager.isDialogShouldShowInDetailsScreen()
                 .collect { isDialogShouldShow ->
