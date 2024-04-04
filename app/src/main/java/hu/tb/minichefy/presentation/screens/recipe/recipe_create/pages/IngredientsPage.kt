@@ -36,15 +36,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.PageNextButton
-import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.TextFieldWithDropdownMenu
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.Red400
@@ -227,43 +226,13 @@ fun IngredientsPage(
                             isError = uiState.isIngredientTitleHasError
                         )
                         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            OutlinedTextField(
-                                modifier = Modifier
-                                    .weight(1f),
-                                value = uiState.ingredientQuantityDraft,
-                                onValueChange = onIngredientQuantityChange,
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Number,
-                                    imeAction = ImeAction.Done
-                                ),
-                                label = {
-                                    Text(
-                                        text = "Amount",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                },
-                                singleLine = true,
-                                isError = uiState.isIngredientQuantityHasError
-                            )
-                            Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                            ) {
-                                TextFieldWithDropdownMenu(
-                                    textFieldValue = uiState.ingredientUnitOfMeasurementDraft.name,
-                                    labelFieldText = "Measurement",
-                                    menuItemList = UnitOfMeasurement.entries,
-                                    onMenuItemClick = { onIngredientUnitOfMeasurementChange(it) }
-                                )
-                            }
-                        }
+                        QuantityAndMeasurementRow(
+                            quantityValue = uiState.ingredientQuantityDraft,
+                            onQuantityChange = onIngredientQuantityChange,
+                            isQuantityHasError = uiState.isIngredientQuantityHasError,
+                            measurementValue = uiState.ingredientUnitOfMeasurementDraft,
+                            onMeasurementChange = onIngredientUnitOfMeasurementChange
+                        )
                         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
                         Button(
                             modifier = Modifier

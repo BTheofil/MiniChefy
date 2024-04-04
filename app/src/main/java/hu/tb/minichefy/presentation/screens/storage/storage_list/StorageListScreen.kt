@@ -53,6 +53,7 @@ import hu.tb.minichefy.presentation.screens.components.SettingsPanel
 import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
+import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditQuantityDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditStorageItem
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
@@ -64,9 +65,11 @@ fun StorageListScreen(
     onFABClick: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val modifyFoodState by viewModel.modifyFoodState.collectAsStateWithLifecycle()
 
     StorageScreenContent(
         uiState = uiState,
+        modifyFoodState = modifyFoodState,
         onFABClick = onFABClick,
         onEvent = viewModel::onEvent
     )
@@ -76,6 +79,7 @@ fun StorageListScreen(
 @Composable
 fun StorageScreenContent(
     uiState: StorageListViewModel.UiState,
+    modifyFoodState: StorageListViewModel.ModifyFoodState,
     onFABClick: () -> Unit,
     onEvent: (StorageListViewModel.OnEvent) -> Unit
 ) {
@@ -91,6 +95,10 @@ fun StorageScreenContent(
     }
     var settingPanelFoodId by remember {
         mutableStateOf<Long?>(null)
+    }
+
+    var isEditQuantityDialogOpen by remember {
+        mutableStateOf(false)
     }
 
     val focusManager = LocalFocusManager.current
@@ -161,8 +169,8 @@ fun StorageScreenContent(
                                 onAddTagClick = {
                                     isEditProductTagSelectorOpen = true
                                 },
-                                onQuantityClick = { quantity, unitOfMeasurement ->
-                                    
+                                onQuantityClick = {
+                                    isEditQuantityDialogOpen = true
                                 }
                                 /*onChangeQuantity = { value ->
                                     onEvent(
@@ -232,11 +240,28 @@ fun StorageScreenContent(
         }
     }
 
+    if (isEditQuantityDialogOpen) {
+        EditQuantityDialog(
+            quantityValue = modifyFoodState.quantityModifyValue,
+            onQuantityChange = {
+                onEvent(StorageListViewModel.OnEvent.ModifyFoodQuantity(it))
+            },
+            isQuantityHasError = modifyFoodState.isQuantityModifyDialogHasError,
+            measurementValue = modifyFoodState.unitOfMeasurementModifyValue,
+            onMeasurementChange = {
+
+            },
+            onCancelButtonClick = {},
+            onConfirmButtonClick = {},
+            onDismissRequest = {}
+        )
+    }
+
     if (isIconSelectorOpen) {
         IconSelectorSheet(
             allIconList = uiState.allProductIconList,
             selectedIcon = IconManager().convertIntToProductIcon(uiState.foodList[uiState.modifiedProductIndex].icon),
-            onItemClick = { onEvent(StorageListViewModel.OnEvent.ModifyProductIcon(it)) },
+            onItemClick = { onEvent(StorageListViewModel.OnEvent.ModifyFoodIcon(it)) },
             onDismissRequest = { isIconSelectorOpen = false }
         )
     }
@@ -278,6 +303,7 @@ fun StorageScreenContentPreview(
             foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
             foodList = mockProductList,
         ),
+        StorageListViewModel.ModifyFoodState(),
         onEvent = {},
         onFABClick = {}
     )

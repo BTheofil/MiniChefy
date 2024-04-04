@@ -43,7 +43,6 @@ import androidx.constraintlayout.compose.Dimension
 import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
-import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.preview.FoodPreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
@@ -59,7 +58,7 @@ fun EditStorageItem(
     onCloseClick: () -> Unit,
     onAddTagClick: () -> Unit,
     onDeleteTagClick: (tag: FoodTag) -> Unit,
-    onQuantityClick: (quantity: Float, unitOfMeasurement: UnitOfMeasurement) -> Unit
+    onQuantityClick: () -> Unit
 ) {
     OutlinedCard(
         modifier = Modifier
@@ -173,9 +172,7 @@ fun EditStorageItem(
                     TextButton(
                         modifier = Modifier
                             .weight(1f),
-                        onClick = {
-                            onQuantityClick(food.quantity, food.unitOfMeasurement)
-                        },
+                        onClick = onQuantityClick,
                         content = {
                             Text(
                                 text = food.quantity.toString() + " " + food.unitOfMeasurement,
@@ -219,6 +216,6 @@ private fun EditStorageItemPreview(
 ) {
     EditStorageItem(
         food = foodList.first(),
-        {}, {}, {}, {}, { _, _ -> }
+        {}, {}, {}, {}, {}
     )
 }
