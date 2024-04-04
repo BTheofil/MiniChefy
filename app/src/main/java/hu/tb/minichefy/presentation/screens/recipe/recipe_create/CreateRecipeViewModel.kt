@@ -52,7 +52,7 @@ class CreateRecipeViewModel @Inject constructor(
         viewModelScope.launch {
             _ingredientsPageState.update { ingredientsPage ->
                 ingredientsPage.copy(
-                    unSelectedIngredientList = storageRepository.getAllStorageFoodName()
+                    unSelectedIngredientList = storageRepository.getStorageFoodSummary()
                 )
             }
         }
@@ -259,7 +259,7 @@ class CreateRecipeViewModel @Inject constructor(
 
                     _ingredientsPageState.update { ingredientsPage ->
                         ingredientsPage.copy(
-                            unSelectedIngredientList = storageRepository.searchProductByTitle(
+                            unSelectedIngredientList = storageRepository.searchFoodSummaryLikelyByTitle(
                                 event.text
                             )
                         )

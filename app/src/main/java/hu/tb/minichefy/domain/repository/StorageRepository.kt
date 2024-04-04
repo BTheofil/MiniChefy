@@ -9,15 +9,19 @@ import kotlinx.coroutines.flow.Flow
 interface StorageRepository {
 
     //food
-    fun getAllFood(): Flow<List<Food>>
+    fun getKnownFoodsFlow(): Flow<List<Food>>
 
-    fun getKnownFoods(): Flow<List<Food>>
+    suspend fun getStorageFoodSummary(): List<FoodSummary>
 
-    suspend fun getAllStorageFoodName(): List<FoodSummary>
+    suspend fun getKnownFoodList(): List<Food>
 
-    suspend fun searchFoodByTitle(title: String): Food?
+    suspend fun searchExactlyOneFoodByTitle(title: String): Food?
 
-    suspend fun searchProductByTitle(searchText: String): List<FoodSummary>
+    suspend fun searchFoodSummaryLikelyByTitle(searchText: String): List<FoodSummary>
+
+    suspend fun searchFoodsByTag(tagIds: List<Long>): List<Food>
+
+    suspend fun searchKnownFoodByTitle(title: String): List<Food>
 
     suspend fun saveOrModifyFood(
         id: Long? = null,

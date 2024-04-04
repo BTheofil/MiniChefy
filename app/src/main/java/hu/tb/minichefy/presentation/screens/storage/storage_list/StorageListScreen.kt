@@ -130,7 +130,7 @@ fun StorageScreenContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 itemsIndexed(
-                    items = uiState.filterFoodList,
+                    items = uiState.foodList,
                     key = { _, item -> item.id!! },
                     contentType = { _, item -> item }
                 ) { index, food ->
@@ -266,7 +266,6 @@ fun StorageScreenContentPreview(
         StorageListViewModel.UiState(
             foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
             foodList = mockProductList,
-            filterFoodList = mockProductList
         ),
         onEvent = {},
         onFABClick = {}
