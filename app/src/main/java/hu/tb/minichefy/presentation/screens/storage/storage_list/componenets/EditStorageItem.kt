@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +43,7 @@ import androidx.constraintlayout.compose.Dimension
 import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
+import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.preview.FoodPreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
@@ -57,7 +59,7 @@ fun EditStorageItem(
     onCloseClick: () -> Unit,
     onAddTagClick: () -> Unit,
     onDeleteTagClick: (tag: FoodTag) -> Unit,
-    //onChangeQuantity: (value: Int) -> Unit
+    onQuantityClick: (quantity: Float, unitOfMeasurement: UnitOfMeasurement) -> Unit
 ) {
     OutlinedCard(
         modifier = Modifier
@@ -168,33 +170,22 @@ fun EditStorageItem(
                         .fillMaxWidth(0.8f),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    /*IconButton(
-                        modifier = Modifier,
-                        onClick = { onChangeQuantity(-1) }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_remove_24),
-                            contentDescription = "Decrease quantity",
-                            tint = Color(Red400.value)
-                        )
-                    }*/
-                    Text(
+                    TextButton(
                         modifier = Modifier
                             .weight(1f),
-                        text = food.quantity.toString() + " " + food.unitOfMeasurement,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.secondary,
-                        textAlign = TextAlign.Center
+                        onClick = {
+                            onQuantityClick(food.quantity, food.unitOfMeasurement)
+                        },
+                        content = {
+                            Text(
+                                text = food.quantity.toString() + " " + food.unitOfMeasurement,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.secondary,
+                                textAlign = TextAlign.Center,
+                            )
+                        },
                     )
-                    /*IconButton(onClick = { onChangeQuantity(1) }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_add_24),
-                            contentDescription = "Increase quantity",
-                            tint = Color(Green500.value)
-                        )
-                    }*/
                 }
-
             }
 
             Box(
@@ -228,6 +219,6 @@ private fun EditStorageItemPreview(
 ) {
     EditStorageItem(
         food = foodList.first(),
-        {}, {}, {}, {},
+        {}, {}, {}, {}, { _, _ -> }
     )
 }

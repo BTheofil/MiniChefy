@@ -161,6 +161,9 @@ fun StorageScreenContent(
                                 onAddTagClick = {
                                     isEditProductTagSelectorOpen = true
                                 },
+                                onQuantityClick = { quantity, unitOfMeasurement ->
+                                    
+                                }
                                 /*onChangeQuantity = { value ->
                                     onEvent(
                                         StorageListViewModel.OnEvent.ModifyProductQuantity(value)
