@@ -19,15 +19,6 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
 ) : StorageRepository {
 
     //food
-    override fun getAllFood(): Flow<List<Food>> { //unused
-        val foodsEntities = dao.getAllStorageFood()
-        return foodsEntities.map { storageFoodEntities ->
-            storageFoodEntities.map {
-                FoodEntityToFood().map(it)
-            }
-        }
-    }
-
     override fun getKnownFoodsFlow(): Flow<List<Food>> {
         val entities = dao.getKnownFoodsFlow()
         return entities.map {
@@ -37,7 +28,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllStorageFoodName(): List<FoodSummary> {
+    override suspend fun getStorageFoodSummary(): List<FoodSummary> {
         val entities = dao.getAllStorageFoodName()
         return entities.map {
             FoodSummary(
@@ -54,12 +45,12 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchFoodByTitle(title: String): Food? {
+    override suspend fun searchExactlyOneFoodByTitle(title: String): Food? {
         val entity = dao.searchFoodByTitle(title) ?: return null
         return FoodEntityToFood().map(entity)
     }
 
-    override suspend fun searchProductByTitle(searchText: String): List<FoodSummary> {
+    override suspend fun searchFoodSummaryLikelyByTitle(searchText: String): List<FoodSummary> {
         val products = dao.searchSimpleFoodsByTitle("%$searchText%")
         return products.map {
             FoodSummary(
@@ -72,6 +63,13 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
     override suspend fun searchFoodsByTag(tagIds: List<Long>): List<Food> {
         val foodEntity = dao.searchFoodsByTag(tagIds)
         return foodEntity.map {
+            FoodEntityToFood().map(it)
+        }
+    }
+
+    override suspend fun searchKnownFoodByTitle(title: String): List<Food> {
+        val entities = dao.searchKnownFoodByTitle(title)
+        return entities.map {
             FoodEntityToFood().map(it)
         }
     }

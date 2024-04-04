@@ -11,6 +11,8 @@ import hu.tb.minichefy.domain.use_case.CalculationFood
 import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.screens.manager.icons.IconResource
 import hu.tb.minichefy.presentation.screens.manager.icons.ProductIcon
+import hu.tb.minichefy.presentation.ui.theme.SEARCH_BAR_WAIT_AFTER_CHARACTER
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -68,8 +70,17 @@ class StorageListViewModel @Inject constructor(
     fun onEvent(event: OnEvent) {
         when (event) {
             is OnEvent.SearchTextChange -> {
-                _uiState.update {
-                    it.copy(searchText = event.text)
+                viewModelScope.launch {
+                    _uiState.update {
+                        it.copy(searchText = event.text)
+                    }
+
+                    delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
+
+                    val searchResult = storageRepository.searchKnownFoodByTitle(event.text)
+                    _uiState.update {
+                        it.copy(foodList = searchResult)
+                    }
                 }
             }
 
@@ -90,7 +101,7 @@ class StorageListViewModel @Inject constructor(
                 }
 
                 viewModelScope.launch {
-                    val filteredFoodList = if (temp.isNotEmpty()){
+                    val filteredFoodList = if (temp.isNotEmpty()) {
                         storageRepository.searchFoodsByTag(temp.map { it.id!! })
                     } else {
                         storageRepository.getKnownFoodList()

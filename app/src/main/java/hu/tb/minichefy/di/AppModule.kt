@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import hu.tb.minichefy.data.data_source.dao.UNKNOWN_TAG_ID
 import hu.tb.minichefy.data.data_source.db.MiniChefyDatabase
 import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
 import hu.tb.minichefy.data.repository.StorageDatabaseRepositoryImpl
@@ -40,16 +41,16 @@ object AppModule {
         if (!dbFile.exists()) {
             CoroutineScope(Dispatchers.IO).launch {
                 db.storageDao.insertTagEntity(
-                    TagEntity(tagId = null, tag = "fruit")
+                    TagEntity(tagId = 1, tag = "fruit")
                 )
                 db.storageDao.insertTagEntity(
-                    TagEntity(tagId = null, tag = "vegetable")
+                    TagEntity(tagId = 2, tag = "vegetable")
                 )
                 db.storageDao.insertTagEntity(
-                    TagEntity(tagId = null, tag = "dish")
+                    TagEntity(tagId = 3, tag = "dish")
                 )
                 db.storageDao.insertTagEntity(
-                    TagEntity(tagId = null, tag = "unknown")
+                    TagEntity(tagId = UNKNOWN_TAG_ID.toLong(), tag = "unknown")
                 )
             }
         }
