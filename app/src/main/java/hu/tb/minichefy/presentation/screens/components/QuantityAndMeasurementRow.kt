@@ -24,6 +24,7 @@ fun QuantityAndMeasurementRow(
     quantityValue: String,
     onQuantityChange: (String) -> Unit,
     isQuantityHasError: Boolean,
+    measurementOptionList: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
     measurementValue: UnitOfMeasurement,
     onMeasurementChange: (UnitOfMeasurement) -> Unit,
 ) {
@@ -59,7 +60,7 @@ fun QuantityAndMeasurementRow(
             TextFieldWithDropdownMenu(
                 textFieldValue = measurementValue.name,
                 labelFieldText = "Measurement",
-                menuItemList = UnitOfMeasurement.entries,
+                menuItemList = measurementOptionList,
                 onMenuItemClick = onMeasurementChange
             )
         }

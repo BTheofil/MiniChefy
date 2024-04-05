@@ -6,6 +6,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
+import hu.tb.minichefy.domain.use_case.ValidateQuantity
+import hu.tb.minichefy.domain.use_case.ValidateTextField
+import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.screens.manager.icons.ProductIcon
 import kotlinx.coroutines.channels.Channel
@@ -18,7 +21,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StorageCreateViewModel @Inject constructor(
-    private val storageRepository: StorageRepository
+    private val storageRepository: StorageRepository,
+    private val textValidator: ValidateTextField,
+    private val quantityValidator: ValidateQuantity,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -37,11 +42,16 @@ class StorageCreateViewModel @Inject constructor(
 
     data class UiState(
         val productIcon: ProductIcon = IconManager().getRandomProduct(),
-        val productTitleText: String = "",
-        val productType: FoodType? = FoodType.LIQUID,
-        val productUnitOfMeasurement: UnitOfMeasurement = UnitOfMeasurement.entries[1],
-        val availableUnitOfMeasurementList: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
+        val foodTitleText: String = "",
+        val isFoodTitleHasError: Boolean = false,
+        val foodType: FoodType? = FoodType.LIQUID,
+        val foodUnitOfMeasurement: UnitOfMeasurement = UnitOfMeasurement.entries[1],
+        val availableUnitOfMeasurementList: List<UnitOfMeasurement> = listOf(
+            UnitOfMeasurement.DL,
+            UnitOfMeasurement.L
+        ),
         val quantity: String = "",
+        val isQuantityHasError: Boolean = false,
         val selectedTagList: List<FoodTag> = emptyList(),
         val labelFilterTagList: List<FoodTag> = emptyList(),
         val tagDialogValue: String = ""
@@ -73,7 +83,7 @@ class StorageCreateViewModel @Inject constructor(
         when (event) {
             is OnEvent.FoodTextChange -> _uiState.update {
                 it.copy(
-                    productTitleText = event.text
+                    foodTitleText = event.text
                 )
             }
 
@@ -86,7 +96,7 @@ class StorageCreateViewModel @Inject constructor(
                                     UnitOfMeasurement.DL,
                                     UnitOfMeasurement.L
                                 ),
-                                productUnitOfMeasurement = UnitOfMeasurement.DL
+                                foodUnitOfMeasurement = UnitOfMeasurement.DL
                             )
                         }
                     }
@@ -98,38 +108,60 @@ class StorageCreateViewModel @Inject constructor(
                                 UnitOfMeasurement.DKG,
                                 UnitOfMeasurement.KG,
                             ),
-                            productUnitOfMeasurement = UnitOfMeasurement.G,
+                            foodUnitOfMeasurement = UnitOfMeasurement.G,
                         )
                     }
 
                     FoodType.PIECE -> {
                         _uiState.update {
-                            it.copy(productUnitOfMeasurement = UnitOfMeasurement.PIECE)
+                            it.copy(
+                                availableUnitOfMeasurementList = listOf(UnitOfMeasurement.PIECE),
+                                foodUnitOfMeasurement = UnitOfMeasurement.PIECE
+                            )
                         }
                     }
                 }
 
                 _uiState.update {
-                    it.copy(productType = event.type)
+                    it.copy(foodType = event.type)
                 }
             }
 
             is OnEvent.FoodUnitChange -> {
                 _uiState.update {
                     it.copy(
-                        productUnitOfMeasurement = event.type
+                        foodUnitOfMeasurement = event.type
                     )
                 }
             }
 
             OnEvent.Save -> {
                 viewModelScope.launch {
+                    val titleResult = textValidator(uiState.value.foodTitleText)
+                    val quantityResult = try {
+                        quantityValidator(uiState.value.quantity.toFloat())
+                    } catch (e: Exception) {
+                        ValidationResult.ERROR
+                    }
+
+                    val hasError =
+                        listOf(titleResult, quantityResult).any { it == ValidationResult.ERROR }
+                    if (hasError) {
+                        _uiState.update {
+                            it.copy(
+                                isFoodTitleHasError = titleResult == ValidationResult.ERROR,
+                                isQuantityHasError = quantityResult == ValidationResult.ERROR
+                            )
+                        }
+                        return@launch
+                    }
+
                     uiState.value.also {
                         val foodId = storageRepository.saveOrModifyFood(
                             icon = it.productIcon.resource,
-                            title = it.productTitleText,
+                            title = it.foodTitleText,
                             quantity = it.quantity.toFloat(),
-                            unitOfMeasurement = it.productUnitOfMeasurement
+                            unitOfMeasurement = it.foodUnitOfMeasurement
                         )
                         it.selectedTagList.map { tag ->
                             storageRepository.saveFoodAndTag(foodId, tag.id!!)

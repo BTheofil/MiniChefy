@@ -11,19 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,18 +29,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.screens.components.CircleImage
-import hu.tb.minichefy.presentation.screens.components.QuestionRowAnswer
+import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_create.components.RadioButtonWithText
-import hu.tb.minichefy.presentation.ui.components.bottomBorder
 import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
@@ -79,7 +71,6 @@ fun StorageCreateContent(
     uiState: StorageCreateViewModel.UiState,
     onEvent: (StorageCreateViewModel.OnEvent) -> Unit
 ) {
-    var isUnitMenuExpanded by remember { mutableStateOf(false) }
     var isTagPopupVisible by remember { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
@@ -94,10 +85,19 @@ fun StorageCreateContent(
             image = uiState.productIcon.resource
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-        QuestionRowAnswer(
-            questionText = "Title:",
-            textFieldValue = uiState.productTitleText,
-            onTextFieldValueChange = { onEvent(StorageCreateViewModel.OnEvent.FoodTextChange(it)) }
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth(),
+            value = uiState.foodTitleText,
+            onValueChange = { onEvent(StorageCreateViewModel.OnEvent.FoodTextChange(it)) },
+            label = {
+                Text(
+                    text = "Title",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            },
+            isError = uiState.isFoodTitleHasError
         )
         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
         Row(
@@ -117,7 +117,7 @@ fun StorageCreateContent(
                     StorageCreateViewModel.FoodType.entries[foodTypeIndex].also {
                         RadioButtonWithText(
                             displayText = it.displayText,
-                            isSelected = uiState.productType == it,
+                            isSelected = uiState.foodType == it,
                             onClick = {
                                 onEvent(
                                     StorageCreateViewModel.OnEvent.FoodTypeChange(
@@ -131,83 +131,17 @@ fun StorageCreateContent(
             }
         }
         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
-        QuestionRowAnswer(
-            questionText = "Quantity: ",
-            textFieldValue = uiState.quantity,
-            onTextFieldValueChange = { onEvent(StorageCreateViewModel.OnEvent.FoodQuantityChange(it)) },
-            keyboardType = KeyboardType.Number
+        QuantityAndMeasurementRow(
+            quantityValue = uiState.quantity,
+            onQuantityChange = { onEvent(StorageCreateViewModel.OnEvent.FoodQuantityChange(it)) },
+            isQuantityHasError = uiState.isQuantityHasError,
+            measurementOptionList = uiState.availableUnitOfMeasurementList,
+            measurementValue = uiState.foodUnitOfMeasurement,
+            onMeasurementChange = {
+                onEvent(StorageCreateViewModel.OnEvent.FoodUnitChange(it))
+            }
         )
         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
-        if (uiState.productType != StorageCreateViewModel.FoodType.PIECE) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Unit of measurement:",
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-                Box(
-                    modifier = Modifier
-                        .wrapContentSize()
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .weight(1f)
-                                .bottomBorder(
-                                    color = MaterialTheme.colorScheme.primary,
-                                    strokeWidth = 1.dp
-                                )
-                                .clickableWithoutRipple {
-                                    isUnitMenuExpanded = true
-                                },
-                            text = uiState.productUnitOfMeasurement.toString(),
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.titleMedium,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
-                        IconButton(onClick = {
-                            isUnitMenuExpanded = true
-                        }) {
-                            Icon(
-                                Icons.Outlined.MoreVert,
-                                contentDescription = "Unit od measurement dropdown icon",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                    DropdownMenu(
-                        expanded = isUnitMenuExpanded,
-                        onDismissRequest = { isUnitMenuExpanded = false },
-                    ) {
-                        repeat(uiState.availableUnitOfMeasurementList.size) { index ->
-                            uiState.availableUnitOfMeasurementList[index].also { uom ->
-                                DropdownMenuItem(
-                                    text = { Text(uom.toString()) },
-                                    onClick = {
-                                        onEvent(
-                                            StorageCreateViewModel.OnEvent.FoodUnitChange(
-                                                uom
-                                            )
-                                        )
-                                        isUnitMenuExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         Text(
             text = "Select tag",
             color = MaterialTheme.colorScheme.primary,
