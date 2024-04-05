@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.OnBasicInformationPageEvent
-import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.OnEvent
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.OnIngredientEvent
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.OnStepsPageEvent
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.UiEvent
@@ -54,10 +53,12 @@ fun CreateRecipe(
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                UiEvent.PageChange -> pager.animateScrollToPage(uiState.targetPageIndex)
                 is UiEvent.ErrorInRecipeFields -> {
                     isRecipeTitleHasError = event.isRecipeTitleHasError
                     isRecipeTimeHasError = event.isRecipeTimeHasError
+                    if (event.isRecipeTitleHasError || event.isRecipeTimeHasError) {
+                        pager.animateScrollToPage(0)
+                    }
                     scope.launch {
                         if (event.isIngredientHasError && event.isStepsHasError) {
                             snackbarHostState.showSnackbar("Add ingredients to recipe and how to make steps")
@@ -75,13 +76,17 @@ fun CreateRecipe(
     }
 
     LaunchedEffect(key1 = pager.settledPage) {
-        viewModel.onEvent(OnEvent.PageChange(pager.settledPage))
+        scope.launch {
+            pager.animateScrollToPage(pager.settledPage)
+        }
     }
 
     BackHandler(
-        enabled = uiState.targetPageIndex != 0
+        enabled = pager.settledPage != 0
     ) {
-        viewModel.onEvent(OnEvent.PageChange(uiState.targetPageIndex - 1))
+        scope.launch {
+            pager.animateScrollToPage(pager.settledPage - 1)
+        }
     }
 
     Scaffold(
@@ -130,7 +135,7 @@ fun CreateRecipe(
                                 OnBasicInformationPageEvent.OnTimeUnitChange(it)
                             )
                         },
-                        onNextPageClick = { viewModel.onEvent(OnEvent.PageChange(1)) }
+                        onNextPageClick = { scope.launch { pager.animateScrollToPage(1) } }
                     )
 
                 is CreateRecipeViewModel.Pages.IngredientsPage ->
@@ -175,7 +180,9 @@ fun CreateRecipe(
                                 OnIngredientEvent.OnIngredientUnitOfMeasurementChange(it)
                             )
                         },
-                        onNextButtonClick = { viewModel.onEvent(OnEvent.PageChange(2)) }
+                        onNextButtonClick = {
+                            scope.launch { pager.animateScrollToPage(2) }
+                        }
                     )
 
                 is CreateRecipeViewModel.Pages.StepsPage ->

@@ -67,7 +67,6 @@ class CreateRecipeViewModel @Inject constructor(
             Pages.IngredientsPage(),
             Pages.StepsPage()
         ),
-        val targetPageIndex: Int = 0
     )
 
     sealed class Pages {
@@ -102,7 +101,6 @@ class CreateRecipeViewModel @Inject constructor(
     }
 
     sealed class UiEvent {
-        data object PageChange : UiEvent()
         data object RecipeSaved: UiEvent()
         data class ErrorInRecipeFields(
             val isRecipeTitleHasError: Boolean,
@@ -111,10 +109,6 @@ class CreateRecipeViewModel @Inject constructor(
             val isIngredientHasError: Boolean,
             val isStepsHasError: Boolean
         ) : UiEvent()
-    }
-
-    sealed class OnEvent {
-        data class PageChange(val pageIndex: Int) : OnEvent()
     }
 
     sealed class OnBasicInformationPageEvent {
@@ -143,18 +137,6 @@ class CreateRecipeViewModel @Inject constructor(
         data class RecipeItemClick(val index: Int) : OnStepsPageEvent()
         data object OnRecipeSave : OnStepsPageEvent()
         data object ClearStepField : OnStepsPageEvent()
-    }
-
-    fun onEvent(event: OnEvent) {
-        when (event) {
-            //all pages event
-            is OnEvent.PageChange -> viewModelScope.launch {
-                _uiState.update {
-                    it.copy(targetPageIndex = event.pageIndex)
-                }
-                _uiEvent.send(UiEvent.PageChange)
-            }
-        }
     }
 
     fun onBasicInformationPageEvent(event: OnBasicInformationPageEvent) {
