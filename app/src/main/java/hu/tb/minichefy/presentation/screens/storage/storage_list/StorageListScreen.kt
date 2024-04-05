@@ -65,11 +65,11 @@ fun StorageListScreen(
     onFABClick: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val modifyFoodState by viewModel.modifyFoodState.collectAsStateWithLifecycle()
+    val modifyFoodState by viewModel.editFoodState.collectAsStateWithLifecycle()
 
     StorageScreenContent(
         uiState = uiState,
-        modifyFoodState = modifyFoodState,
+        editFoodState = modifyFoodState,
         onFABClick = onFABClick,
         onEvent = viewModel::onEvent
     )
@@ -79,7 +79,7 @@ fun StorageListScreen(
 @Composable
 fun StorageScreenContent(
     uiState: StorageListViewModel.UiState,
-    modifyFoodState: StorageListViewModel.ModifyFoodState,
+    editFoodState: StorageListViewModel.ModifyFoodState,
     onFABClick: () -> Unit,
     onEvent: (StorageListViewModel.OnEvent) -> Unit
 ) {
@@ -151,7 +151,7 @@ fun StorageScreenContent(
                     contentType = { _, item -> item }
                 ) { index, food ->
                     AnimatedContent(
-                        targetState = uiState.modifiedProductIndex == index,
+                        targetState = editFoodState.foodListPositionIndex == index,
                         transitionSpec = {
                             scaleIn().togetherWith(scaleOut())
                         }, label = "edit product animation"
@@ -160,7 +160,7 @@ fun StorageScreenContent(
                             true -> EditStorageItem(
                                 food = food,
                                 onIconClick = { isIconSelectorOpen = true },
-                                onCloseClick = { onEvent(StorageListViewModel.OnEvent.SaveEditedFood) },
+                                onCloseClick = { onEvent(StorageListViewModel.OnEvent.ClearSelectedFoodIndex) },
                                 onDeleteTagClick = { tag ->
                                     onEvent(
                                         StorageListViewModel.OnEvent.ModifyFoodTags(tag)
@@ -170,13 +170,9 @@ fun StorageScreenContent(
                                     isEditProductTagSelectorOpen = true
                                 },
                                 onQuantityClick = {
+                                    onEvent(StorageListViewModel.OnEvent.SetupEditFoodQuantityDialog)
                                     isEditQuantityDialogOpen = true
                                 }
-                                /*onChangeQuantity = { value ->
-                                    onEvent(
-                                        StorageListViewModel.OnEvent.ModifyProductQuantity(value)
-                                    )
-                                },*/
                             )
 
                             false -> {
@@ -242,25 +238,28 @@ fun StorageScreenContent(
 
     if (isEditQuantityDialogOpen) {
         EditQuantityDialog(
-            quantityValue = modifyFoodState.quantityModifyValue,
+            quantityValue = editFoodState.quantityModifyValue,
             onQuantityChange = {
-                onEvent(StorageListViewModel.OnEvent.ModifyFoodQuantity(it))
+                onEvent(StorageListViewModel.OnEvent.EditFoodQuantityDialog(it))
             },
-            isQuantityHasError = modifyFoodState.isQuantityModifyDialogHasError,
-            measurementValue = modifyFoodState.unitOfMeasurementModifyValue,
+            isQuantityHasError = editFoodState.isQuantityModifyDialogHasError,
+            measurementValue = editFoodState.unitOfMeasurementModifyValue,
             onMeasurementChange = {
-
+                onEvent(StorageListViewModel.OnEvent.EditFoodUnitOfMeasurementDialog(it))
             },
-            onCancelButtonClick = {},
-            onConfirmButtonClick = {},
-            onDismissRequest = {}
+            onCancelButtonClick = { isEditQuantityDialogOpen = false },
+            onConfirmButtonClick = {
+                onEvent(StorageListViewModel.OnEvent.SaveEditFoodQuantities)
+                isEditQuantityDialogOpen = false
+            },
+            onDismissRequest = { isEditQuantityDialogOpen = false }
         )
     }
 
     if (isIconSelectorOpen) {
         IconSelectorSheet(
             allIconList = uiState.allProductIconList,
-            selectedIcon = IconManager().convertIntToProductIcon(uiState.foodList[uiState.modifiedProductIndex].icon),
+            selectedIcon = IconManager().convertIntToProductIcon(uiState.foodList[editFoodState.foodListPositionIndex].icon),
             onItemClick = { onEvent(StorageListViewModel.OnEvent.ModifyFoodIcon(it)) },
             onDismissRequest = { isIconSelectorOpen = false }
         )
@@ -288,7 +287,7 @@ fun StorageScreenContent(
                 )
             },
             allTagList = uiState.foodTagList,
-            selectedTagList = uiState.foodList[uiState.modifiedProductIndex].foodTagList.orEmpty()
+            selectedTagList = uiState.foodList[editFoodState.foodListPositionIndex].foodTagList.orEmpty()
         )
     }
 }

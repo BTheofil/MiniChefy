@@ -7,8 +7,6 @@ import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
-import hu.tb.minichefy.domain.use_case.CalculateMeasurements
-import hu.tb.minichefy.domain.use_case.CalculationFood
 import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.screens.manager.icons.IconResource
 import hu.tb.minichefy.presentation.screens.manager.icons.ProductIcon
@@ -22,15 +20,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StorageListViewModel @Inject constructor(
-    private val storageRepository: StorageRepository,
-    private val calculateMeasurements: CalculateMeasurements
+    private val storageRepository: StorageRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState
 
-    private val _modifyFoodState = MutableStateFlow(ModifyFoodState())
-    val modifyFoodState: StateFlow<ModifyFoodState> = _modifyFoodState
+    private val _editFoodState = MutableStateFlow(ModifyFoodState())
+    val editFoodState: StateFlow<ModifyFoodState> = _editFoodState
 
     init {
         viewModelScope.launch {
@@ -55,14 +52,13 @@ class StorageListViewModel @Inject constructor(
         val foodTagList: List<FoodTag> = emptyList(),
         val activeFilter: List<FoodTag> = emptyList(),
         val foodList: List<Food> = emptyList(),
-        val modifiedProductIndex: Int = -1,
         val allProductIconList: List<ProductIcon> = IconManager().getAllProductIconList,
         val quantityModifyValue: String = "",
         val isQuantityModifyDialogHasError: Boolean = false
     )
 
     data class ModifyFoodState(
-        val foodIndex: Int = -1,
+        val foodListPositionIndex: Int = -1,
         val quantityModifyValue: String = "",
         val unitOfMeasurementModifyValue: UnitOfMeasurement = UnitOfMeasurement.PIECE,
         val isQuantityModifyDialogHasError: Boolean = false,
@@ -70,14 +66,18 @@ class StorageListViewModel @Inject constructor(
 
     sealed class OnEvent {
         data object ClearSearchText : OnEvent()
-        data object SaveEditedFood : OnEvent()
+        data object ClearEditFoodDialog : OnEvent()
+        data object ClearSelectedFoodIndex : OnEvent()
+        data object SaveEditFoodQuantities : OnEvent()
+        data object SetupEditFoodQuantityDialog : OnEvent()
         data class DeleteFood(val foodId: Long) : OnEvent()
         data class SearchTextChange(val text: String) : OnEvent()
-        data class OnProductClick(val index: Int) : OnEvent()
+        data class OnProductClick(val positionIndex: Int) : OnEvent()
         data class FilterChipClicked(val tag: FoodTag) : OnEvent()
         data class ModifyFoodTags(val tag: FoodTag) : OnEvent()
         data class ModifyFoodIcon(val icon: IconResource) : OnEvent()
-        data class ModifyFoodQuantity(val value: String) : OnEvent()
+        data class EditFoodQuantityDialog(val value: String) : OnEvent()
+        data class EditFoodUnitOfMeasurementDialog(val value: UnitOfMeasurement) : OnEvent()
     }
 
     fun onEvent(event: OnEvent) {
@@ -101,8 +101,8 @@ class StorageListViewModel @Inject constructor(
                 it.copy(searchText = "")
             }
 
-            is OnEvent.OnProductClick -> _uiState.update {
-                it.copy(modifiedProductIndex = event.index)
+            is OnEvent.OnProductClick -> _editFoodState.update {
+                it.copy(foodListPositionIndex = event.positionIndex)
             }
 
             is OnEvent.FilterChipClicked -> {
@@ -122,33 +122,58 @@ class StorageListViewModel @Inject constructor(
 
                     _uiState.update {
                         it.copy(
-                            activeFilter = temp,
+                            activeFilter = temp.toList(),
                             foodList = filteredFoodList
                         )
                     }
                 }
             }
 
-            is OnEvent.ModifyFoodQuantity -> {
+            is OnEvent.EditFoodQuantityDialog -> _editFoodState.update {
+                it.copy(
+                    quantityModifyValue = event.value
+                )
+            }
 
+            is OnEvent.EditFoodUnitOfMeasurementDialog -> _editFoodState.update {
+                it.copy(
+                    unitOfMeasurementModifyValue = event.value
+                )
+            }
 
-                _modifyFoodState.update {
+            OnEvent.ClearEditFoodDialog -> _editFoodState.update {
+                it.copy(
+                    quantityModifyValue = "",
+                )
+            }
+
+            OnEvent.SetupEditFoodQuantityDialog -> {
+                val editedFood = uiState.value.foodList[editFoodState.value.foodListPositionIndex]
+
+                _editFoodState.update {
                     it.copy(
-                        quantityModifyValue = event.value
+                        quantityModifyValue = editedFood.quantity.toString(),
+                        unitOfMeasurementModifyValue = editedFood.unitOfMeasurement
                     )
                 }
+            }
+
+            OnEvent.SaveEditFoodQuantities -> {
+
 
                 val updatedFood =
-                    uiState.value.foodList[modifyFoodState.value.foodIndex].copy(
-                        quantity = result.quantity,
-                        unitOfMeasurement = result.unitOfMeasurement
+                    uiState.value.foodList[editFoodState.value.foodListPositionIndex].copy(
+                        quantity = editFoodState.value.quantityModifyValue.toFloat(),
+                        unitOfMeasurement = editFoodState.value.unitOfMeasurementModifyValue
                     )
+
                 saveEditedFood(updatedFood)
             }
 
             is OnEvent.ModifyFoodTags -> {
                 viewModelScope.launch {
-                    val modifyFood = uiState.value.foodList[uiState.value.modifiedProductIndex]
+                    val modifyFood =
+                        uiState.value.foodList[editFoodState.value.foodListPositionIndex]
                     if (modifyFood.foodTagList == null) {
                         storageRepository.saveFoodAndTag(modifyFood.id!!, event.tag.id!!)
                     } else {
@@ -161,12 +186,12 @@ class StorageListViewModel @Inject constructor(
                 }
             }
 
-            OnEvent.SaveEditedFood -> {
-                _uiState.update { it.copy(modifiedProductIndex = -1) }
+            OnEvent.ClearSelectedFoodIndex -> {
+                _editFoodState.update { it.copy(foodListPositionIndex = -1) }
             }
 
             is OnEvent.ModifyFoodIcon -> saveEditedFood(
-                uiState.value.foodList[uiState.value.modifiedProductIndex].copy(
+                uiState.value.foodList[editFoodState.value.foodListPositionIndex].copy(
                     icon = event.icon.resource
                 )
             )
