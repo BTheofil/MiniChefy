@@ -41,7 +41,9 @@ fun BasicInformationPage(
     onNextPageClick: () -> Unit,
     onSelectedIconClick: (icon: MealIcon) -> Unit,
     onTimeFieldValueChange: (String) -> Unit,
-    onTimeUnitValueChange: (TimeUnit) -> Unit
+    onTimeUnitValueChange: (TimeUnit) -> Unit,
+    isRecipeTitleHasError: Boolean,
+    isRecipeTimeHasError: Boolean
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -71,8 +73,9 @@ fun BasicInformationPage(
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         QuestionForm(
-            uiState.recipeName,
-            onTitleValueChange,
+            recipeTitleValue = uiState.recipeTitle,
+            recipeTitleOnValueChange = onTitleValueChange,
+            isTitleHasError = isRecipeTitleHasError,
             onAddQuantityClick = {
                 focusManager.clearFocus()
                 onAddQuantityClick()
@@ -82,11 +85,12 @@ fun BasicInformationPage(
                 onRemoveQuantityClick()
             },
             quantityContent = uiState.quantityCounter,
-            isErrorHappened = uiState.isQuantityHasError,
+            isCountHasError = uiState.isQuantityHasError,
             timeFieldValue = uiState.timeField,
             timeFieldValueChange = onTimeFieldValueChange,
             timeUnitValue = uiState.timeUnit,
-            timeUnitValueChange = onTimeUnitValueChange
+            timeUnitValueChange = onTimeUnitValueChange,
+            isTimeHasError = isRecipeTimeHasError
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         Box(
@@ -121,12 +125,14 @@ fun BasicInformationPage(
 fun InformationPagePreview() {
     BasicInformationPage(
         CreateRecipeViewModel.Pages.BasicInformationPage(),
-        {},
-        {},
-        {},
-        {},
-        {},
-        {},
-        {}
+        onTitleValueChange = {},
+        onRemoveQuantityClick = {},
+        onAddQuantityClick = {},
+        onNextPageClick = {},
+        onSelectedIconClick = {},
+        onTimeFieldValueChange = {},
+        onTimeUnitValueChange = {},
+        isRecipeTitleHasError = false,
+        isRecipeTimeHasError = false
     )
 }

@@ -16,7 +16,7 @@ import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.CalculateMeasurements
 import hu.tb.minichefy.domain.use_case.DataStoreManager
 import hu.tb.minichefy.domain.use_case.ValidateQuantity
-import hu.tb.minichefy.domain.use_case.ValidateQuantityInteger
+import hu.tb.minichefy.domain.use_case.ValidateCountInteger
 import hu.tb.minichefy.domain.use_case.ValidateTextField
 import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import kotlinx.coroutines.CoroutineScope
@@ -74,8 +74,8 @@ object AppModule {
 
     // use case
     @Provides
-    fun provideValidateCountIntegerUseCase(): ValidateQuantityInteger =
-        ValidateQuantityInteger()
+    fun provideValidateCountIntegerUseCase(): ValidateCountInteger =
+        ValidateCountInteger()
 
     @Provides
     fun provideValidateQuantityFloatUseCase(): ValidateQuantity =

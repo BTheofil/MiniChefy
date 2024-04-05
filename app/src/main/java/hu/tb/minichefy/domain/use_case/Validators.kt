@@ -1,6 +1,6 @@
 package hu.tb.minichefy.domain.use_case
 
-class ValidateQuantityInteger {
+class ValidateCountInteger {
     operator fun invoke(integer: Int): ValidationResult =
         if (integer <= 0) {
             ValidationResult.ERROR
@@ -16,7 +16,6 @@ class ValidateQuantity {
         } else {
             ValidationResult.SUCCESS
         }
-
 }
 
 class ValidateTextField {
@@ -28,7 +27,7 @@ class ValidateTextField {
         }
 }
 
-enum class ValidationResult(val value: Boolean) {
-    SUCCESS(true),
-    ERROR(false)
+enum class ValidationResult {
+    SUCCESS,
+    ERROR
 }
