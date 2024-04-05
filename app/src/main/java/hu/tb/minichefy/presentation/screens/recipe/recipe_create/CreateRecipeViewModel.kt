@@ -12,7 +12,7 @@ import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
-import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
+import hu.tb.minichefy.domain.use_case.ValidateQuantityInteger
 import hu.tb.minichefy.domain.use_case.ValidateTextField
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
@@ -32,7 +32,7 @@ import kotlin.random.Random
 class CreateRecipeViewModel @Inject constructor(
     private val recipeRepository: RecipeRepository,
     private val storageRepository: StorageRepository,
-    private val validateQuantityNumber: ValidateQuantityNumber,
+    private val validateQuantityInteger: ValidateQuantityInteger,
     private val validateTextField: ValidateTextField,
 ) : ViewModel() {
 
@@ -152,7 +152,7 @@ class CreateRecipeViewModel @Inject constructor(
     fun onBasicInformationPageEvent(event: OnBasicInformationPageEvent) {
         when (event) {
             is OnBasicInformationPageEvent.OnQuantityChange -> {
-                when (validateQuantityNumber((basicPageState.value.quantityCounter + event.value))) {
+                when (validateQuantityInteger((basicPageState.value.quantityCounter + event.value))) {
                     ValidationResult.SUCCESS -> _basicPageState.update {
                         it.copy(
                             quantityCounter = it.quantityCounter + event.value,
@@ -192,7 +192,7 @@ class CreateRecipeViewModel @Inject constructor(
                 val titleResult =
                     validateTextField(currentState.ingredientTitleDraft) == ValidationResult.ERROR
                 val quantityResult =
-                    currentState.ingredientQuantityDraft.isBlank() || validateQuantityNumber(
+                    currentState.ingredientQuantityDraft.isBlank() || validateQuantityInteger(
                         currentState.ingredientQuantityDraft.toInt()
                     ) == ValidationResult.ERROR
 

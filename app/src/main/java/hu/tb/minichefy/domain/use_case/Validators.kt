@@ -1,17 +1,27 @@
 package hu.tb.minichefy.domain.use_case
 
-class ValidateQuantityNumber {
-    operator fun invoke(quantityNumber: Int): ValidationResult =
-        if (quantityNumber <= 0) {
+class ValidateQuantityInteger {
+    operator fun invoke(integer: Int): ValidationResult =
+        if (integer <= 0) {
             ValidationResult.ERROR
         } else {
             ValidationResult.SUCCESS
         }
 }
 
+class ValidateQuantity {
+    operator fun invoke(float: Float): ValidationResult =
+        if (float.isNaN() || float <= 0f) {
+            ValidationResult.ERROR
+        } else {
+            ValidationResult.SUCCESS
+        }
+
+}
+
 class ValidateTextField {
     operator fun invoke(text: String?): ValidationResult =
-        if (text.isNullOrEmpty() || text.isBlank()){
+        if (text.isNullOrEmpty() || text.isBlank()) {
             ValidationResult.ERROR
         } else {
             ValidationResult.SUCCESS

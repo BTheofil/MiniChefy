@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,14 +66,47 @@ fun StorageListScreen(
     onFABClick: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val modifyFoodState by viewModel.editFoodState.collectAsStateWithLifecycle()
+    val editFoodState by viewModel.editFoodState.collectAsStateWithLifecycle()
+
+    var isEditQuantityDialogOpen by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.uiEvent.collect { event ->
+            isEditQuantityDialogOpen = when (event) {
+                StorageListViewModel.UiEvent.CloseEditQuantityDialog -> false
+
+                StorageListViewModel.UiEvent.OpenEditQuantityDialog -> true
+            }
+        }
+    }
 
     StorageScreenContent(
         uiState = uiState,
-        editFoodState = modifyFoodState,
+        editFoodState = editFoodState,
         onFABClick = onFABClick,
         onEvent = viewModel::onEvent
     )
+
+    if (isEditQuantityDialogOpen) {
+        EditQuantityDialog(
+            quantityValue = editFoodState.quantityModifyValue,
+            onQuantityChange = {
+                viewModel.onEvent(StorageListViewModel.OnEvent.EditFoodQuantityChangeDialog(it))
+            },
+            isQuantityHasError = editFoodState.isQuantityModifyDialogHasError,
+            measurementValue = editFoodState.unitOfMeasurementModifyValue,
+            onMeasurementChange = {
+                viewModel.onEvent(StorageListViewModel.OnEvent.EditFoodUnitChangeDialog(it))
+            },
+            onCancelButtonClick = { isEditQuantityDialogOpen = false },
+            onConfirmButtonClick = {
+                viewModel.onEvent(StorageListViewModel.OnEvent.SaveEditFoodQuantities)
+            },
+            onDismissRequest = { isEditQuantityDialogOpen = false }
+        )
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -95,10 +129,6 @@ fun StorageScreenContent(
     }
     var settingPanelFoodId by remember {
         mutableStateOf<Long?>(null)
-    }
-
-    var isEditQuantityDialogOpen by remember {
-        mutableStateOf(false)
     }
 
     val focusManager = LocalFocusManager.current
@@ -171,7 +201,6 @@ fun StorageScreenContent(
                                 },
                                 onQuantityClick = {
                                     onEvent(StorageListViewModel.OnEvent.SetupEditFoodQuantityDialog)
-                                    isEditQuantityDialogOpen = true
                                 }
                             )
 
@@ -234,26 +263,6 @@ fun StorageScreenContent(
                 }
             }
         }
-    }
-
-    if (isEditQuantityDialogOpen) {
-        EditQuantityDialog(
-            quantityValue = editFoodState.quantityModifyValue,
-            onQuantityChange = {
-                onEvent(StorageListViewModel.OnEvent.EditFoodQuantityDialog(it))
-            },
-            isQuantityHasError = editFoodState.isQuantityModifyDialogHasError,
-            measurementValue = editFoodState.unitOfMeasurementModifyValue,
-            onMeasurementChange = {
-                onEvent(StorageListViewModel.OnEvent.EditFoodUnitOfMeasurementDialog(it))
-            },
-            onCancelButtonClick = { isEditQuantityDialogOpen = false },
-            onConfirmButtonClick = {
-                onEvent(StorageListViewModel.OnEvent.SaveEditFoodQuantities)
-                isEditQuantityDialogOpen = false
-            },
-            onDismissRequest = { isEditQuantityDialogOpen = false }
-        )
     }
 
     if (isIconSelectorOpen) {
