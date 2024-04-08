@@ -7,7 +7,9 @@ import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -59,11 +61,16 @@ fun SearchItemBar(
             }
         },
         placeholder = {
-            Text(text = "Search recipe")
+            Text(
+                text = "Search recipe",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
         },
-        content = {
-
-        }
+        colors = SearchBarDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        content = {}
     )
 }
 
@@ -74,5 +81,8 @@ fun SearchItemBarPreview() {
         mutableStateOf("")
     }
 
-    SearchItemBar(queryText = queryText, onQueryChange = { queryText = it }, clearIconButtonClick = { queryText = "" })
+    SearchItemBar(
+        queryText = queryText,
+        onQueryChange = { queryText = it },
+        clearIconButtonClick = { queryText = "" })
 }

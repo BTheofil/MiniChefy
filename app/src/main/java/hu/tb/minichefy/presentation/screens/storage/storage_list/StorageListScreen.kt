@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.intl.Locale
@@ -165,7 +166,13 @@ fun StorageScreenContent(
                     FilterChip(
                         selected = uiState.activeFilter.contains(filter),
                         onClick = { onEvent(StorageListViewModel.OnEvent.FilterChipClicked(filter)) },
-                        label = { Text(text = filter.tag) })
+                        label = {
+                            Text(
+                                text = filter.tag,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        })
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -205,7 +212,12 @@ fun StorageScreenContent(
                             )
 
                             false -> {
-                                Column {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.SpaceBetween
+                                ) {
                                     ListItem(
                                         modifier = Modifier
                                             .combinedClickable(
