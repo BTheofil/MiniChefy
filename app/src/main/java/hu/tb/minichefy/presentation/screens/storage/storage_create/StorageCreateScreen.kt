@@ -162,7 +162,7 @@ fun StorageCreateContent(
                 })
             uiState.selectedTagList.forEach { tagItem ->
                 AssistChip(
-                    onClick = { onEvent(StorageCreateViewModel.OnEvent.DialogChipTouched(tagItem)) },
+                    onClick = { onEvent(StorageCreateViewModel.OnEvent.DialogChipClick(tagItem)) },
                     label = {
                         Text(text = tagItem.tag)
                     },
@@ -194,7 +194,7 @@ fun StorageCreateContent(
                 isTagPopupVisible = false
             },
             onTagClick = {
-                onEvent(StorageCreateViewModel.OnEvent.DialogChipTouched(it))
+                onEvent(StorageCreateViewModel.OnEvent.DialogChipClick(it))
             },
             allTagList = uiState.labelFilterTagList,
             selectedTagList = uiState.selectedTagList

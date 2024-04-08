@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
+import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
 import hu.tb.minichefy.domain.use_case.ValidateQuantity
 import hu.tb.minichefy.domain.use_case.ValidateTextField
 import hu.tb.minichefy.domain.use_case.ValidationResult
@@ -24,6 +25,7 @@ class StorageCreateViewModel @Inject constructor(
     private val storageRepository: StorageRepository,
     private val textValidator: ValidateTextField,
     private val quantityValidator: ValidateQuantity,
+    private val validateNumberKeyboard: ValidateNumberKeyboard
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -68,8 +70,8 @@ class StorageCreateViewModel @Inject constructor(
         data class FoodTextChange(val text: String) : OnEvent()
         data class FoodTypeChange(val type: FoodType) : OnEvent()
         data class FoodUnitChange(val type: UnitOfMeasurement) : OnEvent()
-        data class FoodQuantityChange(val quantity: String) : OnEvent()
-        data class DialogChipTouched(val editedTag: FoodTag) : OnEvent()
+        data class FoodQuantityChange(val quantityString: String) : OnEvent()
+        data class DialogChipClick(val editedTag: FoodTag) : OnEvent()
     }
 
     private val _uiEvent = Channel<UiEvent>()
@@ -92,10 +94,7 @@ class StorageCreateViewModel @Inject constructor(
                     FoodType.LIQUID -> {
                         _uiState.update {
                             it.copy(
-                                availableUnitOfMeasurementList = listOf(
-                                    UnitOfMeasurement.DL,
-                                    UnitOfMeasurement.L
-                                ),
+                                availableUnitOfMeasurementList = getLiquidUnitOfMeasurements(),
                                 foodUnitOfMeasurement = UnitOfMeasurement.DL
                             )
                         }
@@ -103,11 +102,7 @@ class StorageCreateViewModel @Inject constructor(
 
                     FoodType.SOLID -> _uiState.update {
                         it.copy(
-                            availableUnitOfMeasurementList = listOf(
-                                UnitOfMeasurement.G,
-                                UnitOfMeasurement.DKG,
-                                UnitOfMeasurement.KG,
-                            ),
+                            availableUnitOfMeasurementList = getSolidUnitOfMeasurements(),
                             foodUnitOfMeasurement = UnitOfMeasurement.G,
                         )
                     }
@@ -136,26 +131,11 @@ class StorageCreateViewModel @Inject constructor(
             }
 
             OnEvent.Save -> {
+                if (checkFoodDraftHasError()) {
+                    return
+                }
+
                 viewModelScope.launch {
-                    val titleResult = textValidator(uiState.value.foodTitleText)
-                    val quantityResult = try {
-                        quantityValidator(uiState.value.quantity.toFloat())
-                    } catch (e: Exception) {
-                        ValidationResult.ERROR
-                    }
-
-                    val hasError =
-                        listOf(titleResult, quantityResult).any { it == ValidationResult.ERROR }
-                    if (hasError) {
-                        _uiState.update {
-                            it.copy(
-                                isFoodTitleHasError = titleResult == ValidationResult.ERROR,
-                                isQuantityHasError = quantityResult == ValidationResult.ERROR
-                            )
-                        }
-                        return@launch
-                    }
-
                     uiState.value.also {
                         val foodId = storageRepository.saveOrModifyFood(
                             icon = it.productIcon.resource,
@@ -171,7 +151,7 @@ class StorageCreateViewModel @Inject constructor(
                 }
             }
 
-            is OnEvent.DialogChipTouched -> {
+            is OnEvent.DialogChipClick -> {
                 val updatedTagList = uiState.value.selectedTagList.toMutableList().apply {
                     if (contains(event.editedTag)) remove(event.editedTag)
                     else add(event.editedTag)
@@ -181,19 +161,46 @@ class StorageCreateViewModel @Inject constructor(
             }
 
             is OnEvent.FoodQuantityChange -> {
-                val value =
-                    if (event.quantity.isEmpty() || event.quantity.isBlank() || event.quantity == "-") {
-                        ""
-                    } else {
-                        event.quantity
-                    }
+                if(validateNumberKeyboard(event.quantityString) == ValidationResult.ERROR) return
 
                 _uiState.update {
                     it.copy(
-                        quantity = value
+                        quantity = event.quantityString
                     )
                 }
             }
         }
     }
+
+    private fun checkFoodDraftHasError(): Boolean {
+        val titleResult = textValidator(uiState.value.foodTitleText)
+        val quantityResult = try {
+            quantityValidator(uiState.value.quantity.toFloat())
+        } catch (e: Exception) {
+            ValidationResult.ERROR
+        }
+
+        val hasError =
+            listOf(titleResult, quantityResult).any { it == ValidationResult.ERROR }
+        if (hasError) {
+            _uiState.update {
+                it.copy(
+                    isFoodTitleHasError = titleResult == ValidationResult.ERROR,
+                    isQuantityHasError = quantityResult == ValidationResult.ERROR
+                )
+            }
+        }
+        return hasError
+    }
+
+    private fun getLiquidUnitOfMeasurements(): List<UnitOfMeasurement> = listOf(
+        UnitOfMeasurement.DL,
+        UnitOfMeasurement.L
+    )
+
+    private fun getSolidUnitOfMeasurements(): List<UnitOfMeasurement> = listOf(
+        UnitOfMeasurement.G,
+        UnitOfMeasurement.DKG,
+        UnitOfMeasurement.KG
+    )
 }

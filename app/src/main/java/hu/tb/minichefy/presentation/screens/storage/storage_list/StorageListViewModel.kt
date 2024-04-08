@@ -7,6 +7,7 @@ import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
+import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
 import hu.tb.minichefy.domain.use_case.ValidateQuantity
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
@@ -25,7 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class StorageListViewModel @Inject constructor(
     private val storageRepository: StorageRepository,
-    private val validateQuantity: ValidateQuantity
+    private val validateQuantity: ValidateQuantity,
+    private val validateNumberKeyboard: ValidateNumberKeyboard
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -61,8 +63,6 @@ class StorageListViewModel @Inject constructor(
         val activeFilter: List<FoodTag> = emptyList(),
         val foodList: List<Food> = emptyList(),
         val allProductIconList: List<ProductIcon> = IconManager().getAllProductIconList,
-        val quantityModifyValue: String = "",
-        val isQuantityModifyDialogHasError: Boolean = false
     )
 
     data class ModifyFoodState(
@@ -89,8 +89,8 @@ class StorageListViewModel @Inject constructor(
         data class FilterChipClicked(val tag: FoodTag) : OnEvent()
         data class ModifyFoodTags(val tag: FoodTag) : OnEvent()
         data class ModifyFoodIcon(val icon: IconResource) : OnEvent()
-        data class EditFoodQuantityChangeDialog(val value: String) : OnEvent()
-        data class EditFoodUnitChangeDialog(val value: UnitOfMeasurement) : OnEvent()
+        data class EditFoodDialogQuantityChange(val value: String) : OnEvent()
+        data class EditFoodDialogUnitChange(val value: UnitOfMeasurement) : OnEvent()
     }
 
     fun onEvent(event: OnEvent) {
@@ -142,8 +142,8 @@ class StorageListViewModel @Inject constructor(
                 }
             }
 
-            is OnEvent.EditFoodQuantityChangeDialog -> {
-                if (event.value.contains("-") || event.value.contains(" ") || event.value.contains(",")) return
+            is OnEvent.EditFoodDialogQuantityChange -> {
+                if (validateNumberKeyboard(event.value) == ValidationResult.ERROR) return
 
                 _editFoodState.update {
                     it.copy(
@@ -152,7 +152,7 @@ class StorageListViewModel @Inject constructor(
                 }
             }
 
-            is OnEvent.EditFoodUnitChangeDialog -> _editFoodState.update {
+            is OnEvent.EditFoodDialogUnitChange -> _editFoodState.update {
                 it.copy(
                     unitOfMeasurementModifyValue = event.value
                 )
@@ -181,7 +181,10 @@ class StorageListViewModel @Inject constructor(
 
             OnEvent.SaveEditFoodQuantities -> {
                 val quantityModifyValue = editFoodState.value.quantityModifyValue
-                if (!quantityModifyValue.matches(Regex("^(?!.*\\..*\\.).*$")) || validateQuantity(quantityModifyValue.toFloat()) == ValidationResult.ERROR) {
+                if (!quantityModifyValue.matches(Regex("^(?!.*\\..*\\.).*$")) || validateQuantity(
+                        quantityModifyValue.toFloat()
+                    ) == ValidationResult.ERROR
+                ) {
                     _editFoodState.update {
                         it.copy(
                             isQuantityModifyDialogHasError = true
@@ -190,10 +193,11 @@ class StorageListViewModel @Inject constructor(
                     return
                 }
 
-                val updatedFood = uiState.value.foodList[editFoodState.value.foodListPositionIndex].copy(
-                    quantity = quantityModifyValue.toFloat(),
-                    unitOfMeasurement = editFoodState.value.unitOfMeasurementModifyValue,
-                )
+                val updatedFood =
+                    uiState.value.foodList[editFoodState.value.foodListPositionIndex].copy(
+                        quantity = quantityModifyValue.toFloat(),
+                        unitOfMeasurement = editFoodState.value.unitOfMeasurementModifyValue,
+                    )
                 _editFoodState.update {
                     it.copy(
                         isQuantityModifyDialogHasError = false

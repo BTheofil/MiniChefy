@@ -27,6 +27,10 @@ import hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages.Ingredien
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages.StepsPage
 import kotlinx.coroutines.launch
 
+private const val BASIC_INFORMATION_PAGE_INDEX = 0
+private const val INGREDIENTS_PAGE_INDEX = 1
+private const val RECIPE_STEPS_PAGE_INDEX = 2
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CreateRecipe(
@@ -48,7 +52,7 @@ fun CreateRecipe(
         uiState.pages.size
     }
     val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
@@ -57,16 +61,10 @@ fun CreateRecipe(
                     isRecipeTitleHasError = event.isRecipeTitleHasError
                     isRecipeTimeHasError = event.isRecipeTimeHasError
                     if (event.isRecipeTitleHasError || event.isRecipeTimeHasError) {
-                        pager.animateScrollToPage(0)
+                        pager.animateScrollToPage(BASIC_INFORMATION_PAGE_INDEX)
                     }
                     scope.launch {
-                        if (event.isIngredientHasError && event.isStepsHasError) {
-                            snackbarHostState.showSnackbar("Add ingredients to recipe and how to make steps")
-                        } else if (event.isIngredientHasError) {
-                            snackbarHostState.showSnackbar("Add ingredients")
-                        } else {
-                            snackbarHostState.showSnackbar("Missing recipe steps")
-                        }
+                        showAppropriateSnackBar(event, snackBarHostState)
                     }
                 }
 
@@ -75,14 +73,14 @@ fun CreateRecipe(
         }
     }
 
-    LaunchedEffect(key1 = pager.settledPage) {
+    LaunchedEffect(pager.settledPage) {
         scope.launch {
             pager.animateScrollToPage(pager.settledPage)
         }
     }
 
     BackHandler(
-        enabled = pager.settledPage != 0
+        enabled = pager.settledPage != BASIC_INFORMATION_PAGE_INDEX
     ) {
         scope.launch {
             pager.animateScrollToPage(pager.settledPage - 1)
@@ -91,7 +89,7 @@ fun CreateRecipe(
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(hostState = snackBarHostState)
         }
     ) { paddingValues ->
         HorizontalPager(
@@ -135,7 +133,13 @@ fun CreateRecipe(
                                 OnBasicInformationPageEvent.OnTimeUnitChange(it)
                             )
                         },
-                        onNextPageClick = { scope.launch { pager.animateScrollToPage(1) } }
+                        onNextPageClick = {
+                            scope.launch {
+                                pager.animateScrollToPage(
+                                    INGREDIENTS_PAGE_INDEX
+                                )
+                            }
+                        }
                     )
 
                 is CreateRecipeViewModel.Pages.IngredientsPage ->
@@ -181,7 +185,7 @@ fun CreateRecipe(
                             )
                         },
                         onNextButtonClick = {
-                            scope.launch { pager.animateScrollToPage(2) }
+                            scope.launch { pager.animateScrollToPage(RECIPE_STEPS_PAGE_INDEX) }
                         }
                     )
 
@@ -223,6 +227,25 @@ fun CreateRecipe(
                         }
                     )
             }
+        }
+    }
+}
+
+private suspend fun showAppropriateSnackBar(
+    event: UiEvent.ErrorInRecipeFields,
+    snackBarHostState: SnackbarHostState
+) {
+    when {
+        event.isIngredientHasError && event.isStepsHasError -> {
+            snackBarHostState.showSnackbar("Missing ingredients & steps! Add them to get cooking.")
+        }
+
+        event.isIngredientHasError -> {
+            snackBarHostState.showSnackbar("You haven't added any ingredients yet.")
+        }
+
+        event.isStepsHasError -> {
+            snackBarHostState.showSnackbar("You're missing some recipe steps.")
         }
     }
 }

@@ -17,8 +17,8 @@ import hu.tb.minichefy.domain.use_case.CalculateMeasurements
 import hu.tb.minichefy.domain.use_case.DataStoreManager
 import hu.tb.minichefy.domain.use_case.ValidateQuantity
 import hu.tb.minichefy.domain.use_case.ValidateCountInteger
+import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
 import hu.tb.minichefy.domain.use_case.ValidateTextField
-import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -82,6 +82,10 @@ object AppModule {
         ValidateQuantity()
 
     @Provides
+    fun provideValidateNumberKeyboardUseCase(): ValidateNumberKeyboard =
+        ValidateNumberKeyboard()
+
+    @Provides
     fun provideValidateTextFieldUseCase(): ValidateTextField =
         ValidateTextField()
 
@@ -93,8 +97,5 @@ object AppModule {
     @Singleton
     fun provideDataStore(app: Application): DataStoreManager =
         DataStoreManager(app)
-
-    @Provides
-    fun provideIconManager(): IconManager = IconManager()
 }
 

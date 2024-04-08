@@ -72,7 +72,7 @@ fun StorageListScreen(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             isEditQuantityDialogOpen = when (event) {
                 StorageListViewModel.UiEvent.CloseEditQuantityDialog -> false
@@ -93,12 +93,12 @@ fun StorageListScreen(
         EditQuantityDialog(
             quantityValue = editFoodState.quantityModifyValue,
             onQuantityChange = {
-                viewModel.onEvent(StorageListViewModel.OnEvent.EditFoodQuantityChangeDialog(it))
+                viewModel.onEvent(StorageListViewModel.OnEvent.EditFoodDialogQuantityChange(it))
             },
             isQuantityHasError = editFoodState.isQuantityModifyDialogHasError,
             measurementValue = editFoodState.unitOfMeasurementModifyValue,
             onMeasurementChange = {
-                viewModel.onEvent(StorageListViewModel.OnEvent.EditFoodUnitChangeDialog(it))
+                viewModel.onEvent(StorageListViewModel.OnEvent.EditFoodDialogUnitChange(it))
             },
             onCancelButtonClick = { isEditQuantityDialogOpen = false },
             onConfirmButtonClick = {

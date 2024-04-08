@@ -18,6 +18,15 @@ class ValidateQuantity {
         }
 }
 
+class ValidateNumberKeyboard {
+    operator fun invoke(input: String): ValidationResult =
+        if (input.contains("-") || input.contains(" ") || input.contains(",")) {
+            ValidationResult.ERROR
+        } else {
+            ValidationResult.SUCCESS
+        }
+}
+
 class ValidateTextField {
     operator fun invoke(text: String?): ValidationResult =
         if (text.isNullOrEmpty() || text.isBlank()) {
