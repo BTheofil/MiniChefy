@@ -331,62 +331,56 @@ class CreateRecipeViewModel @Inject constructor(
                     return
                 }
 
-                //save recipe
                 viewModelScope.launch {
-                    val recipeId = recipeRepository.saveOrModifyRecipe(
-                        icon = basicPageState.value.selectedMealIcon.resource,
-                        title = basicPageState.value.recipeTitle,
-                        quantity = basicPageState.value.quantityCounter,
-                        timeToCreate = basicPageState.value.timeField.toInt(),
-                        timeUnit = basicPageState.value.timeUnit,
-                    )
-                    //Log.i("CreateRecipeVM", "RecipeId: $recipeId")
-
-                    //save ingredients
-                    val notCommonFoods =
-                        ingredientsPageState.value.selectedIngredientList.filter { food ->
-                            ingredientsPageState.value.unSelectedIngredientList.none { it.title == food.title }
-                        }
-
-                    notCommonFoods.forEach { food ->
-                        val foodId = storageRepository.saveOrModifyFood(
-                            id = food.id,
-                            title = food.title,
-                            icon = food.icon,
-                            quantity = food.quantity,
-                            unitOfMeasurement = food.unitOfMeasurement,
-                        )
-                        food.foodTagList?.map { tag ->
-                            storageRepository.saveFoodAndTag(foodId, tag.id!!)
-                        }
-
-                        //Log.i("CreateRecipeVM", "FoodId: $foodId")
-
-                        recipeRepository.saveRecipeIngredientCrossRef(recipeId, foodId)
-                        //Log.i("CreateRecipeVM", "CrossRefId: $crossRefId")
-                    }
-
-                    val commonFoods =
-                        ingredientsPageState.value.selectedIngredientList.filter { food ->
-                            ingredientsPageState.value.unSelectedIngredientList.any { it.title == food.title }
-                        }
-
-                    commonFoods.forEach {
-                        recipeRepository.saveRecipeIngredientCrossRef(recipeId, it.id!!)
-                        //Log.i("CreateRecipeVM", "CrossRefId: $crossRefId")
-                    }
-
-                    //save steps
-                    stepsPageState.value.recipeSteps.forEach { step ->
-                        recipeRepository.saveStep(step, recipeId)
-                        //Log.i("CreateRecipeVM", "StepId: $stepId")
-                    }
+                    val recipeId = saveRecipe()
+                    saveIngredients(recipeId)
+                    saveSteps(recipeId)
 
                     _uiEvent.send(UiEvent.RecipeSaved)
                 }
             }
         }
     }
+
+    private suspend fun saveRecipe(): Long =
+        recipeRepository.saveOrModifyRecipe(
+            icon = basicPageState.value.selectedMealIcon.resource,
+            title = basicPageState.value.recipeTitle,
+            quantity = basicPageState.value.quantityCounter,
+            timeToCreate = basicPageState.value.timeField.toInt(),
+            timeUnit = basicPageState.value.timeUnit,
+        )
+
+    private suspend fun saveIngredients(recipeId: Long) {
+        val (notCommonFoods, commonFoods) = ingredientsPageState.value.selectedIngredientList.partition { food ->
+            ingredientsPageState.value.unSelectedIngredientList.none { it.title == food.title }
+        }
+
+        notCommonFoods.forEach { food ->
+            val foodId = with(food) {
+                storageRepository.saveOrModifyFood(
+                    id = id,
+                    title = title,
+                    icon = icon,
+                    quantity = quantity,
+                    unitOfMeasurement = unitOfMeasurement,
+                )
+            }
+            food.foodTagList?.forEach { tag -> storageRepository.saveFoodAndTag(foodId, tag.id!!) }
+            recipeRepository.saveRecipeIngredientCrossRef(recipeId, foodId)
+        }
+
+        commonFoods.forEach { recipeRepository.saveRecipeIngredientCrossRef(recipeId, it.id!!) }
+    }
+
+
+    private suspend fun saveSteps(recipeId: Long){
+        stepsPageState.value.recipeSteps.forEach { step ->
+            recipeRepository.saveStep(step, recipeId)
+            //Log.i("CreateRecipeVM", "StepId: $stepId")
+        }
+    }
+
 
     private fun checkRecipeDraftHasError(): Boolean {
         val titleResult = validateTextField(basicPageState.value.recipeTitle)
