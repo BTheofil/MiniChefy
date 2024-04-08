@@ -42,8 +42,6 @@ fun BasicInformationPage(
     onSelectedIconClick: (icon: MealIcon) -> Unit,
     onTimeFieldValueChange: (String) -> Unit,
     onTimeUnitValueChange: (TimeUnit) -> Unit,
-    isRecipeTitleHasError: Boolean,
-    isRecipeTimeHasError: Boolean
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -75,7 +73,7 @@ fun BasicInformationPage(
         QuestionForm(
             recipeTitleValue = uiState.recipeTitle,
             recipeTitleOnValueChange = onTitleValueChange,
-            isTitleHasError = isRecipeTitleHasError,
+            isTitleHasError = uiState.isTitleHasError,
             onAddQuantityClick = {
                 focusManager.clearFocus()
                 onAddQuantityClick()
@@ -90,7 +88,7 @@ fun BasicInformationPage(
             timeFieldValueChange = onTimeFieldValueChange,
             timeUnitValue = uiState.timeUnit,
             timeUnitValueChange = onTimeUnitValueChange,
-            isTimeHasError = isRecipeTimeHasError
+            isTimeHasError = uiState.isTimeFieldHasError
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         Box(
@@ -132,7 +130,5 @@ fun InformationPagePreview() {
         onSelectedIconClick = {},
         onTimeFieldValueChange = {},
         onTimeUnitValueChange = {},
-        isRecipeTitleHasError = false,
-        isRecipeTimeHasError = false
     )
 }

@@ -11,10 +11,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,12 +40,6 @@ fun CreateRecipe(
     val ingredientsPageState by viewModel.ingredientsPageState.collectAsStateWithLifecycle()
     val stepsPageState by viewModel.stepsPageState.collectAsStateWithLifecycle()
 
-    var isRecipeTitleHasError by remember {
-        mutableStateOf(false)
-    }
-    var isRecipeTimeHasError by remember {
-        mutableStateOf(false)
-    }
     val pager = rememberPagerState {
         uiState.pages.size
     }
@@ -58,14 +50,10 @@ fun CreateRecipe(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is UiEvent.ErrorInRecipeFields -> {
-                    isRecipeTitleHasError = event.isRecipeTitleHasError
-                    isRecipeTimeHasError = event.isRecipeTimeHasError
-                    if (event.isRecipeTitleHasError || event.isRecipeTimeHasError) {
+                    if (basicPageState.isTitleHasError || basicPageState.isTimeFieldHasError) {
                         pager.animateScrollToPage(BASIC_INFORMATION_PAGE_INDEX)
                     }
-                    scope.launch {
-                        showAppropriateSnackBar(event, snackBarHostState)
-                    }
+                    showAppropriateSnackBar(event, snackBarHostState)
                 }
 
                 UiEvent.RecipeSaved -> onFinishRecipeButtonClick()
@@ -101,8 +89,6 @@ fun CreateRecipe(
                 is CreateRecipeViewModel.Pages.BasicInformationPage ->
                     BasicInformationPage(
                         uiState = basicPageState,
-                        isRecipeTitleHasError = isRecipeTitleHasError,
-                        isRecipeTimeHasError = isRecipeTimeHasError,
                         onAddQuantityClick = {
                             viewModel.onBasicInformationPageEvent(
                                 OnBasicInformationPageEvent.OnQuantityChange(+1)

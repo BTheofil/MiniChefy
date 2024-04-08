@@ -73,6 +73,7 @@ class CreateRecipeViewModel @Inject constructor(
     sealed class Pages {
         data class BasicInformationPage(
             val recipeTitle: String = "",
+            val isTitleHasError: Boolean = false,
             val quantityCounter: Int = 1,
             val isQuantityHasError: Boolean = false,
             val defaultIconCollection: List<MealIcon> = IconManager().getAllSystemMealIconLists,
@@ -81,6 +82,7 @@ class CreateRecipeViewModel @Inject constructor(
                 defaultIconCollection.size
             )],
             val timeField: String = "",
+            val isTimeFieldHasError: Boolean = false,
             val timeUnit: TimeUnit = TimeUnit.MINUTES,
         ) : Pages()
 
@@ -104,9 +106,6 @@ class CreateRecipeViewModel @Inject constructor(
     sealed class UiEvent {
         data object RecipeSaved : UiEvent()
         data class ErrorInRecipeFields(
-            val isRecipeTitleHasError: Boolean,
-            val isRecipeCountHasError: Boolean,
-            val isRecipeTimeHasError: Boolean,
             val isIngredientHasError: Boolean,
             val isStepsHasError: Boolean
         ) : UiEvent()
@@ -410,16 +409,20 @@ class CreateRecipeViewModel @Inject constructor(
         }
 
         val validationResults = listOf(
-            titleResult, quantityCounterResult, timeResult, ingredientResult, stepsResult
+            titleResult, timeResult, ingredientResult, stepsResult
         ).any { it == ValidationResult.ERROR }
 
         if (validationResults) {
+            _basicPageState.update {
+                it.copy(
+                    isTitleHasError = titleResult == ValidationResult.ERROR,
+                    isTimeFieldHasError = timeResult == ValidationResult.ERROR,
+                    isQuantityHasError = quantityCounterResult == ValidationResult.ERROR
+                )
+            }
             viewModelScope.launch {
                 _uiEvent.send(
                     UiEvent.ErrorInRecipeFields(
-                        isRecipeTitleHasError = titleResult == ValidationResult.ERROR,
-                        isRecipeCountHasError = quantityCounterResult == ValidationResult.ERROR,
-                        isRecipeTimeHasError = timeResult == ValidationResult.ERROR,
                         isIngredientHasError = ingredientResult == ValidationResult.ERROR,
                         isStepsHasError = stepsResult == ValidationResult.ERROR
                     )
