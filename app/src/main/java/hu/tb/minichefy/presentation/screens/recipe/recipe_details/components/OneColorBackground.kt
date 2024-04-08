@@ -12,7 +12,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.tooling.preview.Preview
-import hu.tb.minichefy.presentation.ui.theme.Pink50
+import hu.tb.minichefy.presentation.ui.theme.primaryContainerLight
 
 @Composable
 fun OneColorBackground(
@@ -40,7 +40,7 @@ fun OneColorBackground(
                 )
             )
         }
-        drawPath(path, color = Color(Pink50.value))
+        drawPath(path, color = Color(primaryContainerLight.value))
     }
 }
 
