@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
-import hu.tb.minichefy.presentation.screens.components.QuestionRowAnswer
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.TextFieldWithDropdownMenu
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 
@@ -25,20 +24,31 @@ import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 fun QuestionForm(
     recipeTitleValue: String,
     recipeTitleOnValueChange: (String) -> Unit,
+    isTitleHasError: Boolean,
     onAddQuantityClick: () -> Unit,
     onRemoveQuantityClick: () -> Unit,
     quantityContent: Int,
-    isErrorHappened: Boolean,
+    isCountHasError: Boolean,
     timeFieldValue: String,
     timeFieldValueChange: (String) -> Unit,
     timeUnitValue: TimeUnit,
     timeUnitValueChange: (TimeUnit) -> Unit,
+    isTimeHasError: Boolean
 ) {
     Column {
-        QuestionRowAnswer(
-            questionText = "Recipe title:",
-            textFieldValue = recipeTitleValue,
-            onTextFieldValueChange = recipeTitleOnValueChange
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth(),
+            value = recipeTitleValue,
+            onValueChange = recipeTitleOnValueChange,
+            label = {
+                Text(
+                    text = "Recipe title",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            },
+            isError = isTitleHasError
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         Text(
@@ -51,7 +61,7 @@ fun QuestionForm(
             onAddButtonClick = { onAddQuantityClick() },
             onRemoveButtonClick = { onRemoveQuantityClick() },
             displayContent = quantityContent,
-            isErrorHappened = isErrorHappened
+            isErrorHappened = isCountHasError
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         Row(
@@ -73,6 +83,7 @@ fun QuestionForm(
                     )
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = isTimeHasError
             )
             Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
             Box(
@@ -96,13 +107,15 @@ fun QuestionFormPreview() {
     QuestionForm(
         recipeTitleValue = "test recipe title",
         recipeTitleOnValueChange = {},
+        isTitleHasError = false,
         onAddQuantityClick = {},
         onRemoveQuantityClick = {},
         quantityContent = 1,
-        isErrorHappened = false,
+        isCountHasError = false,
         timeFieldValue = "",
         timeFieldValueChange = {},
         timeUnitValue = TimeUnit.MINUTES,
-        timeUnitValueChange = {}
+        timeUnitValueChange = {},
+        isTimeHasError = false
     )
 }

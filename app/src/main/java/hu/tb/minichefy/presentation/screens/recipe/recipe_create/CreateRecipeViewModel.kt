@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +11,8 @@ import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
-import hu.tb.minichefy.domain.use_case.ValidateQuantityNumber
+import hu.tb.minichefy.domain.use_case.ValidateCountInteger
+import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
 import hu.tb.minichefy.domain.use_case.ValidateTextField
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
@@ -32,8 +32,9 @@ import kotlin.random.Random
 class CreateRecipeViewModel @Inject constructor(
     private val recipeRepository: RecipeRepository,
     private val storageRepository: StorageRepository,
-    private val validateQuantityNumber: ValidateQuantityNumber,
+    private val validateCountInteger: ValidateCountInteger,
     private val validateTextField: ValidateTextField,
+    private val validateNumberKeyboard: ValidateNumberKeyboard
 ) : ViewModel() {
 
     private val _basicPageState = MutableStateFlow(Pages.BasicInformationPage())
@@ -47,6 +48,9 @@ class CreateRecipeViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
+
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -64,12 +68,12 @@ class CreateRecipeViewModel @Inject constructor(
             Pages.IngredientsPage(),
             Pages.StepsPage()
         ),
-        val targetPageIndex: Int = 0
     )
 
     sealed class Pages {
         data class BasicInformationPage(
-            val recipeName: String = "",
+            val recipeTitle: String = "",
+            val isTitleHasError: Boolean = false,
             val quantityCounter: Int = 1,
             val isQuantityHasError: Boolean = false,
             val defaultIconCollection: List<MealIcon> = IconManager().getAllSystemMealIconLists,
@@ -78,6 +82,7 @@ class CreateRecipeViewModel @Inject constructor(
                 defaultIconCollection.size
             )],
             val timeField: String = "",
+            val isTimeFieldHasError: Boolean = false,
             val timeUnit: TimeUnit = TimeUnit.MINUTES,
         ) : Pages()
 
@@ -98,15 +103,12 @@ class CreateRecipeViewModel @Inject constructor(
         ) : Pages()
     }
 
-    private val _uiEvent = Channel<UiEvent>()
-    val uiEvent = _uiEvent.receiveAsFlow()
-
     sealed class UiEvent {
-        data object PageChange : UiEvent()
-    }
-
-    sealed class OnEvent {
-        data class PageChange(val pageIndex: Int) : OnEvent()
+        data object RecipeSaved : UiEvent()
+        data class ErrorInRecipeFields(
+            val isIngredientHasError: Boolean,
+            val isStepsHasError: Boolean
+        ) : UiEvent()
     }
 
     sealed class OnBasicInformationPageEvent {
@@ -137,22 +139,10 @@ class CreateRecipeViewModel @Inject constructor(
         data object ClearStepField : OnStepsPageEvent()
     }
 
-    fun onEvent(event: OnEvent) {
-        when (event) {
-            //all pages event
-            is OnEvent.PageChange -> viewModelScope.launch {
-                _uiState.update {
-                    it.copy(targetPageIndex = event.pageIndex)
-                }
-                _uiEvent.send(UiEvent.PageChange)
-            }
-        }
-    }
-
     fun onBasicInformationPageEvent(event: OnBasicInformationPageEvent) {
         when (event) {
             is OnBasicInformationPageEvent.OnQuantityChange -> {
-                when (validateQuantityNumber((basicPageState.value.quantityCounter + event.value))) {
+                when (validateCountInteger((basicPageState.value.quantityCounter + event.value))) {
                     ValidationResult.SUCCESS -> _basicPageState.update {
                         it.copy(
                             quantityCounter = it.quantityCounter + event.value,
@@ -167,15 +157,18 @@ class CreateRecipeViewModel @Inject constructor(
             }
 
             is OnBasicInformationPageEvent.OnRecipeTitleChange -> _basicPageState.update {
-                it.copy(recipeName = event.text)
+                it.copy(recipeTitle = event.text)
             }
 
             is OnBasicInformationPageEvent.OnSelectedIconChange -> _basicPageState.update {
                 it.copy(selectedMealIcon = event.icon)
             }
 
-            is OnBasicInformationPageEvent.OnTimeChange -> _basicPageState.update {
-                it.copy(timeField = event.text)
+            is OnBasicInformationPageEvent.OnTimeChange -> {
+                if (validateNumberKeyboard(event.text) == ValidationResult.ERROR) return
+                _basicPageState.update {
+                    it.copy(timeField = event.text)
+                }
             }
 
             is OnBasicInformationPageEvent.OnTimeUnitChange -> _basicPageState.update {
@@ -192,7 +185,7 @@ class CreateRecipeViewModel @Inject constructor(
                 val titleResult =
                     validateTextField(currentState.ingredientTitleDraft) == ValidationResult.ERROR
                 val quantityResult =
-                    currentState.ingredientQuantityDraft.isBlank() || validateQuantityNumber(
+                    currentState.ingredientQuantityDraft.isBlank() || validateCountInteger(
                         currentState.ingredientQuantityDraft.toInt()
                     ) == ValidationResult.ERROR
 
@@ -267,10 +260,13 @@ class CreateRecipeViewModel @Inject constructor(
                 }
             }
 
-            is OnIngredientEvent.OnIngredientQuantityChange -> _ingredientsPageState.update {
-                it.copy(
-                    ingredientQuantityDraft = event.quantityString
-                )
+            is OnIngredientEvent.OnIngredientQuantityChange -> {
+                if (validateNumberKeyboard(event.quantityString) == ValidationResult.ERROR) return
+                _ingredientsPageState.update {
+                    it.copy(
+                        ingredientQuantityDraft = event.quantityString
+                    )
+                }
             }
 
             is OnIngredientEvent.OnIngredientTitleChange -> _ingredientsPageState.update {
@@ -330,56 +326,104 @@ class CreateRecipeViewModel @Inject constructor(
 
             OnStepsPageEvent.ClearStepField -> _stepsPageState.update { it.copy(stepBoxTextField = "") }
 
-            OnStepsPageEvent.OnRecipeSave -> viewModelScope.launch {
-                //save recipe
-                val recipeId = recipeRepository.saveOrModifyRecipe(
-                    icon = basicPageState.value.selectedMealIcon.resource,
-                    title = basicPageState.value.recipeName,
-                    quantity = basicPageState.value.quantityCounter,
-                    timeToCreate = basicPageState.value.timeField.toInt(),
-                    timeUnit = basicPageState.value.timeUnit,
-                )
-                Log.i("CreateRecipeVM", "RecipeId: $recipeId")
-
-                //save ingredients
-                val notCommonFoods =
-                    ingredientsPageState.value.selectedIngredientList.filter { food ->
-                        ingredientsPageState.value.unSelectedIngredientList.none { it.title == food.title }
-                    }
-
-                notCommonFoods.forEach { food ->
-                    val foodId = storageRepository.saveOrModifyFood(
-                        id = food.id,
-                        title = food.title,
-                        icon = food.icon,
-                        quantity = food.quantity,
-                        unitOfMeasurement = food.unitOfMeasurement,
-                    )
-                    food.foodTagList?.map { tag ->
-                        storageRepository.saveFoodAndTag(foodId, tag.id!!)
-                    }
-
-                    Log.i("CreateRecipeVM", "FoodId: $foodId")
-
-                    val crossRefId = recipeRepository.saveRecipeIngredientCrossRef(recipeId, foodId)
-                    Log.i("CreateRecipeVM", "CrossRefId: $crossRefId")
+            OnStepsPageEvent.OnRecipeSave -> {
+                if (checkRecipeDraftHasError()) {
+                    return
                 }
 
-                val commonFoods = ingredientsPageState.value.selectedIngredientList.filter { food ->
-                    ingredientsPageState.value.unSelectedIngredientList.any { it.title == food.title }
-                }
+                viewModelScope.launch {
+                    val recipeId = saveRecipe()
+                    saveIngredients(recipeId)
+                    saveSteps(recipeId)
 
-                commonFoods.forEach {
-                    val crossRefId = recipeRepository.saveRecipeIngredientCrossRef(recipeId, it.id!!)
-                    Log.i("CreateRecipeVM", "CrossRefId: $crossRefId")
-                }
-
-                //save steps
-                stepsPageState.value.recipeSteps.forEach { step ->
-                    val stepId = recipeRepository.saveStep(step, recipeId)
-                    Log.i("CreateRecipeVM", "StepId: $stepId")
+                    _uiEvent.send(UiEvent.RecipeSaved)
                 }
             }
         }
+    }
+
+    private suspend fun saveRecipe(): Long =
+        recipeRepository.saveOrModifyRecipe(
+            icon = basicPageState.value.selectedMealIcon.resource,
+            title = basicPageState.value.recipeTitle,
+            quantity = basicPageState.value.quantityCounter,
+            timeToCreate = basicPageState.value.timeField.toInt(),
+            timeUnit = basicPageState.value.timeUnit,
+        )
+
+    private suspend fun saveIngredients(recipeId: Long) {
+        val (notCommonFoods, commonFoods) = ingredientsPageState.value.selectedIngredientList.partition { food ->
+            ingredientsPageState.value.unSelectedIngredientList.none { it.title == food.title }
+        }
+
+        notCommonFoods.forEach { food ->
+            val foodId = with(food) {
+                storageRepository.saveOrModifyFood(
+                    id = id,
+                    title = title,
+                    icon = icon,
+                    quantity = quantity,
+                    unitOfMeasurement = unitOfMeasurement,
+                )
+            }
+            food.foodTagList?.forEach { tag -> storageRepository.saveFoodAndTag(foodId, tag.id!!) }
+            recipeRepository.saveRecipeIngredientCrossRef(recipeId, foodId)
+        }
+
+        commonFoods.forEach { recipeRepository.saveRecipeIngredientCrossRef(recipeId, it.id!!) }
+    }
+
+
+    private suspend fun saveSteps(recipeId: Long){
+        stepsPageState.value.recipeSteps.forEach { step ->
+            recipeRepository.saveStep(step, recipeId)
+            //Log.i("CreateRecipeVM", "StepId: $stepId")
+        }
+    }
+
+
+    private fun checkRecipeDraftHasError(): Boolean {
+        val titleResult = validateTextField(basicPageState.value.recipeTitle)
+        val quantityCounterResult =
+            validateCountInteger(basicPageState.value.quantityCounter)
+        val timeResult = try {
+            validateCountInteger(basicPageState.value.timeField.toInt())
+        } catch (e: Exception) {
+            ValidationResult.ERROR
+        }
+
+        val ingredientResult =
+            if (ingredientsPageState.value.selectedIngredientList.isEmpty()) ValidationResult.ERROR else ValidationResult.SUCCESS
+        var stepsResult = ValidationResult.SUCCESS
+        for (step in stepsPageState.value.recipeSteps) {
+            if (step.step.isEmpty()) {
+                stepsResult = ValidationResult.ERROR
+                break
+            }
+        }
+
+        val validationResults = listOf(
+            titleResult, timeResult, ingredientResult, stepsResult
+        ).any { it == ValidationResult.ERROR }
+
+        if (validationResults) {
+            _basicPageState.update {
+                it.copy(
+                    isTitleHasError = titleResult == ValidationResult.ERROR,
+                    isTimeFieldHasError = timeResult == ValidationResult.ERROR,
+                    isQuantityHasError = quantityCounterResult == ValidationResult.ERROR
+                )
+            }
+            viewModelScope.launch {
+                _uiEvent.send(
+                    UiEvent.ErrorInRecipeFields(
+                        isIngredientHasError = ingredientResult == ValidationResult.ERROR,
+                        isStepsHasError = stepsResult == ValidationResult.ERROR
+                    )
+                )
+            }
+        }
+
+        return validationResults
     }
 }

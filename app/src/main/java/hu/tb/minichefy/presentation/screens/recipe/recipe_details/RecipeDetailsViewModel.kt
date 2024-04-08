@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_details
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -62,7 +61,7 @@ class RecipeDetailsViewModel @Inject constructor(
                         )
                         storageRepository.saveFoodAndTag(savedDishId, dishTag.id!!)
 
-                        Log.i("RecipeDetailsVM", savedDishId.toString())
+                        //Log.i("RecipeDetailsVM", savedDishId.toString())
                     }
                 }
             }
