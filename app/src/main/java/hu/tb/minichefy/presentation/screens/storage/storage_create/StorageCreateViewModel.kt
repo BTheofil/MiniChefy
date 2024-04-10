@@ -43,7 +43,8 @@ class StorageCreateViewModel @Inject constructor(
     }
 
     data class UiState(
-        val foodIcon: FoodIcon = IconManager().getRandomFood(),
+        val allFoodIcons: List<FoodIcon> = FoodIcon.entries,
+        val selectedFoodIcon: FoodIcon = IconManager().getRandomFood(),
         val foodTitleText: String = "",
         val isFoodTitleHasError: Boolean = false,
         val foodType: FoodType? = FoodType.LIQUID,
@@ -68,6 +69,7 @@ class StorageCreateViewModel @Inject constructor(
     sealed class OnEvent {
         data object Save : OnEvent()
         data class FoodTextChange(val text: String) : OnEvent()
+        data class OnSelectedIconDialogClick(val icon: FoodIcon) : OnEvent()
         data class FoodTypeChange(val type: FoodType) : OnEvent()
         data class FoodUnitChange(val type: UnitOfMeasurement) : OnEvent()
         data class FoodQuantityChange(val quantityString: String) : OnEvent()
@@ -138,7 +140,7 @@ class StorageCreateViewModel @Inject constructor(
                 viewModelScope.launch {
                     uiState.value.also {
                         val foodId = storageRepository.saveOrModifyFood(
-                            icon = it.foodIcon.resource,
+                            icon = it.selectedFoodIcon.resource,
                             title = it.foodTitleText,
                             quantity = it.quantity.toFloat(),
                             unitOfMeasurement = it.foodUnitOfMeasurement
@@ -161,13 +163,17 @@ class StorageCreateViewModel @Inject constructor(
             }
 
             is OnEvent.FoodQuantityChange -> {
-                if(validateNumberKeyboard(event.quantityString) == ValidationResult.ERROR) return
+                if (validateNumberKeyboard(event.quantityString) == ValidationResult.ERROR) return
 
                 _uiState.update {
                     it.copy(
                         quantity = event.quantityString
                     )
                 }
+            }
+
+            is OnEvent.OnSelectedIconDialogClick -> _uiState.update {
+                it.copy(selectedFoodIcon = event.icon)
             }
         }
     }
