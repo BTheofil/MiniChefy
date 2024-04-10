@@ -16,7 +16,7 @@ private object MockRecipeDomain {
 
     val mockRecipe = Recipe(
         id = 0,
-        icon = IconManager().getRandomProduct().resource,
+        icon = IconManager().getRandomFood().resource,
         title = "Apple pie",
         quantity = 4,
         howToSteps = listOf(

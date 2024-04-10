@@ -11,7 +11,7 @@ import hu.tb.minichefy.domain.use_case.ValidateQuantity
 import hu.tb.minichefy.domain.use_case.ValidateTextField
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
-import hu.tb.minichefy.presentation.screens.manager.icons.ProductIcon
+import hu.tb.minichefy.presentation.screens.manager.icons.FoodIcon
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,7 +43,7 @@ class StorageCreateViewModel @Inject constructor(
     }
 
     data class UiState(
-        val productIcon: ProductIcon = IconManager().getRandomProduct(),
+        val foodIcon: FoodIcon = IconManager().getRandomFood(),
         val foodTitleText: String = "",
         val isFoodTitleHasError: Boolean = false,
         val foodType: FoodType? = FoodType.LIQUID,
@@ -138,7 +138,7 @@ class StorageCreateViewModel @Inject constructor(
                 viewModelScope.launch {
                     uiState.value.also {
                         val foodId = storageRepository.saveOrModifyFood(
-                            icon = it.productIcon.resource,
+                            icon = it.foodIcon.resource,
                             title = it.foodTitleText,
                             quantity = it.quantity.toFloat(),
                             unitOfMeasurement = it.foodUnitOfMeasurement

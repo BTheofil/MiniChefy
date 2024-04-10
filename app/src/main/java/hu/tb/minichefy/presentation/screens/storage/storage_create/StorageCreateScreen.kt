@@ -82,7 +82,7 @@ fun StorageCreateContent(
             .clickableWithoutRipple { focusManager.clearFocus() }
     ) {
         CircleImage(
-            image = uiState.productIcon.resource
+            image = uiState.foodIcon.resource
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         OutlinedTextField(

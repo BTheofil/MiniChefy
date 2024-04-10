@@ -52,12 +52,12 @@ import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.components.SettingsPanel
-import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditQuantityDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditStorageItem
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
+import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 
@@ -114,7 +114,7 @@ fun StorageListScreen(
 @Composable
 fun StorageScreenContent(
     uiState: StorageListViewModel.UiState,
-    editFoodState: StorageListViewModel.ModifyFoodState,
+    editFoodState: StorageListViewModel.ModifyFoodQuantityDialogState,
     onFABClick: () -> Unit,
     onEvent: (StorageListViewModel.OnEvent) -> Unit
 ) {
@@ -188,7 +188,7 @@ fun StorageScreenContent(
                     contentType = { _, item -> item }
                 ) { index, food ->
                     AnimatedContent(
-                        targetState = editFoodState.foodListPositionIndex == index,
+                        targetState = editFoodState.modifyFoodListPositionIndex == index,
                         transitionSpec = {
                             scaleIn().togetherWith(scaleOut())
                         }, label = "edit product animation"
@@ -196,7 +196,7 @@ fun StorageScreenContent(
                         when (isFoodEdited) {
                             true -> EditStorageItem(
                                 food = food,
-                                onIconClick = { isIconSelectorOpen = true },
+                                onFoodIconClick = { isIconSelectorOpen = true },
                                 onCloseClick = { onEvent(StorageListViewModel.OnEvent.ClearSelectedFoodIndex) },
                                 onDeleteTagClick = { tag ->
                                     onEvent(
@@ -223,7 +223,7 @@ fun StorageScreenContent(
                                             .combinedClickable(
                                                 onClick = {
                                                     onEvent(
-                                                        StorageListViewModel.OnEvent.OnProductClick(
+                                                        StorageListViewModel.OnEvent.FoodEditButtonClick(
                                                             index
                                                         )
                                                     )
@@ -279,8 +279,8 @@ fun StorageScreenContent(
 
     if (isIconSelectorOpen) {
         IconSelectorSheet(
-            allIconList = uiState.allProductIconList,
-            selectedIcon = IconManager().convertIntToProductIcon(uiState.foodList[editFoodState.foodListPositionIndex].icon),
+            allIconList = uiState.allFoodIconList,
+            selectedIcon = IconManager().findFoodIconByInt(editFoodState.modifyFood!!.icon),
             onItemClick = { onEvent(StorageListViewModel.OnEvent.ModifyFoodIcon(it)) },
             onDismissRequest = { isIconSelectorOpen = false }
         )
@@ -308,7 +308,7 @@ fun StorageScreenContent(
                 )
             },
             allTagList = uiState.foodTagList,
-            selectedTagList = uiState.foodList[editFoodState.foodListPositionIndex].foodTagList.orEmpty()
+            selectedTagList = editFoodState.modifyFood!!.foodTagList.orEmpty()
         )
     }
 }
@@ -323,7 +323,7 @@ fun StorageScreenContentPreview(
             foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
             foodList = mockProductList,
         ),
-        StorageListViewModel.ModifyFoodState(),
+        StorageListViewModel.ModifyFoodQuantityDialogState(),
         onEvent = {},
         onFABClick = {}
     )

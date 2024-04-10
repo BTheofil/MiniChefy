@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.screens.manager.icons.IconResource
 import hu.tb.minichefy.presentation.screens.manager.icons.MealIcon
 
@@ -103,7 +102,7 @@ fun IconSelectorSheetPreview() {
 
         if (isSheetVisible) {
             IconSelectorSheet(
-                allIconList = IconManager().getAllSystemMealIconLists,
+                allIconList = MealIcon.entries,
                 selectedIcon = selectedIcon,
                 onItemClick = { selectedIcon = it },
                 onDismissRequest = { isSheetVisible = false }
