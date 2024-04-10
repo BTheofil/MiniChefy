@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,10 +21,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.PageNextButton
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.steps.RecipeStepItem
+import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
+import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
+import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,8 +58,11 @@ fun StepsPage(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding() + 16.dp)
-                .padding(horizontal = 22.dp),
+                .padding(top = paddingValues.calculateTopPadding())
+                .padding(
+                    horizontal = SCREEN_HORIZONTAL_PADDING,
+                    vertical = SCREEN_VERTICAL_PADDING
+                ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LazyColumn(
@@ -80,7 +85,7 @@ fun StepsPage(
                     )
                 }
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                     Button(onClick = {
                         onAddButtonClick()
                     }) {
@@ -88,10 +93,10 @@ fun StepsPage(
                     }
                 }
             }
-            OutlinedButton(onClick = onNextButtonClick) {
-                Text(text = "Finish")
-            }
-            Spacer(modifier = Modifier.height(22.dp))
+            PageNextButton(
+                text = "Finish",
+                onClick = onNextButtonClick
+            )
         }
     }
 }

@@ -44,7 +44,7 @@ import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.PageNextButton
-import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
+import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.Red400
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING

@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.ui.components
+package hu.tb.minichefy.presentation.screens.components.extensions
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource

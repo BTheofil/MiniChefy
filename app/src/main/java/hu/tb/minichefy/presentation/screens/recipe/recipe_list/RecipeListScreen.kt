@@ -30,7 +30,7 @@ import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.components.SettingsPanel
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
-import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
+import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING

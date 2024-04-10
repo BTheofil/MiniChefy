@@ -57,7 +57,7 @@ import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditQuantityDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditStorageItem
-import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
+import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 

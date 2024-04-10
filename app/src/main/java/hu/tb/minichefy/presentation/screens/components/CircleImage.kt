@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
-import hu.tb.minichefy.presentation.ui.components.clickableWithoutRipple
+import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 
 @Composable
 fun CircleImage(
