@@ -18,7 +18,7 @@ object MockFoodDomain {
     val mockFoodLists = listOf(
         Food(
             id = 0,
-            icon = IconManager().getRandomProduct().resource,
+            icon = IconManager().getRandomFood().resource,
             title = "Apple",
             quantity = 3f,
             unitOfMeasurement = UnitOfMeasurement.PIECE,
@@ -28,7 +28,7 @@ object MockFoodDomain {
         ),
         Food(
             id = 1,
-            icon = IconManager().getRandomProduct().resource,
+            icon = IconManager().getRandomFood().resource,
             title = "Milk",
             quantity = 1f,
             unitOfMeasurement = UnitOfMeasurement.L,
@@ -39,7 +39,7 @@ object MockFoodDomain {
         ),
         Food(
             id = 2,
-            icon = IconManager().getRandomProduct().resource,
+            icon = IconManager().getRandomFood().resource,
             title = "Carrot",
             quantity = 2f,
             unitOfMeasurement = UnitOfMeasurement.KG,

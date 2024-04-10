@@ -35,10 +35,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.screens.components.CircleImage
+import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_create.components.RadioButtonWithText
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
+import hu.tb.minichefy.presentation.screens.manager.icons.FoodIcon
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
@@ -72,7 +74,7 @@ fun StorageCreateContent(
     onEvent: (StorageCreateViewModel.OnEvent) -> Unit
 ) {
     var isTagPopupVisible by remember { mutableStateOf(false) }
-
+    var showIconPicker by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     Column(
@@ -81,8 +83,10 @@ fun StorageCreateContent(
             .padding(horizontal = SCREEN_HORIZONTAL_PADDING, vertical = SCREEN_VERTICAL_PADDING)
             .clickableWithoutRipple { focusManager.clearFocus() }
     ) {
+
         CircleImage(
-            image = uiState.productIcon.resource
+            image = uiState.selectedFoodIcon.resource,
+            onClick = { showIconPicker = true }
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         OutlinedTextField(
@@ -186,6 +190,17 @@ fun StorageCreateContent(
                 Text(text = "Save")
             }
         }
+    }
+
+    if (showIconPicker) {
+        IconSelectorSheet(
+            allIconList = uiState.allFoodIcons,
+            selectedIcon = uiState.selectedFoodIcon,
+            onItemClick = {
+                onEvent(StorageCreateViewModel.OnEvent.OnSelectedIconDialogClick(it as FoodIcon))
+            },
+            onDismissRequest = { showIconPicker = false }
+        )
     }
 
     if (isTagPopupVisible) {

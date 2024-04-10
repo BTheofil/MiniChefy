@@ -54,7 +54,7 @@ import kotlin.math.min
 @Composable
 fun EditStorageItem(
     food: Food,
-    onIconClick: () -> Unit,
+    onFoodIconClick: () -> Unit,
     onCloseClick: () -> Unit,
     onAddTagClick: () -> Unit,
     onDeleteTagClick: (tag: FoodTag) -> Unit,
@@ -85,7 +85,7 @@ fun EditStorageItem(
                     })
                     .clip(RoundedCornerShape(12.dp))
                     .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f))
-                    .clickableWithoutRipple(onIconClick)
+                    .clickableWithoutRipple(onFoodIconClick)
                     .padding(12.dp),
                 contentAlignment = Alignment.Center
             ) {

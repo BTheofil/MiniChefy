@@ -98,13 +98,12 @@ fun RecipeDetailsContent(
                             positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
                             tooltip = {
                                 PlainTooltip(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
                                 ) {
                                     Text(
                                         "Cook this recipe",
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.primary
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
                                     )
                                 }
                             },
@@ -317,7 +316,7 @@ fun DetailsBottomContent(
                             ) { index, step ->
                                 DetailsRecipeStepItem(
                                     stepNumber = index,
-                                    stepTextDescription = step.step
+                                    stepTextDescription = step.step + 1
                                 )
                             }
                         }

@@ -1,6 +1,6 @@
 package hu.tb.minichefy.presentation.screens.components
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +31,8 @@ fun QuantityAndMeasurementRow(
     Row(
         modifier = Modifier
             .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End
     ) {
         OutlinedTextField(
             modifier = Modifier
@@ -53,17 +54,14 @@ fun QuantityAndMeasurementRow(
             isError = isQuantityHasError
         )
         Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-        Box(
+        TextFieldWithDropdownMenu(
             modifier = Modifier
-                .weight(1f)
-        ) {
-            TextFieldWithDropdownMenu(
-                textFieldValue = measurementValue.name,
-                labelFieldText = "Measurement",
-                menuItemList = measurementOptionList,
-                onMenuItemClick = onMeasurementChange
-            )
-        }
+                .weight(1f),
+            textFieldValue = measurementValue.name,
+            labelFieldText = "Measurement",
+            menuItemList = measurementOptionList,
+            onMenuItemClick = onMeasurementChange
+        )
     }
 }
 
