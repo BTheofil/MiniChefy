@@ -32,9 +32,6 @@ class StorageListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState
 
-    private val _editFoodState = MutableStateFlow(ModifyFoodQuantityDialogState())
-    val editFoodState: StateFlow<ModifyFoodQuantityDialogState> = _editFoodState
-
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
@@ -56,26 +53,22 @@ class StorageListViewModel @Inject constructor(
         }
     }
 
+    sealed class UiEvent {
+        data object OpenModifyQuantityDialog : UiEvent()
+        data object CloseModifyQuantityDialog : UiEvent()
+    }
+
     data class UiState(
         val searchText: String = "",
         val foodTagList: List<FoodTag> = emptyList(),
         val activeFilter: List<FoodTag> = emptyList(),
         val foodList: List<Food> = emptyList(),
         val allFoodIconList: List<FoodIcon> = FoodIcon.entries,
-    )
-
-    data class ModifyFoodQuantityDialogState(
         val modifyFoodListPositionIndex: Int = -1,
-        val modifyFood: Food? = null,
         val quantityModifyValue: String = "",
         val unitOfMeasurementModifyValue: UnitOfMeasurement = UnitOfMeasurement.PIECE,
         val isQuantityModifyDialogHasError: Boolean = false,
     )
-
-    sealed class UiEvent {
-        data object CloseEditQuantityDialog : UiEvent()
-        data object OpenEditQuantityDialog : UiEvent()
-    }
 
     sealed class OnEvent {
         data object ClearSearchText : OnEvent()
@@ -88,7 +81,7 @@ class StorageListViewModel @Inject constructor(
         data class FilterChipClicked(val tag: FoodTag) : OnEvent()
         data class ModifyFoodTags(val tag: FoodTag) : OnEvent()
         data class ModifyFoodIcon(val icon: IconResource) : OnEvent()
-        data class EditFoodDialogQuantityChange(val value: String) : OnEvent()
+        data class ModifyFoodDialogQuantityChange(val value: String) : OnEvent()
         data class EditFoodDialogUnitChange(val value: UnitOfMeasurement) : OnEvent()
     }
 
@@ -139,64 +132,66 @@ class StorageListViewModel @Inject constructor(
             }
 
             //edit food events
-            is OnEvent.FoodEditButtonClick -> _editFoodState.update {
+            is OnEvent.FoodEditButtonClick -> _uiState.update {
                 it.copy(
-                    modifyFoodListPositionIndex = event.positionIndex,
-                    modifyFood = uiState.value.foodList[event.positionIndex]
+                    modifyFoodListPositionIndex = event.positionIndex
                 )
             }
 
-            is OnEvent.EditFoodDialogQuantityChange -> {
+            is OnEvent.ModifyFoodDialogQuantityChange -> {
                 if (validateNumberKeyboard(event.value) == ValidationResult.ERROR) return
 
-                _editFoodState.update {
+                _uiState.update {
                     it.copy(
                         quantityModifyValue = event.value
                     )
                 }
             }
 
-            is OnEvent.EditFoodDialogUnitChange -> _editFoodState.update {
+            is OnEvent.EditFoodDialogUnitChange -> _uiState.update {
                 it.copy(
                     unitOfMeasurementModifyValue = event.value
                 )
             }
 
             OnEvent.SetupEditFoodQuantityDialog -> {
-                val editedFood = editFoodState.value.modifyFood!!
-
-                _editFoodState.update {
+                val editedFood = uiState.value.foodList[uiState.value.modifyFoodListPositionIndex]
+                _uiState.update {
                     it.copy(
                         quantityModifyValue = editedFood.quantity.toString(),
                         unitOfMeasurementModifyValue = editedFood.unitOfMeasurement
                     )
                 }
-
                 viewModelScope.launch {
-                    _uiEvent.send(UiEvent.OpenEditQuantityDialog)
+                    _uiEvent.send(UiEvent.OpenModifyQuantityDialog)
                 }
             }
 
             OnEvent.SaveEditFoodQuantities -> {
-                val quantityModifyValue = editFoodState.value.quantityModifyValue
-                if (!quantityModifyValue.matches(Regex("^(?!.*\\..*\\.).*$")) || validateQuantity(
-                        quantityModifyValue.toFloat()
-                    ) == ValidationResult.ERROR
-                ) {
-                    _editFoodState.update {
+                val quantityModifyValue = uiState.value.quantityModifyValue
+                val quantityResult = try {
+                    validateQuantity(quantityModifyValue.toFloat())
+                } catch (e: Exception) {
+                    ValidationResult.ERROR
+                }
+                if (quantityResult == ValidationResult.ERROR) {
+                    _uiState.update {
                         it.copy(
                             isQuantityModifyDialogHasError = true
                         )
+                    }
+                    viewModelScope.launch {
+                        _uiEvent.send(UiEvent.OpenModifyQuantityDialog)
                     }
                     return
                 }
 
                 val updatedFood =
-                    editFoodState.value.modifyFood!!.copy(
+                    uiState.value.foodList[uiState.value.modifyFoodListPositionIndex].copy(
                         quantity = quantityModifyValue.toFloat(),
-                        unitOfMeasurement = editFoodState.value.unitOfMeasurementModifyValue,
+                        unitOfMeasurement = uiState.value.unitOfMeasurementModifyValue
                     )
-                _editFoodState.update {
+                _uiState.update {
                     it.copy(
                         isQuantityModifyDialogHasError = false
                     )
@@ -204,39 +199,36 @@ class StorageListViewModel @Inject constructor(
 
                 saveEditedFood(updatedFood)
                 viewModelScope.launch {
-                    _uiEvent.send(UiEvent.CloseEditQuantityDialog)
+                    _uiEvent.send(UiEvent.CloseModifyQuantityDialog)
                 }
             }
 
             is OnEvent.ModifyFoodTags -> {
                 viewModelScope.launch {
-                    val modifyFood = editFoodState.value.modifyFood!!
-                   /* if (modifyFood.foodTagList == null) {
+                    val modifyFood =
+                        uiState.value.foodList[uiState.value.modifyFoodListPositionIndex]
+                    if (modifyFood.foodTagList != null && modifyFood.foodTagList.contains(event.tag)) {
+                        storageRepository.deleteFoodAndTag(modifyFood.id!!, event.tag.id!!)
+                    } else {
                         storageRepository.saveFoodAndTag(modifyFood.id!!, event.tag.id!!)
-                    } else {*/
-                        if (modifyFood.foodTagList != null && modifyFood.foodTagList.contains(event.tag)) {
-                            storageRepository.deleteFoodAndTag(modifyFood.id!!, event.tag.id!!)
-                        } else {
-                            storageRepository.saveFoodAndTag(modifyFood.id!!, event.tag.id!!)
-                        }
-                    //}
-                }
-            }
-
-            OnEvent.ClearSelectedFoodIndex -> {
-                _editFoodState.update {
-                    it.copy(
-                        modifyFoodListPositionIndex = -1,
-                        modifyFood = null
-                    )
+                    }
                 }
             }
 
             is OnEvent.ModifyFoodIcon -> saveEditedFood(
-                editFoodState.value.modifyFood!!.copy(
+                uiState.value.foodList[uiState.value.modifyFoodListPositionIndex].copy(
                     icon = event.icon.resource
                 )
             )
+
+            OnEvent.ClearSelectedFoodIndex -> {
+                _uiState.update {
+                    it.copy(
+                        modifyFoodListPositionIndex = -1,
+                        quantityModifyValue = "",
+                    )
+                }
+            }
 
             is OnEvent.DeleteFood -> {
                 viewModelScope.launch {

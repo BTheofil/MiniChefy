@@ -52,14 +52,16 @@ import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.components.SettingsPanel
+import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
+import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditQuantityDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditStorageItem
-import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
-import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 @Composable
 fun StorageListScreen(
@@ -67,61 +69,29 @@ fun StorageListScreen(
     onFABClick: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val editFoodState by viewModel.editFoodState.collectAsStateWithLifecycle()
-
-    var isEditQuantityDialogOpen by remember {
-        mutableStateOf(false)
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.uiEvent.collect { event ->
-            isEditQuantityDialogOpen = when (event) {
-                StorageListViewModel.UiEvent.CloseEditQuantityDialog -> false
-
-                StorageListViewModel.UiEvent.OpenEditQuantityDialog -> true
-            }
-        }
-    }
 
     StorageScreenContent(
         uiState = uiState,
-        editFoodState = editFoodState,
+        uiEvent = viewModel.uiEvent,
         onFABClick = onFABClick,
         onEvent = viewModel::onEvent
     )
-
-    if (isEditQuantityDialogOpen) {
-        EditQuantityDialog(
-            quantityValue = editFoodState.quantityModifyValue,
-            onQuantityChange = {
-                viewModel.onEvent(StorageListViewModel.OnEvent.EditFoodDialogQuantityChange(it))
-            },
-            isQuantityHasError = editFoodState.isQuantityModifyDialogHasError,
-            measurementValue = editFoodState.unitOfMeasurementModifyValue,
-            onMeasurementChange = {
-                viewModel.onEvent(StorageListViewModel.OnEvent.EditFoodDialogUnitChange(it))
-            },
-            onCancelButtonClick = { isEditQuantityDialogOpen = false },
-            onConfirmButtonClick = {
-                viewModel.onEvent(StorageListViewModel.OnEvent.SaveEditFoodQuantities)
-            },
-            onDismissRequest = { isEditQuantityDialogOpen = false }
-        )
-    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StorageScreenContent(
     uiState: StorageListViewModel.UiState,
-    editFoodState: StorageListViewModel.ModifyFoodQuantityDialogState,
+    uiEvent: Flow<StorageListViewModel.UiEvent>,
     onFABClick: () -> Unit,
     onEvent: (StorageListViewModel.OnEvent) -> Unit
 ) {
     var isEditProductTagSelectorOpen by remember {
         mutableStateOf(false)
     }
-
+    var isEditQuantityDialogOpen by remember {
+        mutableStateOf(false)
+    }
     var isIconSelectorOpen by remember {
         mutableStateOf(false)
     }
@@ -133,6 +103,15 @@ fun StorageScreenContent(
     }
 
     val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(Unit) {
+        uiEvent.collect {
+            isEditQuantityDialogOpen = when (it) {
+                StorageListViewModel.UiEvent.CloseModifyQuantityDialog -> false
+                StorageListViewModel.UiEvent.OpenModifyQuantityDialog -> true
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier
@@ -188,7 +167,7 @@ fun StorageScreenContent(
                     contentType = { _, item -> item }
                 ) { index, food ->
                     AnimatedContent(
-                        targetState = editFoodState.modifyFoodListPositionIndex == index,
+                        targetState = uiState.modifyFoodListPositionIndex == index,
                         transitionSpec = {
                             scaleIn().togetherWith(scaleOut())
                         }, label = "edit product animation"
@@ -277,10 +256,29 @@ fun StorageScreenContent(
         }
     }
 
+    if (isEditQuantityDialogOpen) {
+        EditQuantityDialog(
+            quantityValue = uiState.quantityModifyValue,
+            onQuantityChange = { quantityString ->
+                onEvent(StorageListViewModel.OnEvent.ModifyFoodDialogQuantityChange(quantityString))
+            },
+            isQuantityHasError = uiState.isQuantityModifyDialogHasError,
+            measurementValue = uiState.unitOfMeasurementModifyValue,
+            onMeasurementChange = { uof ->
+                onEvent(StorageListViewModel.OnEvent.EditFoodDialogUnitChange(uof))
+            },
+            onCancelButtonClick = { isEditQuantityDialogOpen = false },
+            onConfirmButtonClick = {
+                onEvent(StorageListViewModel.OnEvent.SaveEditFoodQuantities)
+            },
+            onDismissRequest = { isEditQuantityDialogOpen = false }
+        )
+    }
+
     if (isIconSelectorOpen) {
         IconSelectorSheet(
             allIconList = uiState.allFoodIconList,
-            selectedIcon = IconManager().findFoodIconByInt(editFoodState.modifyFood!!.icon),
+            selectedIcon = IconManager().findFoodIconByInt(uiState.foodList[uiState.modifyFoodListPositionIndex].icon),
             onItemClick = { onEvent(StorageListViewModel.OnEvent.ModifyFoodIcon(it)) },
             onDismissRequest = { isIconSelectorOpen = false }
         )
@@ -308,7 +306,8 @@ fun StorageScreenContent(
                 )
             },
             allTagList = uiState.foodTagList,
-            selectedTagList = editFoodState.modifyFood!!.foodTagList.orEmpty()
+            selectedTagList = uiState.foodList[uiState.modifyFoodListPositionIndex].foodTagList
+                ?: emptyList()
         )
     }
 }
@@ -319,11 +318,11 @@ fun StorageScreenContentPreview(
     @PreviewParameter(FoodPreviewParameterProvider::class) mockProductList: List<Food>
 ) {
     StorageScreenContent(
-        StorageListViewModel.UiState(
+        uiState = StorageListViewModel.UiState(
             foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
             foodList = mockProductList,
         ),
-        StorageListViewModel.ModifyFoodQuantityDialogState(),
+        uiEvent = flow { },
         onEvent = {},
         onFABClick = {}
     )
