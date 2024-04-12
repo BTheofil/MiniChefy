@@ -315,8 +315,8 @@ fun DetailsBottomContent(
                                 key = { _, item -> item.id!! }
                             ) { index, step ->
                                 DetailsRecipeStepItem(
-                                    stepNumber = index,
-                                    stepTextDescription = step.step + 1
+                                    stepNumber = index + 1,
+                                    stepTextDescription = step.step
                                 )
                             }
                         }
