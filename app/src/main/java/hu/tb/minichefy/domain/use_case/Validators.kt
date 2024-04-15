@@ -20,7 +20,13 @@ class ValidateQuantity {
 
 class ValidateNumberKeyboard {
     operator fun invoke(input: String): ValidationResult =
-        if (input.contains("-") || input.contains(" ") || input.contains(",")) {
+        if (!Regex("""^(?!\.)\d*\.?\d*${'$'}""").matches(input) ||
+            input.contains("-") ||
+            input.contains(" ") ||
+            input.contains(
+                ","
+            )
+        ) {
             ValidationResult.ERROR
         } else {
             ValidationResult.SUCCESS

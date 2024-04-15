@@ -74,9 +74,12 @@ fun EditQuantityDialog(
                 QuantityAndMeasurementRow(
                     quantityValue = quantityValue,
                     onQuantityChange = onQuantityChange,
+                    quantityLabel = "Amount",
                     isQuantityHasError = isQuantityHasError,
                     measurementValue = measurementValue,
-                    onMeasurementChange = onMeasurementChange
+                    onMeasurementChange = onMeasurementChange,
+                    measurementLabel = "Measurement",
+                    measurementOptionList = UnitOfMeasurement.entries
                 )
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                 Row(

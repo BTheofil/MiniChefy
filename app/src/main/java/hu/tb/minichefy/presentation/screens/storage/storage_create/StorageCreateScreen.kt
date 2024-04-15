@@ -138,9 +138,11 @@ fun StorageCreateContent(
         QuantityAndMeasurementRow(
             quantityValue = uiState.quantity,
             onQuantityChange = { onEvent(StorageCreateViewModel.OnEvent.FoodQuantityChange(it)) },
+            quantityLabel = "Amount",
             isQuantityHasError = uiState.isQuantityHasError,
             measurementOptionList = uiState.availableUnitOfMeasurementList,
             measurementValue = uiState.foodUnitOfMeasurement,
+            measurementLabel = "Measurement",
             onMeasurementChange = {
                 onEvent(StorageCreateViewModel.OnEvent.FoodUnitChange(it))
             }

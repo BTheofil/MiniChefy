@@ -229,9 +229,12 @@ fun IngredientsPage(
                         QuantityAndMeasurementRow(
                             quantityValue = uiState.ingredientQuantityDraft,
                             onQuantityChange = onIngredientQuantityChange,
+                            quantityLabel = "Amount",
                             isQuantityHasError = uiState.isIngredientQuantityHasError,
                             measurementValue = uiState.ingredientUnitOfMeasurementDraft,
-                            onMeasurementChange = onIngredientUnitOfMeasurementChange
+                            onMeasurementChange = onIngredientUnitOfMeasurementChange,
+                            measurementLabel = "Measurement",
+                            measurementOptionList = UnitOfMeasurement.entries
                         )
                         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
                         Button(

@@ -1,23 +1,17 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
-import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.TextFieldWithDropdownMenu
+import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 
 @Composable
@@ -48,7 +42,8 @@ fun QuestionForm(
                     color = MaterialTheme.colorScheme.primary
                 )
             },
-            isError = isTitleHasError
+            isError = isTitleHasError,
+            singleLine = true
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         Text(
@@ -64,40 +59,16 @@ fun QuestionForm(
             isErrorHappened = isCountHasError
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            OutlinedTextField(
-                modifier = Modifier
-                    .weight(1f),
-                value = timeFieldValue,
-                onValueChange = timeFieldValueChange,
-                singleLine = true,
-                label = {
-                    Text(
-                        text = "Time to cook",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = isTimeHasError
-            )
-            Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-            Box(
-                modifier = Modifier
-                    .weight(1f),
-            ) {
-                TextFieldWithDropdownMenu(
-                    textFieldValue = timeUnitValue.name,
-                    labelFieldText = "Time measurement",
-                    menuItemList = TimeUnit.entries,
-                    onMenuItemClick = { timeUnitValueChange(it) }
-                )
-            }
-        }
+        QuantityAndMeasurementRow(
+            quantityValue = timeFieldValue,
+            onQuantityChange = timeFieldValueChange,
+            quantityLabel = "Time to cook",
+            isQuantityHasError = isTimeHasError,
+            measurementValue = timeUnitValue,
+            onMeasurementChange = timeUnitValueChange,
+            measurementOptionList = TimeUnit.entries,
+            measurementLabel = "Time measurement"
+        )
     }
 }
 
