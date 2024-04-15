@@ -29,10 +29,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
@@ -96,7 +98,7 @@ fun StorageCreateContent(
             onValueChange = { onEvent(StorageCreateViewModel.OnEvent.FoodTextChange(it)) },
             label = {
                 Text(
-                    text = "Title",
+                    text = stringResource(id = R.string.title),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodyLarge,
                 )
@@ -108,7 +110,7 @@ fun StorageCreateContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Type:",
+                text = stringResource(id = R.string.type),
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.titleLarge,
             )
@@ -189,7 +191,7 @@ fun StorageCreateContent(
             contentAlignment = Alignment.BottomCenter
         ) {
             Button(onClick = { onEvent(StorageCreateViewModel.OnEvent.Save) }) {
-                Text(text = "Save")
+                Text(text = stringResource(id = R.string.save))
             }
         }
     }
