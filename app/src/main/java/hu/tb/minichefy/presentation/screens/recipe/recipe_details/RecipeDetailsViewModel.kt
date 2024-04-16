@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.domain.model.storage.entity.DISH_TAG_ID
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.DataStoreManager
@@ -46,7 +47,7 @@ class RecipeDetailsViewModel @Inject constructor(
         when (event) {
             is OnEvent.MakeRecipe -> {
                 viewModelScope.launch {
-                    val dishTag = storageRepository.getTagById(3)
+                    val dishTag = storageRepository.getTagById(DISH_TAG_ID.toLong())
                     val isDishAlreadyInTheStorage =
                         storageRepository.searchExactlyOneFoodByTitle(uiState.value.recipe!!.title)
 

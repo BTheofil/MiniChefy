@@ -8,6 +8,9 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 
+const val UNKNOWN_TAG_ID = 4
+const val DISH_TAG_ID = 3
+
 @Entity
 data class FoodEntity(
     @PrimaryKey(autoGenerate = true)

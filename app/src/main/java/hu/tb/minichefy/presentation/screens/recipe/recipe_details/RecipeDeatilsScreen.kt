@@ -26,6 +26,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -85,6 +88,8 @@ fun RecipeDetailsContent(
     var isConfirmDialogVisible by remember {
         mutableStateOf(false)
     }
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     uiState.recipe?.let { recipe ->
         Scaffold(
@@ -109,20 +114,28 @@ fun RecipeDetailsContent(
                             },
                             state = rememberTooltipState(),
                         ) {
-                            IconButton(onClick = {
+                            IconButton(
+                                modifier = Modifier,
+                                onClick = {
                                 isConfirmDialogVisible = uiState.isInformDialogShouldShow
                                 if (!uiState.isInformDialogShouldShow) {
                                     onEvent(RecipeDetailsViewModel.OnEvent.MakeRecipe)
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(message = "Dish added to storage", duration = SnackbarDuration.Short)
+                                    }
                                 }
                             }) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.chef_hat),
-                                    contentDescription = "",
+                                    contentDescription = "Make recipe icon",
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
                         }
                     })
+            },
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState)
             }
         ) {
             OneColorBackground(color = MaterialTheme.colorScheme.primaryContainer)
@@ -284,7 +297,10 @@ fun DetailsBottomContent(
                                     Box(
                                         modifier = Modifier
                                             .size(8.dp)
-                                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                                            .background(
+                                                MaterialTheme.colorScheme.primary,
+                                                CircleShape
+                                            )
                                     )
                                     Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                                     Text(

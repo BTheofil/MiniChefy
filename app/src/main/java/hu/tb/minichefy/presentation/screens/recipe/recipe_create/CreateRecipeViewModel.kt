@@ -9,6 +9,7 @@ import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.domain.model.storage.entity.UNKNOWN_TAG_ID
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidateCountInteger
@@ -206,7 +207,7 @@ class CreateRecipeViewModel @Inject constructor(
                 viewModelScope.launch {
                     val foodTagList = mutableListOf<FoodTag>()
                     if (currentState.unSelectedIngredientList.find { it.title == currentState.ingredientTitleDraft } == null) {
-                        val unknownTag = storageRepository.getTagById(4)
+                        val unknownTag = storageRepository.getTagById(UNKNOWN_TAG_ID.toLong())
                         foodTagList.add(unknownTag)
                     }
 

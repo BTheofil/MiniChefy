@@ -10,9 +10,8 @@ import hu.tb.minichefy.domain.model.storage.entity.TagEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
 import hu.tb.minichefy.domain.model.storage.entity.SimplerFoodEntity
+import hu.tb.minichefy.domain.model.storage.entity.UNKNOWN_TAG_ID
 import kotlinx.coroutines.flow.Flow
-
-const val UNKNOWN_TAG_ID = 4
 
 @Dao
 interface StorageDAO {
