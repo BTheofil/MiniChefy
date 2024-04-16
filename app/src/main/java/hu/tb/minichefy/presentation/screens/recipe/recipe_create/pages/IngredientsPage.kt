@@ -33,25 +33,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
+import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.PageNextButton
-import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.Red400
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun IngredientsPage(
     uiState: CreateRecipeViewModel.Pages.IngredientsPage,
@@ -92,174 +89,218 @@ fun IngredientsPage(
                     }
                 )
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-                LazyColumn(
+                IngredientList(
                     modifier = Modifier
-                        .height(LocalConfiguration.current.screenHeightDp.dp / 2),
-                ) {
-                    item(
-                        key = "selected_ingredients_title_key"
-                    ) {
-                        Text(
-                            modifier = Modifier.animateItemPlacement(),
-                            text = "Selected ingredients",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    if (uiState.selectedIngredientList.isEmpty()) {
-                        item(
-                            key = "empty_ingredient_list_title_key"
-                        ) {
-                            ListItem(
-                                modifier = Modifier.animateItemPlacement(),
-                                headlineContent = {
-                                    Text(
-                                        text = "No ingredients...",
-                                        style = MaterialTheme.typography.titleLarge,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                })
-                        }
-                    }
-                    itemsIndexed(
-                        items = uiState.selectedIngredientList,
-                    ) { index, product ->
-                        ListItem(
-                            modifier = Modifier.animateItemPlacement(),
-                            headlineContent = {
-                                Text(
-                                    text = product.title,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            supportingContent = {
-                                Row {
-                                    Text(
-                                        text = product.quantity.toString(),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
-                                    Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
-                                    Text(
-                                        text = product.unitOfMeasurement.toString(),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
-                                }
-                            },
-                            trailingContent = {
-                                IconButton(onClick = {
-                                    onRemoveIngredientClick(index)
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Delete,
-                                        contentDescription = "remove selected ingredient icon",
-                                        tint = Color(Red400.value)
-                                    )
-                                }
-                            })
-                    }
-                    item(
-                        key = "all_ingredients_title_key"
-                    ) {
-                        Column(
-                            modifier = Modifier.animateItemPlacement()
-                        ) {
-                            Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-                            Text(
-                                text = "All ingredients",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                    items(
-                        items = uiState.unSelectedIngredientList,
-                        key = { item -> item.id }
-                    ) { ingredient ->
-                        ListItem(
-                            modifier = Modifier.animateItemPlacement(),
-                            headlineContent = {
-                                Text(
-                                    text = ingredient.title,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            trailingContent = {
-                                IconButton(onClick = {
-                                    onIngredientTitleChange(ingredient.title)
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.AddCircle,
-                                        contentDescription = "add ingredient icon",
-                                        tint = MaterialTheme.colorScheme.tertiary
-                                    )
-                                }
-                            })
-                    }
-                }
+                        .weight(1f),
+                    uiState = uiState,
+                    onIngredientTitleChange = onIngredientTitleChange,
+                    onRemoveIngredientClick = onRemoveIngredientClick
+                )
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
-                Row(
+                IngredientsCreatePanel(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            value = uiState.ingredientTitleDraft,
-                            onValueChange = onIngredientTitleChange,
-                            label = {
-                                Text(
-                                    text = "Ingredient name",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.primary,
-                                )
-                            },
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                            isError = uiState.isIngredientTitleHasError
-                        )
-                        Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
-                        QuantityAndMeasurementRow(
-                            quantityValue = uiState.ingredientQuantityDraft,
-                            onQuantityChange = onIngredientQuantityChange,
-                            quantityLabel = "Amount",
-                            isQuantityHasError = uiState.isIngredientQuantityHasError,
-                            measurementValue = uiState.ingredientUnitOfMeasurementDraft,
-                            onMeasurementChange = onIngredientUnitOfMeasurementChange,
-                            measurementLabel = "Measurement",
-                            measurementOptionList = UnitOfMeasurement.entries
-                        )
-                        Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            onClick = {
-                                focusManager.clearFocus()
-                                onAddIngredientClick()
-                            }) {
-                            Text(text = "Add ingredient")
-                        }
-                    }
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.BottomCenter
-                ) {
-                    PageNextButton(text = "Next page", onClick = onNextButtonClick)
-                }
+                        .weight(1f),
+                    uiState = uiState,
+                    onIngredientTitleChange = onIngredientTitleChange,
+                    onIngredientQuantityChange = onIngredientQuantityChange,
+                    onIngredientUnitOfMeasurementChange = onIngredientUnitOfMeasurementChange,
+                    onAddIngredientClick = onAddIngredientClick,
+                    onNextButtonClick = onNextButtonClick
+                )
             }
         }
     )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun IngredientList(
+    modifier: Modifier = Modifier,
+    uiState: CreateRecipeViewModel.Pages.IngredientsPage,
+    onIngredientTitleChange: (String) -> Unit,
+    onRemoveIngredientClick: (Int) -> Unit
+) {
+    LazyColumn(
+        modifier = modifier,
+    ) {
+        item(
+            key = "selected_ingredients_title_key"
+        ) {
+            Text(
+                modifier = Modifier.animateItemPlacement(),
+                text = "Selected ingredients",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        if (uiState.selectedIngredientList.isEmpty()) {
+            item(
+                key = "empty_ingredient_list_title_key"
+            ) {
+                ListItem(
+                    modifier = Modifier.animateItemPlacement(),
+                    headlineContent = {
+                        Text(
+                            text = "No ingredients...",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    })
+            }
+        }
+        itemsIndexed(
+            items = uiState.selectedIngredientList,
+        ) { index, product ->
+            ListItem(
+                modifier = Modifier.animateItemPlacement(),
+                headlineContent = {
+                    Text(
+                        text = product.title,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                },
+                supportingContent = {
+                    Row {
+                        Text(
+                            text = product.quantity.toString(),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        Spacer(modifier = Modifier.width(SMALL_SPACE_BETWEEN_ELEMENTS))
+                        Text(
+                            text = product.unitOfMeasurement.toString(),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                },
+                trailingContent = {
+                    IconButton(onClick = {
+                        onRemoveIngredientClick(index)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = "remove selected ingredient icon",
+                            tint = Color(Red400.value)
+                        )
+                    }
+                })
+        }
+        item(
+            key = "all_ingredients_title_key"
+        ) {
+            Column(
+                modifier = Modifier.animateItemPlacement()
+            ) {
+                Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
+                Text(
+                    text = "All ingredients",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        items(
+            items = uiState.unSelectedIngredientList,
+            key = { item -> item.id }
+        ) { ingredient ->
+            ListItem(
+                modifier = Modifier.animateItemPlacement(),
+                headlineContent = {
+                    Text(
+                        text = ingredient.title,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                },
+                trailingContent = {
+                    IconButton(onClick = {
+                        onIngredientTitleChange(ingredient.title)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Outlined.AddCircle,
+                            contentDescription = "add ingredient icon",
+                            tint = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                })
+        }
+    }
+}
+
+@Composable
+fun IngredientsCreatePanel(
+    modifier: Modifier = Modifier,
+    uiState: CreateRecipeViewModel.Pages.IngredientsPage,
+    onIngredientTitleChange: (String) -> Unit,
+    onIngredientQuantityChange: (String) -> Unit,
+    onIngredientUnitOfMeasurementChange: (UnitOfMeasurement) -> Unit,
+    onAddIngredientClick: () -> Unit,
+    onNextButtonClick: () -> Unit
+) {
+    val focusManager = LocalFocusManager.current
+
+    Column(
+        modifier = modifier,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    value = uiState.ingredientTitleDraft,
+                    onValueChange = onIngredientTitleChange,
+                    label = {
+                        Text(
+                            text = "Ingredient name",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    isError = uiState.isIngredientTitleHasError
+                )
+                Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
+                QuantityAndMeasurementRow(
+                    quantityValue = uiState.ingredientQuantityDraft,
+                    onQuantityChange = onIngredientQuantityChange,
+                    quantityLabel = "Amount",
+                    isQuantityHasError = uiState.isIngredientQuantityHasError,
+                    measurementValue = uiState.ingredientUnitOfMeasurementDraft,
+                    onMeasurementChange = onIngredientUnitOfMeasurementChange,
+                    measurementLabel = "Measurement",
+                    measurementOptionList = UnitOfMeasurement.entries
+                )
+                Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onClick = {
+                        focusManager.clearFocus()
+                        onAddIngredientClick()
+                    }) {
+                    Text(text = "Add ingredient")
+                }
+            }
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            PageNextButton(text = "Next page", onClick = onNextButtonClick)
+        }
+    }
 }
 
 @Preview
