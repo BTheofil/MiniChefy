@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
@@ -58,7 +59,8 @@ fun <T> TextFieldWithDropdownMenu(
             },
             trailingIcon = {
                 IconButton(
-                    modifier = Modifier,
+                    modifier = Modifier
+                        .testTag("DropdownMenuIconTag"),
                     onClick = { isDropdownMenuVisible = true }) {
                     Icon(
                         modifier = Modifier,
