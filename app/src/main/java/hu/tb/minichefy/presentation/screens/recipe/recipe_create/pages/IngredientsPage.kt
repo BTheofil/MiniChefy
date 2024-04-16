@@ -80,6 +80,8 @@ fun IngredientsPage(
                     )
             ) {
                 SearchItemBar(
+                    modifier = Modifier
+                        .fillMaxWidth(),
                     queryText = uiState.searchText,
                     onQueryChange = onQueryChange,
                     clearIconButtonClick = {

@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.components
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Search
@@ -24,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchItemBar(
+    modifier: Modifier = Modifier,
     queryText: String,
     onQueryChange: (text: String) -> Unit,
     clearIconButtonClick: () -> Unit
@@ -35,8 +35,7 @@ fun SearchItemBar(
     }
 
     SearchBar(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .onFocusChanged {
                 isClearIconVisible = it.hasFocus
             },
