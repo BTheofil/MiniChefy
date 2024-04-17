@@ -24,9 +24,3 @@ enum class UnitOfMeasurement(val stringResource: Int) {
     DKG(R.string.dkg),
     KG(R.string.kg)
 }
-
-enum class FoodType(val stringResource: Int) {
-    LIQUID(R.string.liquid),
-    SOLID(R.string.solid),
-    PIECE(R.string.piece)
-}
