@@ -1,11 +1,14 @@
 package hu.tb.minichefy.presentation.storage.create
 
+import android.content.Context
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.test.platform.app.InstrumentationRegistry
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.storage.storage_create.StorageCreateContent
@@ -17,6 +20,8 @@ import org.junit.Rule
 import org.junit.Test
 
 class StorageCreateUITest {
+
+    private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @get:Rule
     val rule = createComposeRule()
@@ -40,12 +45,6 @@ class StorageCreateUITest {
                             )
                         }
 
-                        is StorageCreateViewModel.OnEvent.FoodTypeChange -> uiState.update {
-                            it.copy(
-                                foodType = event.type
-                            )
-                        }
-
                         is StorageCreateViewModel.OnEvent.FoodUnitChange -> uiState.update {
                             it.copy(foodUnitOfMeasurement = event.type)
                         }
@@ -53,7 +52,7 @@ class StorageCreateUITest {
                         is StorageCreateViewModel.OnEvent.OnSelectedIconDialogClick -> TODO()
                         StorageCreateViewModel.OnEvent.Save -> {
                             val expectedFood = Food(
-                                title = "Alma",
+                                title = "Milk",
                                 quantity = 1f,
                                 unitOfMeasurement = UnitOfMeasurement.L,
                                 icon = 1,
@@ -62,7 +61,10 @@ class StorageCreateUITest {
 
                             assertEquals(expectedFood.title, uiState.value.foodTitleText)
                             assertEquals(expectedFood.quantity, uiState.value.quantity.toFloat())
-                            assertEquals(expectedFood.unitOfMeasurement, uiState.value.foodUnitOfMeasurement)
+                            assertEquals(
+                                expectedFood.unitOfMeasurement,
+                                uiState.value.foodUnitOfMeasurement
+                            )
                         }
                     }
                 }
@@ -70,13 +72,10 @@ class StorageCreateUITest {
 
         }
 
-        rule.onNodeWithText("Title").performTextInput("Alma")
-        rule.onNodeWithText("Solid").performClick()
-        rule.onNodeWithText("Piece").performClick()
-        rule.onNodeWithText("Liquid").performClick()
-        rule.onNodeWithText("Amount").performTextInput("1")
+        rule.onNodeWithText(context.resources.getString(R.string.title)).performTextInput("Milk")
+        rule.onNodeWithText(context.resources.getString(R.string.amount)).performTextInput("1")
         rule.onNodeWithTag("DropdownMenuIconTag").performClick()
-        rule.onNodeWithText("L").performClick()
-        rule.onNodeWithText("Save").performClick()
+        rule.onNodeWithText(context.resources.getString(R.string.l)).performClick()
+        rule.onNodeWithText(context.resources.getString(R.string.save)).performClick()
     }
 }

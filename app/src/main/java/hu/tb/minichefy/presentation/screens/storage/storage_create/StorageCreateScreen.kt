@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,14 +35,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.FoodTag
-import hu.tb.minichefy.domain.model.storage.FoodType
 import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
-import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
-import hu.tb.minichefy.presentation.screens.storage.storage_create.components.RadioButtonWithText
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.screens.manager.icons.FoodIcon
+import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
@@ -86,12 +83,13 @@ fun StorageCreateContent(
             .padding(horizontal = SCREEN_HORIZONTAL_PADDING, vertical = SCREEN_VERTICAL_PADDING)
             .clickableWithoutRipple { focusManager.clearFocus() }
     ) {
-
         CircleImage(
             image = uiState.selectedFoodIcon.resource,
             onClick = { showIconPicker = true }
         )
+
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
+
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -106,38 +104,9 @@ fun StorageCreateContent(
             },
             isError = uiState.isFoodTitleHasError
         )
+
         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(id = R.string.type),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleLarge,
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                repeat(FoodType.entries.size) { foodTypeIndex ->
-                    FoodType.entries[foodTypeIndex].also {
-                        RadioButtonWithText(
-                            displayText = stringResource(id = it.stringResource),
-                            isSelected = uiState.foodType == it,
-                            onClick = {
-                                onEvent(
-                                    StorageCreateViewModel.OnEvent.FoodTypeChange(
-                                        it
-                                    )
-                                )
-                            }
-                        )
-                    }
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
+
         QuantityAndMeasurementRow(
             quantityValue = uiState.quantity,
             onQuantityChange = { onEvent(StorageCreateViewModel.OnEvent.FoodQuantityChange(it)) },
@@ -150,13 +119,14 @@ fun StorageCreateContent(
                 onEvent(StorageCreateViewModel.OnEvent.FoodUnitChange(it))
             }
         )
+
         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
+
         Text(
             text = stringResource(R.string.tag),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.titleLarge,
         )
-
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS),
             verticalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS)
