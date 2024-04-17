@@ -1,7 +1,6 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,19 +30,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
+import hu.tb.minichefy.presentation.preview.FoodSummaryPreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
-import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.PageNextButton
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.Red400
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
@@ -98,8 +100,7 @@ fun IngredientsPage(
                 )
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                 IngredientsCreatePanel(
-                    modifier = Modifier
-                        .weight(1f),
+                    modifier = Modifier,
                     uiState = uiState,
                     onIngredientTitleChange = onIngredientTitleChange,
                     onIngredientQuantityChange = onIngredientQuantityChange,
@@ -128,7 +129,7 @@ fun IngredientList(
         ) {
             Text(
                 modifier = Modifier.animateItemPlacement(),
-                text = "Selected ingredients",
+                text = stringResource(id = R.string.selected_ingredients),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -141,7 +142,7 @@ fun IngredientList(
                     modifier = Modifier.animateItemPlacement(),
                     headlineContent = {
                         Text(
-                            text = "No ingredients...",
+                            text = stringResource(id = R.string.no_ingredients),
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -195,7 +196,7 @@ fun IngredientList(
             ) {
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                 Text(
-                    text = "All ingredients",
+                    text = stringResource(id = R.string.all_ingredients),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -244,68 +245,62 @@ fun IngredientsCreatePanel(
     Column(
         modifier = modifier,
     ) {
-        Row(
+        OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    value = uiState.ingredientTitleDraft,
-                    onValueChange = onIngredientTitleChange,
-                    label = {
-                        Text(
-                            text = "Ingredient name",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                    },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    isError = uiState.isIngredientTitleHasError
+            value = uiState.ingredientTitleDraft,
+            onValueChange = onIngredientTitleChange,
+            label = {
+                Text(
+                    text = stringResource(id = R.string.ingredient_name),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
                 )
-                Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
-                QuantityAndMeasurementRow(
-                    quantityValue = uiState.ingredientQuantityDraft,
-                    onQuantityChange = onIngredientQuantityChange,
-                    quantityLabel = "Amount",
-                    isQuantityHasError = uiState.isIngredientQuantityHasError,
-                    measurementValue = uiState.ingredientUnitOfMeasurementDraft,
-                    onMeasurementChange = onIngredientUnitOfMeasurementChange,
-                    measurementLabel = "Measurement",
-                    measurementOptionList = UnitOfMeasurement.entries
-                )
-                Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    onClick = {
-                        focusManager.clearFocus()
-                        onAddIngredientClick()
-                    }) {
-                    Text(text = "Add ingredient")
-                }
-            }
-        }
-        Box(
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            isError = uiState.isIngredientTitleHasError
+        )
+        Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
+        QuantityAndMeasurementRow(
+            quantityValue = uiState.ingredientQuantityDraft,
+            onQuantityChange = onIngredientQuantityChange,
+            quantityLabel = stringResource(id = R.string.amount),
+            isQuantityHasError = uiState.isIngredientQuantityHasError,
+            measurementValue = uiState.ingredientUnitOfMeasurementDraft,
+            onMeasurementChange = onIngredientUnitOfMeasurementChange,
+            measurementLabel = stringResource(id = R.string.measurement),
+            measurementOptionList = UnitOfMeasurement.entries
+        )
+        Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
+        Button(
             modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter
+                .fillMaxWidth(),
+            onClick = {
+                focusManager.clearFocus()
+                onAddIngredientClick()
+            }) {
+            Text(text = stringResource(id = R.string.add_ingredient))
+        }
+        OutlinedButton(
+            modifier = Modifier
+                .fillMaxWidth(),
+            onClick = onNextButtonClick
         ) {
-            PageNextButton(text = "Next page", onClick = onNextButtonClick)
+            Text(
+                text = stringResource(R.string.done),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
 
 @Preview
 @Composable
-private fun IngredientsPagePreview() {
+private fun IngredientsPagePreview(
+    @PreviewParameter(FoodSummaryPreviewParameterProvider::class) mockFoodSummaryList: List<FoodSummary>
+) {
 
     var queryText by remember {
         mutableStateOf("")
@@ -314,10 +309,7 @@ private fun IngredientsPagePreview() {
     IngredientsPage(
         uiState = CreateRecipeViewModel.Pages.IngredientsPage(
             selectedIngredientList = listOf(),
-            unSelectedIngredientList = listOf(
-                FoodSummary(0, "apple"),
-                FoodSummary(1, "banana")
-            ),
+            unSelectedIngredientList = mockFoodSummaryList,
             searchText = queryText,
         ),
         onQueryChange = { queryText = it },
