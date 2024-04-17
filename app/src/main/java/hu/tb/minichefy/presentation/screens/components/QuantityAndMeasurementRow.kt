@@ -59,7 +59,7 @@ fun<T> QuantityAndMeasurementRow(
         TextFieldWithDropdownMenu(
             modifier = Modifier
                 .weight(1f),
-            textFieldValue = measurementValue.toString(),
+            textFieldValue = measurementValue,
             labelFieldText = measurementLabel,
             menuItemList = measurementOptionList,
             onMenuItemClick = onMeasurementChange

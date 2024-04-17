@@ -1,5 +1,6 @@
 package hu.tb.minichefy.domain.model.recipe
 
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 
 data class Recipe(
@@ -13,9 +14,9 @@ data class Recipe(
     val ingredientList: List<Food>
 )
 
-enum class TimeUnit(val id: Int) {
-    MINUTES(1),
-    HOUR(2)
+enum class TimeUnit(val id: Int, val stringResource: Int) {
+    MINUTES(id = 1, stringResource = R.string.minute),
+    HOUR(id = 2, stringResource = R.string.hour)
 }
 
 

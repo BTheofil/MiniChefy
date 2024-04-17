@@ -23,9 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
@@ -86,7 +88,7 @@ fun ProductTagSelectorDialog(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     OutlinedButton(onClick = dismissAndCloseAction) {
-                        Text(text = "Done")
+                        Text(text = stringResource(R.string.done))
                     }
                 }
             }

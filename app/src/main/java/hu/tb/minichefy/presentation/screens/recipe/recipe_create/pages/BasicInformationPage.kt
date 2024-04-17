@@ -23,9 +23,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.presentation.screens.components.CircleImage
+import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.manager.icons.MealIcon
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
-import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.PageNextButton
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info.QuestionForm
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
@@ -98,7 +98,6 @@ fun BasicInformationPage(
             contentAlignment = Alignment.BottomCenter
         ) {
             PageNextButton(
-                text = "Next page",
                 onClick = {
                     focusManager.clearFocus()
                     onNextPageClick()

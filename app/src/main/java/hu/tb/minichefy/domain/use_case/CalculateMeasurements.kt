@@ -12,11 +12,11 @@ class CalculateMeasurements {
         productChanger: CalculationFood
     ): CalculationFood {
         val isLiquid =
-            productBase.unitOfMeasurement.id in liquidRange && productChanger.unitOfMeasurement.id in liquidRange
+            productBase.unitOfMeasurement.ordinal in liquidRange && productChanger.unitOfMeasurement.ordinal in liquidRange
         val isMass =
-            productBase.unitOfMeasurement.id in massRange && productChanger.unitOfMeasurement.id in massRange
+            productBase.unitOfMeasurement.ordinal in massRange && productChanger.unitOfMeasurement.ordinal in massRange
         val isPiece =
-            productBase.unitOfMeasurement.id == 0 && productChanger.unitOfMeasurement.id == 0
+            productBase.unitOfMeasurement.ordinal == 0 && productChanger.unitOfMeasurement.ordinal == 0
 
         if (!isLiquid && !isMass && !isPiece) throw IllegalArgumentException("Not compatible unit of measurements")
 

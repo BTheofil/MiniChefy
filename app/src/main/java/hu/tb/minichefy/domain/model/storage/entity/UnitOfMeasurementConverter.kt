@@ -5,7 +5,7 @@ import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 
 class UnitOfMeasurementConverter {
     @TypeConverter
-    fun unitToInt(unit: UnitOfMeasurement): Int = unit.id
+    fun unitToInt(unit: UnitOfMeasurement): Int = unit.ordinal
 
     @TypeConverter
     fun intToUnit(id: Int): UnitOfMeasurement = when (id) {

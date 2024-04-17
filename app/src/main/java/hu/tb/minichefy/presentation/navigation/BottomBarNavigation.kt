@@ -1,12 +1,14 @@
 package hu.tb.minichefy.presentation.navigation
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -30,7 +32,13 @@ fun BottomBarNavigation(
                         contentDescription = "navigation bar icon"
                     )
                 },
-                label = { Text(menuItem.label) },
+                label = {
+                    Text(
+                        text = stringResource(id = menuItem.label),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                },
                 selected = currentDestination?.hierarchy?.any { it.route == menuItem.route } == true,
                 onClick = {
                     navController.navigate(menuItem.route) {
@@ -48,9 +56,15 @@ val menuItems = listOf(
     BottomNavigationItem.Recipe
 )
 
-sealed class BottomNavigationItem(val icon: Int, val label: String, val route: String) {
+sealed class BottomNavigationItem(val icon: Int, val label: Int, val route: String) {
     data object Storage :
-        BottomNavigationItem(R.drawable.fridge_icon, "Storage", STORAGE_GRAPH)
+        BottomNavigationItem(
+            R.drawable.fridge_icon,
+            R.string.storage, STORAGE_GRAPH
+        )
 
-    data object Recipe : BottomNavigationItem(R.drawable.outline_book_24, "Recipe", RECIPE_GRAPH)
+    data object Recipe : BottomNavigationItem(
+        R.drawable.outline_book_24,
+        R.string.recipe, RECIPE_GRAPH
+    )
 }

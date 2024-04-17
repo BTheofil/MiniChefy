@@ -36,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.FoodTag
+import hu.tb.minichefy.domain.model.storage.FoodType
 import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
@@ -119,10 +120,10 @@ fun StorageCreateContent(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                repeat(StorageCreateViewModel.FoodType.entries.size) { foodTypeIndex ->
-                    StorageCreateViewModel.FoodType.entries[foodTypeIndex].also {
+                repeat(FoodType.entries.size) { foodTypeIndex ->
+                    FoodType.entries[foodTypeIndex].also {
                         RadioButtonWithText(
-                            displayText = it.displayText,
+                            displayText = stringResource(id = it.stringResource),
                             isSelected = uiState.foodType == it,
                             onClick = {
                                 onEvent(
@@ -140,18 +141,18 @@ fun StorageCreateContent(
         QuantityAndMeasurementRow(
             quantityValue = uiState.quantity,
             onQuantityChange = { onEvent(StorageCreateViewModel.OnEvent.FoodQuantityChange(it)) },
-            quantityLabel = "Amount",
+            quantityLabel = stringResource(R.string.amount),
             isQuantityHasError = uiState.isQuantityHasError,
             measurementOptionList = uiState.availableUnitOfMeasurementList,
             measurementValue = uiState.foodUnitOfMeasurement,
-            measurementLabel = "Measurement",
+            measurementLabel = stringResource(R.string.measurement),
             onMeasurementChange = {
                 onEvent(StorageCreateViewModel.OnEvent.FoodUnitChange(it))
             }
         )
         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
         Text(
-            text = "Select tag",
+            text = stringResource(R.string.tag),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.titleLarge,
         )

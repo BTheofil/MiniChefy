@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -204,7 +205,7 @@ private fun DetailsTopContent(
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         QuickInfoBox(
             infoList = listOf(
-                SimpleQuickRecipeInfo(recipe.quantity.toString(), "serve"),
+                SimpleQuickRecipeInfo(recipe.quantity.toString(), stringResource(R.string.serve)),
                 SimpleQuickRecipeInfo(
                     recipe.timeToCreate.toString(),
                     recipe.timeUnit.toString()
