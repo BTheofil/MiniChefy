@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -45,6 +43,7 @@ import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.PageNextButton
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.Red400
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
@@ -113,7 +112,6 @@ fun IngredientsPage(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun IngredientList(
     modifier: Modifier = Modifier,
@@ -128,7 +126,7 @@ fun IngredientList(
             key = "selected_ingredients_title_key"
         ) {
             Text(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 text = stringResource(id = R.string.selected_ingredients),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary
@@ -139,7 +137,7 @@ fun IngredientList(
                 key = "empty_ingredient_list_title_key"
             ) {
                 ListItem(
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier.animateItem(),
                     headlineContent = {
                         Text(
                             text = stringResource(id = R.string.no_ingredients),
@@ -153,7 +151,7 @@ fun IngredientList(
             items = uiState.selectedIngredientList,
         ) { index, product ->
             ListItem(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 headlineContent = {
                     Text(
                         text = product.title,
@@ -192,7 +190,7 @@ fun IngredientList(
             key = "all_ingredients_title_key"
         ) {
             Column(
-                modifier = Modifier.animateItemPlacement()
+                modifier = Modifier.animateItem()
             ) {
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                 Text(
@@ -207,7 +205,7 @@ fun IngredientList(
             key = { item -> item.id }
         ) { ingredient ->
             ListItem(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 headlineContent = {
                     Text(
                         text = ingredient.title,
@@ -282,17 +280,7 @@ fun IngredientsCreatePanel(
             }) {
             Text(text = stringResource(id = R.string.add_ingredient))
         }
-        OutlinedButton(
-            modifier = Modifier
-                .fillMaxWidth(),
-            onClick = onNextButtonClick
-        ) {
-            Text(
-                text = stringResource(R.string.done),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
+        PageNextButton(onClick = onNextButtonClick)
     }
 }
 

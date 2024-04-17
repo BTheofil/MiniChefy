@@ -17,6 +17,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -114,14 +116,22 @@ fun StepsPage(
 @Preview
 @Composable
 fun StepsPagePreview() {
+    val testList = remember {
+        mutableStateListOf(RecipeStep(1, "first"))
+    }
+
     StepsPage(
         CreateRecipeViewModel.Pages.StepsPage(
-            recipeSteps = listOf(RecipeStep(1, "first"))
+            recipeSteps = testList
         ),
         onNextButtonClick = {},
-        onAddButtonClick = {},
+        onAddButtonClick = {
+            testList.add(RecipeStep(testList.size + 1L, "aaa"))
+        },
         onStepTextFieldValueChange = { _, _ -> },
-        onDeleteItemClick = {},
+        onDeleteItemClick = {
+            testList.removeAt(it)
+        },
         onRecipeItemClick = {}
     )
 }

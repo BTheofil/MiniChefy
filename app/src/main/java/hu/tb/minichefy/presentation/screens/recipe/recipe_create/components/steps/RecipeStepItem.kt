@@ -36,6 +36,7 @@ import hu.tb.minichefy.presentation.screens.components.extensions.clickableWitho
 
 @Composable
 fun RecipeStepItem(
+    modifier: Modifier = Modifier,
     index: Int,
     displayText: String,
     closeIconVisible: Boolean = true,
@@ -46,7 +47,7 @@ fun RecipeStepItem(
     onRecipeItemClick: (Int) -> Unit,
 ) {
     ConstraintLayout(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
     ) {
         val (counterBox,
@@ -163,6 +164,6 @@ fun RecipeStepItemPreview() {
         onRecipeStepTextFieldChange = {},
         onRecipeItemClick = {},
         isTextEditable = true,
-        keyboardController = keyboardController
+        keyboardController = keyboardController,
     )
 }
