@@ -35,9 +35,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
@@ -101,7 +103,7 @@ fun IngredientsPage(
                     ) {
                         Text(
                             modifier = Modifier.animateItemPlacement(),
-                            text = "Selected ingredients",
+                            text = stringResource(R.string.selected_ingredients),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -114,7 +116,7 @@ fun IngredientsPage(
                                 modifier = Modifier.animateItemPlacement(),
                                 headlineContent = {
                                     Text(
-                                        text = "No ingredients...",
+                                        text = stringResource(R.string.no_ingredients),
                                         style = MaterialTheme.typography.titleLarge,
                                         color = MaterialTheme.colorScheme.primary
                                     )
@@ -168,7 +170,7 @@ fun IngredientsPage(
                         ) {
                             Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                             Text(
-                                text = "All ingredients",
+                                text = stringResource(R.string.all_ingredients),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -218,7 +220,7 @@ fun IngredientsPage(
                             onValueChange = onIngredientTitleChange,
                             label = {
                                 Text(
-                                    text = "Ingredient name",
+                                    text = stringResource(R.string.ingredient_name),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.primary,
                                 )
@@ -231,11 +233,11 @@ fun IngredientsPage(
                         QuantityAndMeasurementRow(
                             quantityValue = uiState.ingredientQuantityDraft,
                             onQuantityChange = onIngredientQuantityChange,
-                            quantityLabel = "Amount",
+                            quantityLabel = stringResource(id = R.string.amount),
                             isQuantityHasError = uiState.isIngredientQuantityHasError,
                             measurementValue = uiState.ingredientUnitOfMeasurementDraft,
                             onMeasurementChange = onIngredientUnitOfMeasurementChange,
-                            measurementLabel = "Measurement",
+                            measurementLabel = stringResource(id = R.string.measurement),
                             measurementOptionList = UnitOfMeasurement.entries
                         )
                         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
@@ -246,7 +248,7 @@ fun IngredientsPage(
                                 focusManager.clearFocus()
                                 onAddIngredientClick()
                             }) {
-                            Text(text = "Add ingredient")
+                            Text(text = stringResource(R.string.add_ingredient))
                         }
                     }
                 }
@@ -255,7 +257,9 @@ fun IngredientsPage(
                         .fillMaxSize(),
                     contentAlignment = Alignment.BottomCenter
                 ) {
-                    PageNextButton(text = "Next page", onClick = onNextButtonClick)
+                    PageNextButton(
+                        onClick = onNextButtonClick
+                    )
                 }
             }
         }
