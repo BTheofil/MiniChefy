@@ -35,7 +35,9 @@ interface StorageDAO {
     fun getKnownFoodsFlow(): Flow<List<FoodWithTags>>
 
     @Transaction
-    @Query("SELECT * FROM FoodEntity WHERE foodId IN (SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId != ($UNKNOWN_TAG_ID))")
+    @Query("SELECT * FROM FoodEntity f " +
+            "WHERE NOT EXISTS (SELECT 1 FROM FoodAndTagsCrossRef WHERE f.foodId = foodId AND tagId = ($UNKNOWN_TAG_ID)) " +
+            "OR f.foodId NOT IN (SELECT foodId FROM FoodAndTagsCrossRef)")
     suspend fun getKnownFoodsList(): List<FoodWithTags>
 
     @Transaction
