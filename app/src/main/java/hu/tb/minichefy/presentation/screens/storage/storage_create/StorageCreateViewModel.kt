@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.storage.FoodTag
+import hu.tb.minichefy.domain.model.storage.FoodType
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
@@ -59,12 +60,6 @@ class StorageCreateViewModel @Inject constructor(
         val labelFilterTagList: List<FoodTag> = emptyList(),
         val tagDialogValue: String = ""
     )
-
-    enum class FoodType(val displayText: String) {
-        LIQUID("Liquid"),
-        SOLID("Solid"),
-        PIECE("Piece")
-    }
 
     sealed class OnEvent {
         data object Save : OnEvent()

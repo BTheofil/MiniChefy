@@ -22,14 +22,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 
 @Composable
 fun <T> TextFieldWithDropdownMenu(
     modifier: Modifier = Modifier,
-    textFieldValue: String,
+    textFieldValue: T,
     labelFieldText: String,
     menuItemList: List<T>,
     onMenuItemClick: (T) -> Unit,
@@ -47,7 +49,7 @@ fun <T> TextFieldWithDropdownMenu(
                 .onSizeChanged {
                     itemWidth = with(density) { it.width.toDp() }
                 },
-            value = textFieldValue,
+            value = stringResource(id = convertGeneric(textFieldValue)),
             onValueChange = {},
             readOnly = true,
             label = {
@@ -77,7 +79,7 @@ fun <T> TextFieldWithDropdownMenu(
             onDismissRequest = { isDropdownMenuVisible = false }) {
             menuItemList.forEach {
                 DropdownMenuItem(
-                    text = { Text(text = it.toString()) },
+                    text = { Text(text = stringResource(id = convertGeneric(it))) },
                     onClick = {
                         onMenuItemClick(it)
                         isDropdownMenuVisible = false
@@ -85,6 +87,16 @@ fun <T> TextFieldWithDropdownMenu(
             }
         }
     }
+}
+
+private fun <T> convertGeneric(input: T): Int {
+    if (input is TimeUnit) {
+        return input.stringResource
+    }
+    if (input is UnitOfMeasurement) {
+        return input.stringResource
+    }
+    return -1
 }
 
 @Preview
@@ -96,7 +108,7 @@ private fun TextFieldWithDropdownMenuPreview() {
     }
 
     TextFieldWithDropdownMenu(
-        textFieldValue = selected.name,
+        textFieldValue = selected,
         labelFieldText = "Mesurement",
         menuItemList = UnitOfMeasurement.entries,
         onMenuItemClick = { selected = it }

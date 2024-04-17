@@ -9,7 +9,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
@@ -37,7 +39,7 @@ fun QuestionForm(
             onValueChange = recipeTitleOnValueChange,
             label = {
                 Text(
-                    text = "Recipe title",
+                    text = stringResource(R.string.recipe_title),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -47,7 +49,7 @@ fun QuestionForm(
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         Text(
-            text = "How many times can eat?",
+            text = stringResource(R.string.how_many_times_can_eat),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary
         )
@@ -62,12 +64,12 @@ fun QuestionForm(
         QuantityAndMeasurementRow(
             quantityValue = timeFieldValue,
             onQuantityChange = timeFieldValueChange,
-            quantityLabel = "Time to cook",
+            quantityLabel = stringResource(R.string.time_to_cook),
             isQuantityHasError = isTimeHasError,
             measurementValue = timeUnitValue,
             onMeasurementChange = timeUnitValueChange,
             measurementOptionList = TimeUnit.entries,
-            measurementLabel = "Time measurement"
+            measurementLabel = stringResource(R.string.time_measurement)
         )
     }
 }

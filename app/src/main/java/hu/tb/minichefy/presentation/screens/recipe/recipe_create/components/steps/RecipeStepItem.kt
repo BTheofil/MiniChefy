@@ -20,7 +20,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -35,7 +34,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RecipeStepItem(
     index: Int,
@@ -154,7 +152,6 @@ fun RecipeStepItem(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Preview
 @Composable
 fun RecipeStepItemPreview() {
