@@ -68,7 +68,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun searchKnownFoodByTitle(title: String): List<Food> {
-        val entities = dao.searchKnownFoodByTitle(title)
+        val entities = dao.searchKnownFoodByTitle("%$title%")
         return entities.map {
             FoodEntityToFood().map(it)
         }

@@ -71,7 +71,6 @@ class StorageListViewModel @Inject constructor(
     )
 
     sealed class OnEvent {
-        data object ClearSearchText : OnEvent()
         data object ClearSelectedFoodIndex : OnEvent()
         data object SaveEditFoodQuantities : OnEvent()
         data object SetupEditFoodQuantityDialog : OnEvent()
@@ -101,10 +100,6 @@ class StorageListViewModel @Inject constructor(
                         it.copy(foodList = searchResult)
                     }
                 }
-            }
-
-            OnEvent.ClearSearchText -> _uiState.update {
-                it.copy(searchText = "")
             }
 
             is OnEvent.FilterChipClicked -> {
