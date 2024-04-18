@@ -95,7 +95,7 @@ class StorageListViewModel @Inject constructor(
 
                     delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
 
-                    val searchResult = storageRepository.searchKnownFoodByTitle(event.text)
+                    val searchResult = storageRepository.searchKnownFoodLikelyByTitle(event.text)
                     _uiState.update {
                         it.copy(foodList = searchResult)
                     }

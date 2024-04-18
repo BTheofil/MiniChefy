@@ -9,6 +9,8 @@ import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.model.storage.entity.DISH_TAG_ID
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
+import hu.tb.minichefy.domain.use_case.CalculateMeasurements
+import hu.tb.minichefy.domain.use_case.CalculationFood
 import hu.tb.minichefy.domain.use_case.DataStoreManager
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.navigation.RECIPE_ID_ARGUMENT_KEY
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +25,7 @@ class RecipeDetailsViewModel @Inject constructor(
     private val recipeRepository: RecipeRepository,
     private val storageRepository: StorageRepository,
     private val dataStoreManager: DataStoreManager,
+    private val calculateMeasurements: CalculateMeasurements,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -47,23 +50,8 @@ class RecipeDetailsViewModel @Inject constructor(
         when (event) {
             is OnEvent.MakeRecipe -> {
                 viewModelScope.launch {
-                    val dishTag = storageRepository.getTagById(DISH_TAG_ID.toLong())
-                    val isDishAlreadyInTheStorage =
-                        storageRepository.searchExactlyOneFoodByTitle(uiState.value.recipe!!.title)
-
-                    uiState.value.recipe.also { recipe ->
-                        val savedDishId = storageRepository.saveOrModifyFood(
-                            id = isDishAlreadyInTheStorage?.id,
-                            icon = recipe!!.icon,
-                            title = recipe.title,
-                            quantity = recipe.quantity + (isDishAlreadyInTheStorage?.quantity
-                                ?: 0f),
-                            unitOfMeasurement = UnitOfMeasurement.PIECE,
-                        )
-                        storageRepository.saveFoodAndTag(savedDishId, dishTag.id!!)
-
-                        //Log.i("RecipeDetailsVM", savedDishId.toString())
-                    }
+                    addRecipeToStorage()
+                    modifyStorageFoodBasedOnIngredients()
                 }
             }
 
@@ -98,6 +86,56 @@ class RecipeDetailsViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    private suspend fun addRecipeToStorage() {
+        val recipeInStorageMultipleNames =
+            storageRepository.searchFoodByTitle(uiState.value.recipe!!.title)
+
+        val result = if (recipeInStorageMultipleNames.isNotEmpty()) {
+            recipeInStorageMultipleNames.first {
+                it.foodTagList?.contains(storageRepository.getTagById(DISH_TAG_ID.toLong()))
+                    ?: false
+            }
+        } else {
+            null
+        }
+
+        val savedDishId = storageRepository.saveOrModifyFood(
+            id = result?.id,
+            icon = uiState.value.recipe!!.icon,
+            title = uiState.value.recipe!!.title,
+            quantity = uiState.value.recipe!!.quantity + (result?.quantity
+                ?: 0f),
+            unitOfMeasurement = UnitOfMeasurement.PIECE,
+        )
+
+        val dishTag = storageRepository.getTagById(DISH_TAG_ID.toLong())
+        storageRepository.saveFoodAndTag(savedDishId, dishTag.id!!)
+    }
+
+    private suspend fun modifyStorageFoodBasedOnIngredients() {
+        uiState.value.recipe!!.ingredientList.forEach { food ->
+            val storageFood = storageRepository.searchKnownFoodByTitle(food.title)
+            if (storageFood.isNotEmpty()) {
+                val result = calculateMeasurements.simpleProductCalculations(
+                    productBase = CalculationFood(
+                        storageFood.first().quantity,
+                        storageFood.first().unitOfMeasurement
+                    ),
+                    productChanger = CalculationFood(food.quantity * (-1), food.unitOfMeasurement)
+                )
+
+                storageRepository.saveOrModifyFood(
+                    id = storageFood.first().id,
+                    title = storageFood.first().title,
+                    icon = storageFood.first().icon,
+                    quantity = result.quantity,
+                    unitOfMeasurement = result.unitOfMeasurement
+                )
+            }
+
         }
     }
 }

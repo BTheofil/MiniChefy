@@ -45,9 +45,11 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchExactlyOneFoodByTitle(title: String): Food? {
-        val entity = dao.searchFoodByTitle(title) ?: return null
-        return FoodEntityToFood().map(entity)
+    override suspend fun searchFoodByTitle(title: String): List<Food>  {
+        val entities = dao.searchFoodByTitle(title)
+        return entities.map {
+            FoodEntityToFood().map(it)
+        }
     }
 
     override suspend fun searchFoodSummaryLikelyByTitle(searchText: String): List<FoodSummary> {
@@ -68,6 +70,13 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun searchKnownFoodByTitle(title: String): List<Food> {
+        val entities = dao.searchKnownFoodByTitle(title)
+        return entities.map {
+            FoodEntityToFood().map(it)
+        }
+    }
+
+    override suspend fun searchKnownFoodLikelyByTitle(title: String): List<Food> {
         val entities = dao.searchKnownFoodByTitle("%$title%")
         return entities.map {
             FoodEntityToFood().map(it)
