@@ -3,20 +3,18 @@ package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import hu.tb.minichefy.domain.model.recipe.RecipeIngredient
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
-import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodSummary
-import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.domain.model.storage.entity.UNKNOWN_TAG_ID
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidateCountInteger
 import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
+import hu.tb.minichefy.domain.use_case.ValidateQuantity
 import hu.tb.minichefy.domain.use_case.ValidateTextField
 import hu.tb.minichefy.domain.use_case.ValidationResult
-import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.screens.manager.icons.MealIcon
 import hu.tb.minichefy.presentation.ui.theme.SEARCH_BAR_WAIT_AFTER_CHARACTER
 import kotlinx.coroutines.channels.Channel
@@ -34,6 +32,7 @@ class CreateRecipeViewModel @Inject constructor(
     private val recipeRepository: RecipeRepository,
     private val storageRepository: StorageRepository,
     private val validateCountInteger: ValidateCountInteger,
+    private val validateQuantity: ValidateQuantity,
     private val validateTextField: ValidateTextField,
     private val validateNumberKeyboard: ValidateNumberKeyboard
 ) : ViewModel() {
@@ -88,7 +87,7 @@ class CreateRecipeViewModel @Inject constructor(
         ) : Pages()
 
         data class IngredientsPage(
-            val selectedIngredientList: List<Food> = emptyList(),
+            val selectedIngredientList: List<RecipeIngredient> = emptyList(),
             val unSelectedIngredientList: List<FoodSummary> = emptyList(),
             val searchText: String = "",
             val isIngredientTitleHasError: Boolean = false,
@@ -181,57 +180,29 @@ class CreateRecipeViewModel @Inject constructor(
     fun onIngredientPageEvent(event: OnIngredientEvent) {
         when (event) {
             OnIngredientEvent.IngredientAdd -> {
-                val currentState = ingredientsPageState.value
-
-                val titleResult =
-                    validateTextField(currentState.ingredientTitleDraft) == ValidationResult.ERROR
-                val quantityResult =
-                    currentState.ingredientQuantityDraft.isBlank() || validateCountInteger(
-                        currentState.ingredientQuantityDraft.toInt()
-                    ) == ValidationResult.ERROR
-
-                val hasError = listOf(
-                    titleResult, quantityResult
-                ).any { it }
-
-                if (hasError) {
-                    _ingredientsPageState.value = currentState.copy(
-                        isIngredientTitleHasError = titleResult,
-                        isIngredientQuantityHasError = quantityResult
-                    )
+                if(checkAddedIngredientValid()){
                     return
                 }
 
-                val selectedMutableList = currentState.selectedIngredientList.toMutableList()
+                val currentState = ingredientsPageState.value
+                val updatedSelectedIngredients = currentState.selectedIngredientList.toMutableList()
+                val temp = RecipeIngredient(
+                    title = currentState.ingredientTitleDraft,
+                    quantity = currentState.ingredientQuantityDraft.toFloat(),
+                    unitOfMeasurement = currentState.ingredientUnitOfMeasurementDraft
+                )
 
-                viewModelScope.launch {
-                    val foodTagList = mutableListOf<FoodTag>()
-                    if (currentState.unSelectedIngredientList.find { it.title == currentState.ingredientTitleDraft } == null) {
-                        val unknownTag = storageRepository.getTagById(UNKNOWN_TAG_ID.toLong())
-                        foodTagList.add(unknownTag)
-                    }
-
-                    val temp = Food(
-                        id = currentState.unSelectedIngredientList.find { it.title == currentState.ingredientTitleDraft }?.id,
-                        title = currentState.ingredientTitleDraft,
-                        quantity = currentState.ingredientQuantityDraft.toFloat(),
-                        unitOfMeasurement = currentState.ingredientUnitOfMeasurementDraft,
-                        icon = IconManager().getDefaultIcon.resource,
-                        foodTagList = foodTagList
-                    )
-
-                    if (temp !in selectedMutableList) {
-                        selectedMutableList.add(0, temp)
-                    }
-
-                    _ingredientsPageState.value = currentState.copy(
-                        selectedIngredientList = selectedMutableList,
-                        isIngredientTitleHasError = false,
-                        isIngredientQuantityHasError = false,
-                        ingredientTitleDraft = "",
-                        ingredientQuantityDraft = "",
-                    )
+                if (temp !in updatedSelectedIngredients) {
+                    updatedSelectedIngredients.add(0, temp)
                 }
+
+                _ingredientsPageState.value = currentState.copy(
+                    selectedIngredientList = updatedSelectedIngredients,
+                    isIngredientTitleHasError = false,
+                    isIngredientQuantityHasError = false,
+                    ingredientTitleDraft = "",
+                    ingredientQuantityDraft = "",
+                )
             }
 
             is OnIngredientEvent.IngredientRemove -> {
@@ -328,7 +299,7 @@ class CreateRecipeViewModel @Inject constructor(
             OnStepsPageEvent.ClearStepField -> _stepsPageState.update { it.copy(stepBoxTextField = "") }
 
             OnStepsPageEvent.OnRecipeSave -> {
-                if (checkRecipeDraftHasError()) {
+                if (checkRecipeValid()) {
                     return
                 }
 
@@ -344,7 +315,7 @@ class CreateRecipeViewModel @Inject constructor(
     }
 
     private suspend fun saveRecipe(): Long =
-        recipeRepository.saveOrModifyRecipe(
+        recipeRepository.saveRecipe(
             icon = basicPageState.value.selectedMealIcon.resource,
             title = basicPageState.value.recipeTitle,
             quantity = basicPageState.value.quantityCounter,
@@ -352,38 +323,18 @@ class CreateRecipeViewModel @Inject constructor(
             timeUnit = basicPageState.value.timeUnit,
         )
 
-    private suspend fun saveIngredients(recipeId: Long) {
-        val (notCommonFoods, commonFoods) = ingredientsPageState.value.selectedIngredientList.partition { food ->
-            ingredientsPageState.value.unSelectedIngredientList.none { it.title == food.title }
+    private suspend fun saveIngredients(recipeId: Long) =
+        ingredientsPageState.value.selectedIngredientList.forEach {
+            recipeRepository.saveIngredient(it, recipeId)
         }
 
-        notCommonFoods.forEach { food ->
-            val foodId = with(food) {
-                storageRepository.saveOrModifyFood(
-                    id = id,
-                    title = title,
-                    icon = icon,
-                    quantity = quantity,
-                    unitOfMeasurement = unitOfMeasurement,
-                )
-            }
-            food.foodTagList?.forEach { tag -> storageRepository.saveFoodAndTag(foodId, tag.id!!) }
-            recipeRepository.saveRecipeIngredientCrossRef(recipeId, foodId)
-        }
-
-        commonFoods.forEach { recipeRepository.saveRecipeIngredientCrossRef(recipeId, it.id!!) }
-    }
-
-
-    private suspend fun saveSteps(recipeId: Long){
+    private suspend fun saveSteps(recipeId: Long) =
         stepsPageState.value.recipeSteps.forEach { step ->
             recipeRepository.saveStep(step, recipeId)
             //Log.i("CreateRecipeVM", "StepId: $stepId")
         }
-    }
 
-
-    private fun checkRecipeDraftHasError(): Boolean {
+    private fun checkRecipeValid(): Boolean {
         val titleResult = validateTextField(basicPageState.value.recipeTitle)
         val quantityCounterResult =
             validateCountInteger(basicPageState.value.quantityCounter)
@@ -423,6 +374,31 @@ class CreateRecipeViewModel @Inject constructor(
                     )
                 )
             }
+        }
+
+        return validationResults
+    }
+
+    private fun checkAddedIngredientValid(): Boolean {
+        val currentState = ingredientsPageState.value
+
+        val titleResult =
+            validateTextField(currentState.ingredientTitleDraft)
+        val quantityResult = try {
+            validateQuantity(currentState.ingredientQuantityDraft.toFloat())
+        } catch (e: Exception) {
+            ValidationResult.ERROR
+        }
+
+        val validationResults = listOf(
+            titleResult, quantityResult
+        ).any { it == ValidationResult.ERROR }
+
+        if (validationResults) {
+            _ingredientsPageState.value = currentState.copy(
+                isIngredientTitleHasError = titleResult == ValidationResult.ERROR,
+                isIngredientQuantityHasError = quantityResult == ValidationResult.ERROR,
+            )
         }
 
         return validationResults

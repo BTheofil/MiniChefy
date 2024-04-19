@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import hu.tb.minichefy.data.data_source.dao.RecipeDAO
 import hu.tb.minichefy.data.data_source.dao.StorageDAO
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
-import hu.tb.minichefy.domain.model.recipe.entity.RecipeFoodCrossRef
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeIngredientEntity
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeStepEntity
 import hu.tb.minichefy.domain.model.recipe.entity.TimeUnitConverter
 import hu.tb.minichefy.domain.model.storage.entity.FoodAndTagsCrossRef
@@ -17,10 +17,10 @@ import hu.tb.minichefy.domain.model.storage.entity.UnitOfMeasurementConverter
 @Database(
     entities = [
         RecipeEntity::class,
+        RecipeIngredientEntity::class,
         RecipeStepEntity::class,
         FoodEntity::class,
         TagEntity::class,
-        RecipeFoodCrossRef::class,
         FoodAndTagsCrossRef::class
     ], version = 1, exportSchema = false
 )

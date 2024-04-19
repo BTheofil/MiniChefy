@@ -53,7 +53,7 @@ fun StorageCreateScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 StorageCreateViewModel.UiEvent.SaveSuccess -> saveSuccess()

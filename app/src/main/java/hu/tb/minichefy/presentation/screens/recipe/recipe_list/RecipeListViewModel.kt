@@ -47,7 +47,6 @@ class RecipeListViewModel @Inject constructor(
     fun onEvent(event: OnEvent) {
         when (event) {
             OnEvent.DeleteRecipe -> viewModelScope.launch {
-                repository.deleteRecipeIngredientsConnectionByRecipeId(uiState.value.selectedRecipeId!!)
                 repository.deleteRecipe(uiState.value.selectedRecipeId!!)
             }
 

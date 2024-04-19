@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.model.storage.entity.DISH_TAG_ID
@@ -13,8 +14,10 @@ import hu.tb.minichefy.domain.use_case.CalculateMeasurements
 import hu.tb.minichefy.domain.use_case.CalculationFood
 import hu.tb.minichefy.domain.use_case.DataStoreManager
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.navigation.RECIPE_ID_ARGUMENT_KEY
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,6 +34,9 @@ class RecipeDetailsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
 
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
+
     init {
         loadRecipe()
         loadInformationDialogShouldShow()
@@ -41,17 +47,27 @@ class RecipeDetailsViewModel @Inject constructor(
         val isInformDialogShouldShow: Boolean = true
     )
 
+    sealed class UiEvent {
+        data class ShowSnackBar(val message: Int) : UiEvent()
+    }
+
     sealed class OnEvent {
         data object MakeRecipe : OnEvent()
         data class ShouldDialogAppear(val isDialogNeverShow: Boolean) : OnEvent()
     }
 
-    fun onEvent(event: OnEvent) {
+    fun onAction(event: OnEvent) {
         when (event) {
             is OnEvent.MakeRecipe -> {
                 viewModelScope.launch {
-                    addRecipeToStorage()
-                    modifyStorageFoodBasedOnIngredients()
+                    try {
+                        modifyStorageFoodBasedOnIngredients()
+                        addRecipeToStorage()
+                        _uiEvent.send(UiEvent.ShowSnackBar(message = R.string.dish_added_to_storage))
+                    } catch (e: IllegalArgumentException) {
+                        _uiEvent.send(UiEvent.ShowSnackBar(message = R.string.can_not_make_the_meal_incompatible_ingredient_s))
+                        return@launch
+                    }
                 }
             }
 
@@ -135,7 +151,6 @@ class RecipeDetailsViewModel @Inject constructor(
                     unitOfMeasurement = result.unitOfMeasurement
                 )
             }
-
         }
     }
 }

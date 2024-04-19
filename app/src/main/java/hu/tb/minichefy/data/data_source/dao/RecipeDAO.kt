@@ -7,7 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeBlock
-import hu.tb.minichefy.domain.model.recipe.entity.RecipeFoodCrossRef
+import hu.tb.minichefy.domain.model.recipe.entity.RecipeIngredientEntity
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeStepEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -33,11 +33,7 @@ interface RecipeDAO {
     suspend fun insertStepEntity(stepEntity: RecipeStepEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRecipeIngredientCrossRef(crossRef: RecipeFoodCrossRef): Long
-
-    @Transaction
-    @Query("DELETE FROM RecipeFoodCrossRef WHERE recipeId = :recipeId")
-    suspend fun deleteRecipeIngredientConnectionByRecipeId(recipeId: Long): Int
+    suspend fun insertIngredientEntity(ingredientEntity: RecipeIngredientEntity): Long
 
     @Transaction
     @Query("DELETE FROM RecipeEntity WHERE recipeId = :id")
