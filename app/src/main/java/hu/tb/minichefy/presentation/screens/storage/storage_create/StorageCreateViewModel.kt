@@ -10,8 +10,8 @@ import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
 import hu.tb.minichefy.domain.use_case.ValidateQuantity
 import hu.tb.minichefy.domain.use_case.ValidateTextField
 import hu.tb.minichefy.domain.use_case.ValidationResult
-import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import hu.tb.minichefy.presentation.screens.manager.icons.FoodIcon
+import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,12 +47,8 @@ class StorageCreateViewModel @Inject constructor(
         val selectedFoodIcon: FoodIcon = IconManager().getRandomFood(),
         val foodTitleText: String = "",
         val isFoodTitleHasError: Boolean = false,
-        val foodType: FoodType? = FoodType.LIQUID,
         val foodUnitOfMeasurement: UnitOfMeasurement = UnitOfMeasurement.entries[1],
-        val availableUnitOfMeasurementList: List<UnitOfMeasurement> = listOf(
-            UnitOfMeasurement.DL,
-            UnitOfMeasurement.L
-        ),
+        val availableUnitOfMeasurementList: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
         val quantity: String = "",
         val isQuantityHasError: Boolean = false,
         val selectedTagList: List<FoodTag> = emptyList(),
@@ -60,17 +56,10 @@ class StorageCreateViewModel @Inject constructor(
         val tagDialogValue: String = ""
     )
 
-    enum class FoodType(val displayText: String) {
-        LIQUID("Liquid"),
-        SOLID("Solid"),
-        PIECE("Piece")
-    }
-
     sealed class OnEvent {
         data object Save : OnEvent()
         data class FoodTextChange(val text: String) : OnEvent()
         data class OnSelectedIconDialogClick(val icon: FoodIcon) : OnEvent()
-        data class FoodTypeChange(val type: FoodType) : OnEvent()
         data class FoodUnitChange(val type: UnitOfMeasurement) : OnEvent()
         data class FoodQuantityChange(val quantityString: String) : OnEvent()
         data class DialogChipClick(val editedTag: FoodTag) : OnEvent()
@@ -89,39 +78,6 @@ class StorageCreateViewModel @Inject constructor(
                 it.copy(
                     foodTitleText = event.text
                 )
-            }
-
-            is OnEvent.FoodTypeChange -> {
-                when (event.type) {
-                    FoodType.LIQUID -> {
-                        _uiState.update {
-                            it.copy(
-                                availableUnitOfMeasurementList = getLiquidUnitOfMeasurements(),
-                                foodUnitOfMeasurement = UnitOfMeasurement.DL
-                            )
-                        }
-                    }
-
-                    FoodType.SOLID -> _uiState.update {
-                        it.copy(
-                            availableUnitOfMeasurementList = getSolidUnitOfMeasurements(),
-                            foodUnitOfMeasurement = UnitOfMeasurement.G,
-                        )
-                    }
-
-                    FoodType.PIECE -> {
-                        _uiState.update {
-                            it.copy(
-                                availableUnitOfMeasurementList = listOf(UnitOfMeasurement.PIECE),
-                                foodUnitOfMeasurement = UnitOfMeasurement.PIECE
-                            )
-                        }
-                    }
-                }
-
-                _uiState.update {
-                    it.copy(foodType = event.type)
-                }
             }
 
             is OnEvent.FoodUnitChange -> {
@@ -198,15 +154,4 @@ class StorageCreateViewModel @Inject constructor(
         }
         return hasError
     }
-
-    private fun getLiquidUnitOfMeasurements(): List<UnitOfMeasurement> = listOf(
-        UnitOfMeasurement.DL,
-        UnitOfMeasurement.L
-    )
-
-    private fun getSolidUnitOfMeasurements(): List<UnitOfMeasurement> = listOf(
-        UnitOfMeasurement.G,
-        UnitOfMeasurement.DKG,
-        UnitOfMeasurement.KG
-    )
 }

@@ -20,13 +20,15 @@ import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.Text
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 
 @Composable
-fun QuantityAndMeasurementRow(
+fun<T> QuantityAndMeasurementRow(
     quantityValue: String,
     onQuantityChange: (String) -> Unit,
+    quantityLabel: String,
     isQuantityHasError: Boolean,
-    measurementOptionList: List<UnitOfMeasurement> = UnitOfMeasurement.entries,
-    measurementValue: UnitOfMeasurement,
-    onMeasurementChange: (UnitOfMeasurement) -> Unit,
+    measurementOptionList: List<T>,
+    measurementValue: T,
+    onMeasurementChange: (T) -> Unit,
+    measurementLabel: String
 ) {
     Row(
         modifier = Modifier
@@ -45,7 +47,7 @@ fun QuantityAndMeasurementRow(
             ),
             label = {
                 Text(
-                    text = "Amount",
+                    text = quantityLabel,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -57,8 +59,8 @@ fun QuantityAndMeasurementRow(
         TextFieldWithDropdownMenu(
             modifier = Modifier
                 .weight(1f),
-            textFieldValue = measurementValue.name,
-            labelFieldText = "Measurement",
+            textFieldValue = measurementValue,
+            labelFieldText = measurementLabel,
             menuItemList = measurementOptionList,
             onMenuItemClick = onMeasurementChange
         )
@@ -71,8 +73,11 @@ private fun AmountAndMeasurementRowPreview() {
     QuantityAndMeasurementRow(
         quantityValue = "5",
         onQuantityChange = {},
+        quantityLabel = "Amount",
         isQuantityHasError = false,
         measurementValue = UnitOfMeasurement.PIECE,
-        onMeasurementChange = {}
+        measurementOptionList = UnitOfMeasurement.entries,
+        onMeasurementChange = {},
+        measurementLabel = "Measurement"
     )
 }

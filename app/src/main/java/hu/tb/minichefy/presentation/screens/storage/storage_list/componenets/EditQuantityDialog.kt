@@ -20,9 +20,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
@@ -66,7 +68,7 @@ fun EditQuantityDialog(
                         .align(Alignment.CenterHorizontally)
                 ) {
                     Text(
-                        text = "Modify quantity count",
+                        text = stringResource(R.string.modify_amount),
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -74,9 +76,12 @@ fun EditQuantityDialog(
                 QuantityAndMeasurementRow(
                     quantityValue = quantityValue,
                     onQuantityChange = onQuantityChange,
+                    quantityLabel = stringResource(id = R.string.amount),
                     isQuantityHasError = isQuantityHasError,
                     measurementValue = measurementValue,
-                    onMeasurementChange = onMeasurementChange
+                    onMeasurementChange = onMeasurementChange,
+                    measurementLabel = stringResource(id = R.string.measurement),
+                    measurementOptionList = UnitOfMeasurement.entries
                 )
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                 Row(
@@ -94,7 +99,7 @@ fun EditQuantityDialog(
                     Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                     TextButton(onClick = onConfirmButtonClick) {
                         Text(
-                            text = "Proceed",
+                            text = stringResource(id = R.string.done),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary
                         )

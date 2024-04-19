@@ -6,10 +6,11 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import hu.tb.minichefy.R
 
 @Composable
 fun PageNextButton(
-    text: String,
     onClick: () -> Unit
 ) {
     OutlinedButton(
@@ -18,7 +19,7 @@ fun PageNextButton(
         onClick = onClick
     ) {
         Text(
-            text = text,
+            text = stringResource(R.string.next_page),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary
         )

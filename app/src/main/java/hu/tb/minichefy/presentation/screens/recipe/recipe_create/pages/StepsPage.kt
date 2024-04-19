@@ -12,18 +12,23 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
-import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.PageNextButton
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.steps.RecipeStepItem
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
@@ -51,7 +56,7 @@ fun StepsPage(
             },
         topBar = {
             CenterAlignedTopAppBar(title = {
-                Text(text = "Write down the recipe steps")
+                Text(text = stringResource(R.string.write_down_the_recipe_steps))
             })
         }
     ) { paddingValues ->
@@ -89,14 +94,21 @@ fun StepsPage(
                     Button(onClick = {
                         onAddButtonClick()
                     }) {
-                        Text(text = "Add more step")
+                        Text(text = stringResource(R.string.add_more_step))
                     }
                 }
             }
-            PageNextButton(
-                text = "Finish",
+            OutlinedButton(
+                modifier = Modifier
+                    .fillMaxWidth(),
                 onClick = onNextButtonClick
-            )
+            ) {
+                Text(
+                    text = stringResource(R.string.done),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }
@@ -104,14 +116,22 @@ fun StepsPage(
 @Preview
 @Composable
 fun StepsPagePreview() {
+    val testList = remember {
+        mutableStateListOf(RecipeStep(1, "first"))
+    }
+
     StepsPage(
         CreateRecipeViewModel.Pages.StepsPage(
-            recipeSteps = listOf(RecipeStep(1, "first"))
+            recipeSteps = testList
         ),
         onNextButtonClick = {},
-        onAddButtonClick = {},
+        onAddButtonClick = {
+            testList.add(RecipeStep(testList.size + 1L, "aaa"))
+        },
         onStepTextFieldValueChange = { _, _ -> },
-        onDeleteItemClick = {},
+        onDeleteItemClick = {
+            testList.removeAt(it)
+        },
         onRecipeItemClick = {}
     )
 }

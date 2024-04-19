@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_details
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +25,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -35,6 +36,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +45,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -62,6 +66,8 @@ import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.Qui
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -72,7 +78,8 @@ fun RecipeDetailsScreen(
 
     RecipeDetailsContent(
         uiState = uiState,
-        onEvent = viewModel::onEvent
+        uiEvent = viewModel.uiEvent,
+        onAction = viewModel::onAction
     )
 }
 
@@ -80,10 +87,24 @@ fun RecipeDetailsScreen(
 @Composable
 fun RecipeDetailsContent(
     uiState: RecipeDetailsViewModel.UiState,
-    onEvent: (RecipeDetailsViewModel.OnEvent) -> Unit,
+    uiEvent: Flow<RecipeDetailsViewModel.UiEvent>,
+    onAction: (RecipeDetailsViewModel.OnEvent) -> Unit,
 ) {
     var isConfirmDialogVisible by remember {
         mutableStateOf(false)
+    }
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        uiEvent.collect { event ->
+            when (event) {
+                is RecipeDetailsViewModel.UiEvent.ShowSnackBar -> scope.launch {
+                    snackbarHostState.showSnackbar(context.getString(event.message))
+                }
+            }
+        }
     }
 
     uiState.recipe?.let { recipe ->
@@ -109,20 +130,25 @@ fun RecipeDetailsContent(
                             },
                             state = rememberTooltipState(),
                         ) {
-                            IconButton(onClick = {
-                                isConfirmDialogVisible = uiState.isInformDialogShouldShow
-                                if (!uiState.isInformDialogShouldShow) {
-                                    onEvent(RecipeDetailsViewModel.OnEvent.MakeRecipe)
-                                }
-                            }) {
+                            IconButton(
+                                modifier = Modifier,
+                                onClick = {
+                                    isConfirmDialogVisible = uiState.isInformDialogShouldShow
+                                    if (!uiState.isInformDialogShouldShow) {
+                                        onAction(RecipeDetailsViewModel.OnEvent.MakeRecipe)
+                                    }
+                                }) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.chef_hat),
-                                    contentDescription = "",
+                                    contentDescription = "Make recipe icon",
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
                         }
                     })
+            },
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState)
             }
         ) {
             OneColorBackground(color = MaterialTheme.colorScheme.primaryContainer)
@@ -146,12 +172,12 @@ fun RecipeDetailsContent(
     if (isConfirmDialogVisible && uiState.isInformDialogShouldShow) {
         ConfirmRecipeAddToStorageDialog(
             onConfirmButtonClick = {
-                onEvent(RecipeDetailsViewModel.OnEvent.ShouldDialogAppear(it))
-                onEvent(RecipeDetailsViewModel.OnEvent.MakeRecipe)
+                onAction(RecipeDetailsViewModel.OnEvent.ShouldDialogAppear(it))
+                onAction(RecipeDetailsViewModel.OnEvent.MakeRecipe)
                 isConfirmDialogVisible = false
             },
             onCancelButtonClick = {
-                onEvent(RecipeDetailsViewModel.OnEvent.ShouldDialogAppear(it))
+                onAction(RecipeDetailsViewModel.OnEvent.ShouldDialogAppear(it))
                 isConfirmDialogVisible = false
             }
         )
@@ -191,7 +217,7 @@ private fun DetailsTopContent(
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
         QuickInfoBox(
             infoList = listOf(
-                SimpleQuickRecipeInfo(recipe.quantity.toString(), "serve"),
+                SimpleQuickRecipeInfo(recipe.quantity.toString(), stringResource(R.string.serve)),
                 SimpleQuickRecipeInfo(
                     recipe.timeToCreate.toString(),
                     recipe.timeUnit.toString()
@@ -202,7 +228,6 @@ private fun DetailsTopContent(
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DetailsBottomContent(
     modifier: Modifier = Modifier,
@@ -284,7 +309,10 @@ fun DetailsBottomContent(
                                     Box(
                                         modifier = Modifier
                                             .size(8.dp)
-                                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                                            .background(
+                                                MaterialTheme.colorScheme.primary,
+                                                CircleShape
+                                            )
                                     )
                                     Spacer(modifier = Modifier.width(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                                     Text(
@@ -338,6 +366,7 @@ fun RecipeDetailsContentPreview(
         uiState = RecipeDetailsViewModel.UiState(
             recipe = mockRecipe
         ),
-        onEvent = {}
+        uiEvent = flow {  },
+        onAction = {}
     )
 }

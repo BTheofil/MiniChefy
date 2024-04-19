@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,18 +28,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
-import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
-import hu.tb.minichefy.presentation.screens.storage.storage_create.components.RadioButtonWithText
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.screens.manager.icons.FoodIcon
+import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
@@ -53,7 +53,7 @@ fun StorageCreateScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 StorageCreateViewModel.UiEvent.SaveSuccess -> saveSuccess()
@@ -83,12 +83,13 @@ fun StorageCreateContent(
             .padding(horizontal = SCREEN_HORIZONTAL_PADDING, vertical = SCREEN_VERTICAL_PADDING)
             .clickableWithoutRipple { focusManager.clearFocus() }
     ) {
-
         CircleImage(
             image = uiState.selectedFoodIcon.resource,
             onClick = { showIconPicker = true }
         )
+
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
+
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -96,62 +97,36 @@ fun StorageCreateContent(
             onValueChange = { onEvent(StorageCreateViewModel.OnEvent.FoodTextChange(it)) },
             label = {
                 Text(
-                    text = "Title",
+                    text = stringResource(id = R.string.title),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodyLarge,
                 )
             },
             isError = uiState.isFoodTitleHasError
         )
+
         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Type:",
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleLarge,
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                repeat(StorageCreateViewModel.FoodType.entries.size) { foodTypeIndex ->
-                    StorageCreateViewModel.FoodType.entries[foodTypeIndex].also {
-                        RadioButtonWithText(
-                            displayText = it.displayText,
-                            isSelected = uiState.foodType == it,
-                            onClick = {
-                                onEvent(
-                                    StorageCreateViewModel.OnEvent.FoodTypeChange(
-                                        it
-                                    )
-                                )
-                            }
-                        )
-                    }
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
+
         QuantityAndMeasurementRow(
             quantityValue = uiState.quantity,
             onQuantityChange = { onEvent(StorageCreateViewModel.OnEvent.FoodQuantityChange(it)) },
+            quantityLabel = stringResource(R.string.amount),
             isQuantityHasError = uiState.isQuantityHasError,
             measurementOptionList = uiState.availableUnitOfMeasurementList,
             measurementValue = uiState.foodUnitOfMeasurement,
+            measurementLabel = stringResource(R.string.measurement),
             onMeasurementChange = {
                 onEvent(StorageCreateViewModel.OnEvent.FoodUnitChange(it))
             }
         )
+
         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))
+
         Text(
-            text = "Select tag",
+            text = stringResource(R.string.tag),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.titleLarge,
         )
-
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS),
             verticalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS)
@@ -187,7 +162,7 @@ fun StorageCreateContent(
             contentAlignment = Alignment.BottomCenter
         ) {
             Button(onClick = { onEvent(StorageCreateViewModel.OnEvent.Save) }) {
-                Text(text = "Save")
+                Text(text = stringResource(id = R.string.save))
             }
         }
     }

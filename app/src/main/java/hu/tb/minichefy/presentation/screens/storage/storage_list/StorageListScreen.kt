@@ -126,12 +126,17 @@ fun StorageScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = SCREEN_HORIZONTAL_PADDING, vertical = SCREEN_VERTICAL_PADDING)
+                .padding(
+                    horizontal = SCREEN_HORIZONTAL_PADDING,
+                    vertical = SCREEN_VERTICAL_PADDING
+                )
         ) {
             SearchItemBar(
+                modifier = Modifier
+                    .fillMaxWidth(),
                 queryText = uiState.searchText,
                 onQueryChange = { onEvent(StorageListViewModel.OnEvent.SearchTextChange(it)) },
-                clearIconButtonClick = { onEvent(StorageListViewModel.OnEvent.ClearSearchText) }
+                clearIconButtonClick = { onEvent(StorageListViewModel.OnEvent.SearchTextChange("")) }
             )
             Spacer(modifier = Modifier.height(22.dp))
             LazyRow(

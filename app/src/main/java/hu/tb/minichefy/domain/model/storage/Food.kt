@@ -1,5 +1,7 @@
 package hu.tb.minichefy.domain.model.storage
 
+import hu.tb.minichefy.R
+
 data class FoodSummary(
     val id: Long,
     val title: String
@@ -14,11 +16,11 @@ data class Food(
     val foodTagList: List<FoodTag>?
 )
 
-enum class UnitOfMeasurement(val id: Int) {
-    PIECE(0),
-    DL(1),
-    L(2),
-    G(3),
-    DKG(4),
-    KG(5)
+enum class UnitOfMeasurement(val stringResource: Int) {
+    PIECE(R.string.piece),
+    DL(R.string.dl),
+    L(R.string.l),
+    G(R.string.g),
+    DKG(R.string.dkg),
+    KG(R.string.kg)
 }

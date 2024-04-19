@@ -15,13 +15,15 @@ interface StorageRepository {
 
     suspend fun getKnownFoodList(): List<Food>
 
-    suspend fun searchExactlyOneFoodByTitle(title: String): Food?
+    suspend fun searchFoodByTitle(title: String): List<Food>
 
     suspend fun searchFoodSummaryLikelyByTitle(searchText: String): List<FoodSummary>
 
     suspend fun searchFoodsByTag(tagIds: List<Long>): List<Food>
 
     suspend fun searchKnownFoodByTitle(title: String): List<Food>
+
+    suspend fun searchKnownFoodLikelyByTitle(title: String): List<Food>
 
     suspend fun saveOrModifyFood(
         id: Long? = null,

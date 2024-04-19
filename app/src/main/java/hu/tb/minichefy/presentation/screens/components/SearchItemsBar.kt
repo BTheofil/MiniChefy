@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.components
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Search
@@ -19,11 +18,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import hu.tb.minichefy.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchItemBar(
+    modifier: Modifier = Modifier,
     queryText: String,
     onQueryChange: (text: String) -> Unit,
     clearIconButtonClick: () -> Unit
@@ -35,8 +37,7 @@ fun SearchItemBar(
     }
 
     SearchBar(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .onFocusChanged {
                 isClearIconVisible = it.hasFocus
             },
@@ -62,7 +63,7 @@ fun SearchItemBar(
         },
         placeholder = {
             Text(
-                text = "Search recipe",
+                text = stringResource(R.string.search_recipe),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
