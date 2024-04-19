@@ -1,6 +1,7 @@
 package hu.tb.minichefy.data.mapper
 
 import hu.tb.minichefy.domain.model.recipe.Recipe
+import hu.tb.minichefy.domain.model.recipe.RecipeIngredient
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeBlock
 
@@ -12,7 +13,7 @@ class RecipeEntityToRecipe {
             icon = recipeEntity.icon,
             title = recipeEntity.title,
             quantity = recipeEntity.quantity,
-            howToSteps = recipeSteps.map {
+            howToSteps = stepList.map {
                 RecipeStep(
                     id = it.recipeStepId,
                     step = it.step
@@ -20,7 +21,14 @@ class RecipeEntityToRecipe {
             },
             timeToCreate = recipeEntity.timeToCreate,
             timeUnit = recipeEntity.timeUnit,
-            ingredientList = ingredients.map { FoodEntityToFood().map(it) }
+            ingredientList = ingredientList.map {
+                RecipeIngredient(
+                    id = it.ingredientId,
+                    title = it.title,
+                    quantity = it.quantity,
+                    unitOfMeasurement = it.unitOfMeasurement
+                )
+            }
         )
     }
 }
