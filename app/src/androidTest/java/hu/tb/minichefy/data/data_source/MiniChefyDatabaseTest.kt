@@ -12,6 +12,7 @@ import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.model.storage.entity.DISH_TAG_ID
 import hu.tb.minichefy.domain.model.storage.entity.FoodAndTagsCrossRef
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
+import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
 import hu.tb.minichefy.domain.model.storage.entity.TagEntity
 import hu.tb.minichefy.domain.model.storage.entity.UNKNOWN_TAG_ID
 import kotlinx.coroutines.runBlocking
@@ -84,22 +85,42 @@ class MiniChefyDatabaseTest {
 
         storageDao.insertFoodEntity(foodEntity)
 
-        val foodWithTags = storageDao.searchFoodByTitle("Tomato")
+        val foodWithTags = storageDao.searchFoodByTitle("Tomato").first()
 
-        //return food
-        foodWithTags.also {
-            assertEquals(2, it!!.foodEntity.icon)
-            assertEquals("Tomato", it.foodEntity.title)
-            assertEquals(1f, it.foodEntity.quantity)
-            assertEquals(UnitOfMeasurement.KG, it.foodEntity.unitOfMeasurement)
-        }
+        assertEquals(2, foodWithTags.foodEntity.icon)
+        assertEquals("Tomato", foodWithTags.foodEntity.title)
+        assertEquals(1f, foodWithTags.foodEntity.quantity)
+        assertEquals(UnitOfMeasurement.KG, foodWithTags.foodEntity.unitOfMeasurement)
+    }
 
-        //delete food
+    @Test
+    fun deleteFood() = runBlocking {
+        val foodEntity = FoodEntity(
+            foodId = 1,
+            icon = 2,
+            title = "Tomato",
+            quantity = 1f,
+            unitOfMeasurement = UnitOfMeasurement.KG
+        )
+
+        storageDao.insertFoodEntity(foodEntity)
+
         storageDao.deleteFoodEntity(id = 1)
-        val result = storageDao.searchFoodByTitle("Tomato")
-        assertEquals(null, result)
 
-        //return food with tag
+        val result = storageDao.searchFoodByTitle("Tomato")
+        assertEquals(emptyList<FoodWithTags>(), result)
+    }
+
+    @Test
+    fun insertTagWithFoodAndReturn() = runBlocking {
+        val foodEntity = FoodEntity(
+            foodId = 1,
+            icon = 2,
+            title = "Tomato",
+            quantity = 1f,
+            unitOfMeasurement = UnitOfMeasurement.KG
+        )
+
         storageDao.insertFoodEntity(foodEntity)
         storageDao.insertFoodTagCrossRef(
             FoodAndTagsCrossRef(
