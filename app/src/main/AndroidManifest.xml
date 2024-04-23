@@ -11,12 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MiniChefy"
+        android:theme="@style/Theme.MiniChefy.Starting"
         tools:targetApi="31">
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.MiniChefy">
+            android:theme="@style/Theme.MiniChefy.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
