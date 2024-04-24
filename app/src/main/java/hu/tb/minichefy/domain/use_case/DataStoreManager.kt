@@ -12,7 +12,6 @@ private val Context.dataStore by preferencesDataStore("settings")
 class DataStoreManager @Inject constructor(
     context: Context
 ) {
-
     private val settingsDataStore = context.dataStore
 
     suspend fun setNeverShowDialogInDetailsScreen() = settingsDataStore.edit { settings ->

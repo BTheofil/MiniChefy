@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.storage.storage_list
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,7 +34,6 @@ class StorageListViewModel @Inject constructor(
     val uiEvent = _uiEvent.receiveAsFlow()
 
     init {
-        Log.d("MYTAG", "created")
         viewModelScope.launch {
             storageRepository.getKnownFoodsFlow().collect { foodList ->
                 _uiState.update {
