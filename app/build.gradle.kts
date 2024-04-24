@@ -88,6 +88,9 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
 
     implementation(libs.androidx.datastore.preferences)
+
+    implementation(libs.androidx.core.splashscreen)
+
 }
 
 kapt {
