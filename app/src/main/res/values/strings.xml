@@ -39,4 +39,5 @@
     <string name="solid">Solid</string>
     <string name="dish_added_to_storage">Dish added to storage</string>
     <string name="can_not_make_the_meal_incompatible_ingredient_s">Can not make the meal. Incompatible ingredient(s).</string>
+    <string name="settings">Settings</string>
 </resources>

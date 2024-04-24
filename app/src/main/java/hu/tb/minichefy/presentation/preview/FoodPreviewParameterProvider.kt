@@ -4,7 +4,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
+import hu.tb.minichefy.presentation.util.icons.IconManager
 
 class FoodPreviewParameterProvider : PreviewParameterProvider<List<Food>> {
 

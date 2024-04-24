@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.screens.manager.icons
+package hu.tb.minichefy.presentation.util.icons
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -6,8 +6,6 @@ import androidx.compose.ui.res.vectorResource
 import kotlin.random.Random
 
 class IconManager {
-
-    val getDefaultIcon: AppWideIcon = AppWideIcon.DEFAULT_EMPTY_ICON
 
     fun getRandomFood(): FoodIcon = FoodIcon.entries[Random.nextInt(0, FoodIcon.entries.size)]
 

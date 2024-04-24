@@ -12,7 +12,7 @@ import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.domain.use_case.Validators
-import hu.tb.minichefy.presentation.screens.manager.icons.MealIcon
+import hu.tb.minichefy.presentation.util.icons.MealIcon
 import hu.tb.minichefy.presentation.ui.theme.SEARCH_BAR_WAIT_AFTER_CHARACTER
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay

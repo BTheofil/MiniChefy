@@ -9,8 +9,8 @@ import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.domain.use_case.Validators
-import hu.tb.minichefy.presentation.screens.manager.icons.FoodIcon
-import hu.tb.minichefy.presentation.screens.manager.icons.IconResource
+import hu.tb.minichefy.presentation.util.icons.FoodIcon
+import hu.tb.minichefy.presentation.util.icons.IconResource
 import hu.tb.minichefy.presentation.ui.theme.SEARCH_BAR_WAIT_AFTER_CHARACTER
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay

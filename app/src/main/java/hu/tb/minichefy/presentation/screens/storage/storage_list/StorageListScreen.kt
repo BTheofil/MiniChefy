@@ -53,8 +53,8 @@ import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.components.SettingsPanel
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
-import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
-import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
+import hu.tb.minichefy.presentation.util.icons.IconManager
+import hu.tb.minichefy.presentation.util.icons.iconVectorResource
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditQuantityDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditStorageItem

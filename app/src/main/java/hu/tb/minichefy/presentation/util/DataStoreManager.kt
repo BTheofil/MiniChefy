@@ -1,4 +1,4 @@
-package hu.tb.minichefy.domain.use_case
+package hu.tb.minichefy.presentation.util
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
