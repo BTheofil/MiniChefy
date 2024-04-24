@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.R
+import hu.tb.minichefy.di.DISH_TAG_ID
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.domain.model.storage.entity.DISH_TAG_ID
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.CalculateMeasurements
@@ -51,14 +51,14 @@ class RecipeDetailsViewModel @Inject constructor(
         data class ShowSnackBar(val message: Int) : UiEvent()
     }
 
-    sealed class OnEvent {
-        data object MakeRecipe : OnEvent()
-        data class ShouldDialogAppear(val isDialogNeverShow: Boolean) : OnEvent()
+    sealed class OnAction {
+        data object MakeRecipe : OnAction()
+        data class ShouldDialogAppear(val isDialogNeverShow: Boolean) : OnAction()
     }
 
-    fun onAction(event: OnEvent) {
+    fun onAction(event: OnAction) {
         when (event) {
-            is OnEvent.MakeRecipe -> {
+            is OnAction.MakeRecipe -> {
                 viewModelScope.launch {
                     try {
                         modifyStorageFoodBasedOnIngredients()
@@ -71,7 +71,7 @@ class RecipeDetailsViewModel @Inject constructor(
                 }
             }
 
-            is OnEvent.ShouldDialogAppear -> if (event.isDialogNeverShow) {
+            is OnAction.ShouldDialogAppear -> if (event.isDialogNeverShow) {
                 viewModelScope.launch {
                     dataStoreManager.setNeverShowDialogInDetailsScreen()
                 }

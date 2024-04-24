@@ -5,25 +5,20 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import hu.tb.minichefy.di.UNKNOWN_TAG_ID
 import hu.tb.minichefy.domain.model.storage.entity.FoodAndTagsCrossRef
 import hu.tb.minichefy.domain.model.storage.entity.TagEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
 import hu.tb.minichefy.domain.model.storage.entity.SimplerFoodEntity
-import hu.tb.minichefy.domain.model.storage.entity.UNKNOWN_TAG_ID
 import kotlinx.coroutines.flow.Flow
+
+typealias FoodId = Long
 
 @Dao
 interface StorageDAO {
 
     //food
-    @Transaction
-    @Query("SELECT * FROM FoodEntity")
-    fun getAllStorageFood(): Flow<List<FoodWithTags>>
-
-    @Query("SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId = ($UNKNOWN_TAG_ID)")
-    fun getUnknownTagFoodIds(): Flow<List<Long>>
-
     @Transaction
     @Query("SELECT foodId, title FROM FoodEntity")
     suspend fun getAllStorageFoodName(): List<SimplerFoodEntity>
@@ -70,7 +65,7 @@ interface StorageDAO {
     suspend fun searchKnownFoodByTitle(foodTitle: String): List<FoodWithTags>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFoodEntity(foodEntity: FoodEntity): Long
+    suspend fun insertFoodEntity(foodEntity: FoodEntity): FoodId
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFoodTagCrossRef(crossRef: FoodAndTagsCrossRef): Long

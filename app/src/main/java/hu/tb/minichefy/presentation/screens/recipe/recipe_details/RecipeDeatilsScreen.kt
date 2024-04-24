@@ -88,7 +88,7 @@ fun RecipeDetailsScreen(
 fun RecipeDetailsContent(
     uiState: RecipeDetailsViewModel.UiState,
     uiEvent: Flow<RecipeDetailsViewModel.UiEvent>,
-    onAction: (RecipeDetailsViewModel.OnEvent) -> Unit,
+    onAction: (RecipeDetailsViewModel.OnAction) -> Unit,
 ) {
     var isConfirmDialogVisible by remember {
         mutableStateOf(false)
@@ -135,7 +135,7 @@ fun RecipeDetailsContent(
                                 onClick = {
                                     isConfirmDialogVisible = uiState.isInformDialogShouldShow
                                     if (!uiState.isInformDialogShouldShow) {
-                                        onAction(RecipeDetailsViewModel.OnEvent.MakeRecipe)
+                                        onAction(RecipeDetailsViewModel.OnAction.MakeRecipe)
                                     }
                                 }) {
                                 Icon(
@@ -172,12 +172,12 @@ fun RecipeDetailsContent(
     if (isConfirmDialogVisible && uiState.isInformDialogShouldShow) {
         ConfirmRecipeAddToStorageDialog(
             onConfirmButtonClick = {
-                onAction(RecipeDetailsViewModel.OnEvent.ShouldDialogAppear(it))
-                onAction(RecipeDetailsViewModel.OnEvent.MakeRecipe)
+                onAction(RecipeDetailsViewModel.OnAction.ShouldDialogAppear(it))
+                onAction(RecipeDetailsViewModel.OnAction.MakeRecipe)
                 isConfirmDialogVisible = false
             },
             onCancelButtonClick = {
-                onAction(RecipeDetailsViewModel.OnEvent.ShouldDialogAppear(it))
+                onAction(RecipeDetailsViewModel.OnAction.ShouldDialogAppear(it))
                 isConfirmDialogVisible = false
             }
         )

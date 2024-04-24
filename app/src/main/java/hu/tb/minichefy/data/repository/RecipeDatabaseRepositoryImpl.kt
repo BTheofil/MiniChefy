@@ -1,6 +1,10 @@
 package hu.tb.minichefy.data.repository
 
+import hu.tb.minichefy.data.data_source.dao.DeletedRecipeCount
+import hu.tb.minichefy.data.data_source.dao.IngredientId
 import hu.tb.minichefy.data.data_source.dao.RecipeDAO
+import hu.tb.minichefy.data.data_source.dao.RecipeId
+import hu.tb.minichefy.data.data_source.dao.StepId
 import hu.tb.minichefy.data.mapper.RecipeEntityToRecipe
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeIngredient
@@ -34,7 +38,7 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
         quantity: Int,
         timeToCreate: Int,
         timeUnit: TimeUnit,
-    ): Long {
+    ): RecipeId {
         val temp = RecipeEntity(
             recipeId = id,
             icon = icon,
@@ -47,13 +51,13 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
         return dao.insertRecipeEntity(temp)
     }
 
-    override suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long =
+    override suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): StepId =
         dao.insertStepEntity(step.toRecipeStepEntity(recipeEntityId))
 
     override suspend fun saveIngredient(
         ingredient: RecipeIngredient,
         recipeEntityId: Long
-    ): Long =
+    ): IngredientId =
         dao.insertIngredientEntity(ingredient.toIngredientEntity(recipeEntityId))
 
     override suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe> {
@@ -63,5 +67,5 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteRecipe(id: Long): Int = dao.deleteRecipe(id)
+    override suspend fun deleteRecipe(id: Long): DeletedRecipeCount = dao.deleteRecipe(id)
 }

@@ -6,10 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
-import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
-import hu.tb.minichefy.domain.use_case.ValidateQuantity
-import hu.tb.minichefy.domain.use_case.ValidateTextField
 import hu.tb.minichefy.domain.use_case.ValidationResult
+import hu.tb.minichefy.domain.use_case.Validators
 import hu.tb.minichefy.presentation.screens.manager.icons.FoodIcon
 import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
 import kotlinx.coroutines.channels.Channel
@@ -23,9 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StorageCreateViewModel @Inject constructor(
     private val storageRepository: StorageRepository,
-    private val textValidator: ValidateTextField,
-    private val quantityValidator: ValidateQuantity,
-    private val validateNumberKeyboard: ValidateNumberKeyboard
+    private val validators: Validators,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -119,7 +115,7 @@ class StorageCreateViewModel @Inject constructor(
             }
 
             is OnEvent.FoodQuantityChange -> {
-                if (validateNumberKeyboard(event.quantityString) == ValidationResult.ERROR) return
+                if (validators.validateNumberKeyboard(event.quantityString) == ValidationResult.ERROR) return
 
                 _uiState.update {
                     it.copy(
@@ -135,9 +131,9 @@ class StorageCreateViewModel @Inject constructor(
     }
 
     private fun checkFoodDraftHasError(): Boolean {
-        val titleResult = textValidator(uiState.value.foodTitleText)
+        val titleResult = validators.validateTextField(uiState.value.foodTitleText)
         val quantityResult = try {
-            quantityValidator(uiState.value.quantity.toFloat())
+            validators.validateQuantity(uiState.value.quantity.toFloat())
         } catch (e: Exception) {
             ValidationResult.ERROR
         }

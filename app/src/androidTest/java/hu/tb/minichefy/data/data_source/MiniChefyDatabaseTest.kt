@@ -6,15 +6,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import hu.tb.minichefy.data.data_source.dao.RecipeDAO
 import hu.tb.minichefy.data.data_source.dao.StorageDAO
 import hu.tb.minichefy.data.data_source.db.MiniChefyDatabase
+import hu.tb.minichefy.di.DISH_TAG_ID
+import hu.tb.minichefy.di.UNKNOWN_TAG_ID
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.domain.model.storage.entity.DISH_TAG_ID
 import hu.tb.minichefy.domain.model.storage.entity.FoodAndTagsCrossRef
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
 import hu.tb.minichefy.domain.model.storage.entity.TagEntity
-import hu.tb.minichefy.domain.model.storage.entity.UNKNOWN_TAG_ID
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals

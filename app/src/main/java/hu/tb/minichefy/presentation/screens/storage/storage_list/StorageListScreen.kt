@@ -74,7 +74,7 @@ fun StorageListScreen(
         uiState = uiState,
         uiEvent = viewModel.uiEvent,
         onFABClick = onFABClick,
-        onEvent = viewModel::onEvent
+        onAction = viewModel::onAction
     )
 }
 
@@ -84,7 +84,7 @@ fun StorageScreenContent(
     uiState: StorageListViewModel.UiState,
     uiEvent: Flow<StorageListViewModel.UiEvent>,
     onFABClick: () -> Unit,
-    onEvent: (StorageListViewModel.OnEvent) -> Unit
+    onAction: (StorageListViewModel.OnAction) -> Unit
 ) {
     var isEditProductTagSelectorOpen by remember {
         mutableStateOf(false)
@@ -135,8 +135,8 @@ fun StorageScreenContent(
                 modifier = Modifier
                     .fillMaxWidth(),
                 queryText = uiState.searchText,
-                onQueryChange = { onEvent(StorageListViewModel.OnEvent.SearchTextChange(it)) },
-                clearIconButtonClick = { onEvent(StorageListViewModel.OnEvent.SearchTextChange("")) }
+                onQueryChange = { onAction(StorageListViewModel.OnAction.SearchTextChange(it)) },
+                clearIconButtonClick = { onAction(StorageListViewModel.OnAction.SearchTextChange("")) }
             )
             Spacer(modifier = Modifier.height(22.dp))
             LazyRow(
@@ -149,7 +149,7 @@ fun StorageScreenContent(
                 ) { filter ->
                     FilterChip(
                         selected = uiState.activeFilter.contains(filter),
-                        onClick = { onEvent(StorageListViewModel.OnEvent.FilterChipClicked(filter)) },
+                        onClick = { onAction(StorageListViewModel.OnAction.FilterChipClicked(filter)) },
                         label = {
                             Text(
                                 text = filter.tag,
@@ -181,17 +181,17 @@ fun StorageScreenContent(
                             true -> EditStorageItem(
                                 food = food,
                                 onFoodIconClick = { isIconSelectorOpen = true },
-                                onCloseClick = { onEvent(StorageListViewModel.OnEvent.ClearSelectedFoodIndex) },
+                                onCloseClick = { onAction(StorageListViewModel.OnAction.ClearSelectedFoodIndex) },
                                 onDeleteTagClick = { tag ->
-                                    onEvent(
-                                        StorageListViewModel.OnEvent.ModifyFoodTags(tag)
+                                    onAction(
+                                        StorageListViewModel.OnAction.ModifyFoodTags(tag)
                                     )
                                 },
                                 onAddTagClick = {
                                     isEditProductTagSelectorOpen = true
                                 },
                                 onQuantityClick = {
-                                    onEvent(StorageListViewModel.OnEvent.SetupEditFoodQuantityDialog)
+                                    onAction(StorageListViewModel.OnAction.SetupEditFoodQuantityDialog)
                                 }
                             )
 
@@ -206,8 +206,8 @@ fun StorageScreenContent(
                                         modifier = Modifier
                                             .combinedClickable(
                                                 onClick = {
-                                                    onEvent(
-                                                        StorageListViewModel.OnEvent.FoodEditButtonClick(
+                                                    onAction(
+                                                        StorageListViewModel.OnAction.FoodEditButtonClick(
                                                             index
                                                         )
                                                     )
@@ -265,16 +265,16 @@ fun StorageScreenContent(
         EditQuantityDialog(
             quantityValue = uiState.quantityModifyValue,
             onQuantityChange = { quantityString ->
-                onEvent(StorageListViewModel.OnEvent.ModifyFoodDialogQuantityChange(quantityString))
+                onAction(StorageListViewModel.OnAction.ModifyFoodDialogQuantityChange(quantityString))
             },
             isQuantityHasError = uiState.isQuantityModifyDialogHasError,
             measurementValue = uiState.unitOfMeasurementModifyValue,
             onMeasurementChange = { uof ->
-                onEvent(StorageListViewModel.OnEvent.EditFoodDialogUnitChange(uof))
+                onAction(StorageListViewModel.OnAction.EditFoodDialogUnitChange(uof))
             },
             onCancelButtonClick = { isEditQuantityDialogOpen = false },
             onConfirmButtonClick = {
-                onEvent(StorageListViewModel.OnEvent.SaveEditFoodQuantities)
+                onAction(StorageListViewModel.OnAction.SaveEditFoodQuantities)
             },
             onDismissRequest = { isEditQuantityDialogOpen = false }
         )
@@ -284,7 +284,7 @@ fun StorageScreenContent(
         IconSelectorSheet(
             allIconList = uiState.allFoodIconList,
             selectedIcon = IconManager().findFoodIconByInt(uiState.foodList[uiState.modifyFoodListPositionIndex].icon),
-            onItemClick = { onEvent(StorageListViewModel.OnEvent.ModifyFoodIcon(it)) },
+            onItemClick = { onAction(StorageListViewModel.OnAction.ModifyFoodIcon(it)) },
             onDismissRequest = { isIconSelectorOpen = false }
         )
     }
@@ -293,7 +293,7 @@ fun StorageScreenContent(
         SettingsPanel(
             dismissSettingPanel = { isSettingPanelOpen = false },
             onDeleteItemClick = {
-                onEvent(StorageListViewModel.OnEvent.DeleteFood(settingPanelFoodId!!))
+                onAction(StorageListViewModel.OnAction.DeleteFood(settingPanelFoodId!!))
                 isSettingPanelOpen = false
                 settingPanelFoodId = null
             }
@@ -306,8 +306,8 @@ fun StorageScreenContent(
                 isEditProductTagSelectorOpen = false
             },
             onTagClick = {
-                onEvent(
-                    StorageListViewModel.OnEvent.ModifyFoodTags(it)
+                onAction(
+                    StorageListViewModel.OnAction.ModifyFoodTags(it)
                 )
             },
             allTagList = uiState.foodTagList,
@@ -328,7 +328,7 @@ fun StorageScreenContentPreview(
             foodList = mockProductList,
         ),
         uiEvent = flow { },
-        onEvent = {},
+        onAction = {},
         onFABClick = {}
     )
 }

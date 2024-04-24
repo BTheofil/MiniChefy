@@ -10,11 +10,8 @@ import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
-import hu.tb.minichefy.domain.use_case.ValidateCountInteger
-import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
-import hu.tb.minichefy.domain.use_case.ValidateQuantity
-import hu.tb.minichefy.domain.use_case.ValidateTextField
 import hu.tb.minichefy.domain.use_case.ValidationResult
+import hu.tb.minichefy.domain.use_case.Validators
 import hu.tb.minichefy.presentation.screens.manager.icons.MealIcon
 import hu.tb.minichefy.presentation.ui.theme.SEARCH_BAR_WAIT_AFTER_CHARACTER
 import kotlinx.coroutines.channels.Channel
@@ -31,10 +28,7 @@ import kotlin.random.Random
 class CreateRecipeViewModel @Inject constructor(
     private val recipeRepository: RecipeRepository,
     private val storageRepository: StorageRepository,
-    private val validateCountInteger: ValidateCountInteger,
-    private val validateQuantity: ValidateQuantity,
-    private val validateTextField: ValidateTextField,
-    private val validateNumberKeyboard: ValidateNumberKeyboard
+    private val validators: Validators,
 ) : ViewModel() {
 
     private val _basicPageState = MutableStateFlow(Pages.BasicInformationPage())
@@ -142,7 +136,7 @@ class CreateRecipeViewModel @Inject constructor(
     fun onBasicInformationPageEvent(event: OnBasicInformationPageEvent) {
         when (event) {
             is OnBasicInformationPageEvent.OnQuantityChange -> {
-                when (validateCountInteger((basicPageState.value.quantityCounter + event.value))) {
+                when (validators.validateQuantity((basicPageState.value.quantityCounter + event.value))) {
                     ValidationResult.SUCCESS -> _basicPageState.update {
                         it.copy(
                             quantityCounter = it.quantityCounter + event.value,
@@ -165,7 +159,7 @@ class CreateRecipeViewModel @Inject constructor(
             }
 
             is OnBasicInformationPageEvent.OnTimeChange -> {
-                if (validateNumberKeyboard(event.text) == ValidationResult.ERROR) return
+                if (validators.validateNumberKeyboard(event.text) == ValidationResult.ERROR) return
                 _basicPageState.update {
                     it.copy(timeField = event.text)
                 }
@@ -233,7 +227,7 @@ class CreateRecipeViewModel @Inject constructor(
             }
 
             is OnIngredientEvent.OnIngredientQuantityChange -> {
-                if (validateNumberKeyboard(event.quantityString) == ValidationResult.ERROR) return
+                if (validators.validateNumberKeyboard(event.quantityString) == ValidationResult.ERROR) return
                 _ingredientsPageState.update {
                     it.copy(
                         ingredientQuantityDraft = event.quantityString
@@ -331,15 +325,14 @@ class CreateRecipeViewModel @Inject constructor(
     private suspend fun saveSteps(recipeId: Long) =
         stepsPageState.value.recipeSteps.forEach { step ->
             recipeRepository.saveStep(step, recipeId)
-            //Log.i("CreateRecipeVM", "StepId: $stepId")
         }
 
     private fun checkRecipeValid(): Boolean {
-        val titleResult = validateTextField(basicPageState.value.recipeTitle)
+        val titleResult = validators.validateTextField(basicPageState.value.recipeTitle)
         val quantityCounterResult =
-            validateCountInteger(basicPageState.value.quantityCounter)
+            validators.validateQuantity(basicPageState.value.quantityCounter)
         val timeResult = try {
-            validateCountInteger(basicPageState.value.timeField.toInt())
+            validators.validateQuantity(basicPageState.value.timeField.toInt())
         } catch (e: Exception) {
             ValidationResult.ERROR
         }
@@ -383,9 +376,9 @@ class CreateRecipeViewModel @Inject constructor(
         val currentState = ingredientsPageState.value
 
         val titleResult =
-            validateTextField(currentState.ingredientTitleDraft)
+            validators.validateTextField(currentState.ingredientTitleDraft)
         val quantityResult = try {
-            validateQuantity(currentState.ingredientQuantityDraft.toFloat())
+            validators.validateQuantity(currentState.ingredientQuantityDraft.toFloat())
         } catch (e: Exception) {
             ValidationResult.ERROR
         }

@@ -28,6 +28,13 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getKnownFoodList(): List<Food> {
+        val entities = dao.getKnownFoodsList()
+        return entities.map {
+            FoodEntityToFood().map(it)
+        }
+    }
+
     override suspend fun getStorageFoodSummary(): List<FoodSummary> {
         val entities = dao.getAllStorageFoodName()
         return entities.map {
@@ -36,13 +43,6 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
                 title = it.title,
             )
         }.sortedBy { it.title }
-    }
-
-    override suspend fun getKnownFoodList(): List<Food> {
-        val entities = dao.getKnownFoodsList()
-        return entities.map {
-            FoodEntityToFood().map(it)
-        }
     }
 
     override suspend fun searchFoodByTitle(title: String): List<Food>  {

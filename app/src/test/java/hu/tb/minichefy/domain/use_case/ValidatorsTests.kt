@@ -5,7 +5,7 @@ import org.junit.Test
 
 class ValidatorsTests {
 
-    private val countIntegerUseCase = ValidateCountInteger()
+    private val countIntegerUseCase = ValidateQuantity()
     private val quantityUseCase = ValidateQuantity()
     private val numberUseCase = ValidateNumberKeyboard()
     private val textFieldUseCase = ValidateTextField()

@@ -9,21 +9,22 @@ import dagger.hilt.components.SingletonComponent
 import hu.tb.minichefy.data.data_source.db.MiniChefyDatabase
 import hu.tb.minichefy.data.repository.RecipeDatabaseRepositoryImpl
 import hu.tb.minichefy.data.repository.StorageDatabaseRepositoryImpl
-import hu.tb.minichefy.domain.model.storage.entity.DISH_TAG_ID
 import hu.tb.minichefy.domain.model.storage.entity.TagEntity
-import hu.tb.minichefy.domain.model.storage.entity.UNKNOWN_TAG_ID
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.CalculateMeasurements
 import hu.tb.minichefy.domain.use_case.DataStoreManager
 import hu.tb.minichefy.domain.use_case.ValidateQuantity
-import hu.tb.minichefy.domain.use_case.ValidateCountInteger
 import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
 import hu.tb.minichefy.domain.use_case.ValidateTextField
+import hu.tb.minichefy.domain.use_case.Validators
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Singleton
+
+const val UNKNOWN_TAG_ID = 4
+const val DISH_TAG_ID = 3
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -74,21 +75,14 @@ object AppModule {
 
 
     // use case
+    @Singleton
     @Provides
-    fun provideValidateCountIntegerUseCase(): ValidateCountInteger =
-        ValidateCountInteger()
-
-    @Provides
-    fun provideValidateQuantityFloatUseCase(): ValidateQuantity =
-        ValidateQuantity()
-
-    @Provides
-    fun provideValidateNumberKeyboardUseCase(): ValidateNumberKeyboard =
-        ValidateNumberKeyboard()
-
-    @Provides
-    fun provideValidateTextFieldUseCase(): ValidateTextField =
-        ValidateTextField()
+    fun provideValidatorsUseCase(): Validators =
+        Validators(
+            validateQuantity = ValidateQuantity(),
+            validateNumberKeyboard = ValidateNumberKeyboard(),
+            validateTextField = ValidateTextField()
+        )
 
     @Provides
     fun provideCalculateMeasurements(): CalculateMeasurements =
