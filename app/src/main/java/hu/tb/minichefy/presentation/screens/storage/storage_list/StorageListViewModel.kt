@@ -44,9 +44,10 @@ class StorageListViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            val tags = storageRepository.getFilterableTagList()
-            _uiState.update {
-                it.copy(foodTagList = tags)
+            storageRepository.getFoodTagFlow().collect { tagList ->
+                _uiState.update {
+                    it.copy(foodTagList = tagList)
+                }
             }
         }
     }
@@ -93,7 +94,7 @@ class StorageListViewModel @Inject constructor(
 
                     delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
 
-                    val searchResult = storageRepository.searchKnownFoodLikelyByTitle(action.text)
+                    val searchResult = storageRepository.searchFoodByTitle("%$action.text%")
                     _uiState.update {
                         it.copy(foodList = searchResult)
                     }

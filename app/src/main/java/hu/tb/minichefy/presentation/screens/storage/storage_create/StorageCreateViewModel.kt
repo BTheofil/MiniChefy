@@ -29,11 +29,12 @@ class StorageCreateViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val tags = storageRepository.getFilterableTagList()
-            _uiState.update {
-                it.copy(
-                    labelFilterTagList = tags
-                )
+            storageRepository.getFoodTagFlow().collect { tagList ->
+                _uiState.update {
+                    it.copy(
+                        labelFilterTagList = tagList
+                    )
+                }
             }
         }
     }

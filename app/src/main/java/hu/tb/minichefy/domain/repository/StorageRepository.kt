@@ -21,10 +21,6 @@ interface StorageRepository {
 
     suspend fun searchFoodsByTag(tagIds: List<Long>): List<Food>
 
-    suspend fun searchKnownFoodByTitle(title: String): List<Food>
-
-    suspend fun searchKnownFoodLikelyByTitle(title: String): List<Food>
-
     suspend fun saveOrModifyFood(
         id: Long? = null,
         title: String,
@@ -42,9 +38,7 @@ interface StorageRepository {
     suspend fun deleteFoodById(id: Long): Int
 
     //tag
-    fun getAllFoodTag(): Flow<List<FoodTag>>
-
-    suspend fun getFilterableTagList(): List<FoodTag>
+    fun getFoodTagFlow(): Flow<List<FoodTag>>
 
     suspend fun getTagById(id: Long): FoodTag
 

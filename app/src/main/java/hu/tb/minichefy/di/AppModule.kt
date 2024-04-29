@@ -23,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
-const val UNKNOWN_TAG_ID = 4
 const val DISH_TAG_ID = 3
 
 @Module
@@ -52,9 +51,6 @@ object AppModule {
                 )
                 db.storageDao.insertTagEntity(
                     TagEntity(tagId = DISH_TAG_ID.toLong(), tag = "dish")
-                )
-                db.storageDao.insertTagEntity(
-                    TagEntity(tagId = UNKNOWN_TAG_ID.toLong(), tag = "unknown")
                 )
             }
         }

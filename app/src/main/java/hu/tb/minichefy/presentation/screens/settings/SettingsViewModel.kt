@@ -25,7 +25,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun getTagList(){
         viewModelScope.launch {
-            storageRepository.getAllFoodTag().collect { tagList ->
+            storageRepository.getFoodTagFlow().collect { tagList ->
                 foodTagList = tagList
             }
         }

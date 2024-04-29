@@ -7,7 +7,6 @@ import hu.tb.minichefy.data.data_source.dao.RecipeDAO
 import hu.tb.minichefy.data.data_source.dao.StorageDAO
 import hu.tb.minichefy.data.data_source.db.MiniChefyDatabase
 import hu.tb.minichefy.di.DISH_TAG_ID
-import hu.tb.minichefy.di.UNKNOWN_TAG_ID
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
@@ -42,7 +41,6 @@ class MiniChefyDatabaseTest {
             TagEntity(tagId = 1, tag = "fruit"),
             TagEntity(tagId = 2, tag = "vegetable"),
             TagEntity(tagId = DISH_TAG_ID.toLong(), tag = "dish"),
-            TagEntity(tagId = UNKNOWN_TAG_ID.toLong(), tag = "unknown"),
         )
         runBlocking {
             tagList.forEach {
@@ -128,7 +126,7 @@ class MiniChefyDatabaseTest {
                 tagId = 1
             )
         )
-        val result2 = storageDao.getKnownFoodsList()
+        val result2 = storageDao.getFoodWithTagsList()
         assertEquals(1, result2[0].tags.size)
     }
 }
