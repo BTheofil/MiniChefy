@@ -1,26 +1,33 @@
 package hu.tb.minichefy.presentation.screens.settings
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import hu.tb.minichefy.R
-import hu.tb.minichefy.domain.model.settings.SettingItem
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import hu.tb.minichefy.domain.model.storage.FoodTag
+import hu.tb.minichefy.domain.repository.StorageRepository
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SettingsViewModel : ViewModel() {
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
+    private val storageRepository: StorageRepository
+): ViewModel() {
 
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState = _uiState.asStateFlow()
+    var foodTagList by mutableStateOf<List<FoodTag>>(emptyList())
+        private set
 
-    data class UiState(
-        val settingsMenuList: List<SettingItem> = listOf(
-            SettingItem(
-                "Tag",
-                R.drawable.tag_icon
-            ),
-            SettingItem(
-                "Theme",
-                R.drawable.theme_icon
-            )
-        )
-    )
+    init {
+        getTagList()
+    }
+
+    private fun getTagList(){
+        viewModelScope.launch {
+            storageRepository.getAllFoodTag().collect { tagList ->
+                foodTagList = tagList
+            }
+        }
+    }
 }

@@ -18,6 +18,6 @@ fun MainNavigation(
 
         recipeNestedGraph(navController)
 
-        settingsNavigation()
+        settingsNavigation(navController)
     }
 }
