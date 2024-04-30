@@ -19,8 +19,28 @@ class SettingsViewModel @Inject constructor(
     var foodTagList by mutableStateOf<List<FoodTag>>(emptyList())
         private set
 
+    var tagState by mutableStateOf("")
+        private set
+
     init {
         getTagList()
+    }
+
+    fun updateTagTextFieldValue(text: String){
+        tagState = text
+    }
+
+    fun saveNewTag(){
+        viewModelScope.launch {
+            storageRepository.saveOrModifyFoodTag(tag = FoodTag(tag = tagState))
+            tagState = ""
+        }
+    }
+
+    fun deleteTag(tagId: Long){
+        viewModelScope.launch {
+            storageRepository.deleteFoodById(tagId)
+        }
     }
 
     private fun getTagList(){

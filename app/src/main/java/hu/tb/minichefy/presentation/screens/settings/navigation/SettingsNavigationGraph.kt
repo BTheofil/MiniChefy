@@ -30,7 +30,13 @@ fun NavGraphBuilder.settingsNavigation(navController: NavController) {
             route = TAG_SCREEN,
         ) {
             val vm = hiltViewModel<SettingsViewModel>()
-            TagScreen(vm.foodTagList)
+            TagScreen(
+                foodTagList = vm.foodTagList,
+                tagFieldValue = vm.tagState,
+                updateTagTextFieldValue = vm::updateTagTextFieldValue,
+                saveNewTag = vm::saveNewTag,
+                deleteTag = vm::deleteTag
+            )
         }
         composable(
             route = THEME_SCREEN
