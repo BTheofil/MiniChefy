@@ -16,7 +16,8 @@
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.MiniChefy.Starting">
+            android:theme="@style/Theme.MiniChefy.Starting"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

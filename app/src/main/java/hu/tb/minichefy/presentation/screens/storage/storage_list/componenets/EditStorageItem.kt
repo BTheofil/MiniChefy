@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -116,7 +115,7 @@ fun EditStorageItem(
                 )
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                 FlowRow(
-                    maxItemsInEachRow = 3,
+                    maxItemsInEachRow = 5,
                     horizontalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS),
                 ) {
                     AssistChip(
@@ -155,7 +154,7 @@ fun EditStorageItem(
                                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
                                 label = {
                                     Text(
-                                        text = "More...",
+                                        text = "+" + (tags.size - 3),
                                         style = MaterialTheme.typography.labelLarge,
                                         color = MaterialTheme.colorScheme.primary
                                     )
