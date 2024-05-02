@@ -1,10 +1,14 @@
 package hu.tb.minichefy.presentation.screens.settings.settings_options.components
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,9 +21,16 @@ fun AddTagDialog(
     onCancelClick: () -> Unit,
     textFieldValue: String,
     onValueChange: (String) -> Unit,
+    isError: Boolean
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
+        icon = {
+            Icon(
+                imageVector = Icons.Outlined.Create, contentDescription = "create icon",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
         confirmButton = {
             TextButton(onClick = onConfirmClick) {
                 Text(text = stringResource(id = R.string.done))
@@ -40,7 +51,13 @@ fun AddTagDialog(
         text = {
             OutlinedTextField(
                 value = textFieldValue,
-                onValueChange = onValueChange
+                onValueChange = onValueChange,
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.primary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                    errorTextColor = MaterialTheme.colorScheme.error
+                ),
+                isError = isError
             )
         }
     )
@@ -54,6 +71,7 @@ private fun AddTagDialogPreview() {
         onConfirmClick = {},
         onCancelClick = {},
         textFieldValue = "test",
-        onValueChange = {}
+        onValueChange = {},
+        isError = false
     )
 }

@@ -8,42 +8,67 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.repository.StorageRepository
+import hu.tb.minichefy.domain.use_case.ValidationResult
+import hu.tb.minichefy.domain.use_case.Validators
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val storageRepository: StorageRepository
-): ViewModel() {
+    private val storageRepository: StorageRepository,
+    private val validators: Validators,
+) : ViewModel() {
 
     var foodTagList by mutableStateOf<List<FoodTag>>(emptyList())
         private set
 
-    var tagState by mutableStateOf("")
-        private set
+    private var _tagState = MutableStateFlow(TagState())
+    val tagState: StateFlow<TagState> = _tagState
 
     init {
         getTagList()
     }
 
-    fun updateTagTextFieldValue(text: String){
-        tagState = text
-    }
+    data class TagState(
+        val tagText: String = "",
+        val isValid: Boolean = true,
+    )
 
-    fun saveNewTag(){
-        viewModelScope.launch {
-            storageRepository.saveOrModifyFoodTag(tag = FoodTag(tag = tagState))
-            tagState = ""
+    fun updateTagTextFieldValue(text: String) {
+        _tagState.update {
+            it.copy(tagText = text)
         }
     }
 
-    fun deleteTag(tagId: Long){
+    fun saveNewTag() {
+        if (validators.validateTextField(tagState.value.tagText) == ValidationResult.ERROR) {
+            _tagState.update {
+                it.copy(isValid = false)
+            }
+            return
+        }
+
         viewModelScope.launch {
-            storageRepository.deleteFoodById(tagId)
+            storageRepository.saveOrModifyFoodTag(tag = FoodTag(tag = tagState.value.tagText))
+            _tagState.update {
+                it.copy(
+                    tagText = "",
+                    isValid = true
+                )
+            }
         }
     }
 
-    private fun getTagList(){
+    fun deleteTag(tagId: Long) {
+        viewModelScope.launch {
+            storageRepository.deleteFoodTag(tagId)
+        }
+    }
+
+    private fun getTagList() {
         viewModelScope.launch {
             storageRepository.getFoodTagFlow().collect { tagList ->
                 foodTagList = tagList

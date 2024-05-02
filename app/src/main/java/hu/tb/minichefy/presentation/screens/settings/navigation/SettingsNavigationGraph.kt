@@ -1,6 +1,8 @@
 package hu.tb.minichefy.presentation.screens.settings.navigation
 
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -30,9 +32,11 @@ fun NavGraphBuilder.settingsNavigation(navController: NavController) {
             route = TAG_SCREEN,
         ) {
             val vm = hiltViewModel<SettingsViewModel>()
+            val tagState by vm.tagState.collectAsStateWithLifecycle()
             TagScreen(
+                onNavigateBackClick = { navController.popBackStack() },
                 foodTagList = vm.foodTagList,
-                tagFieldValue = vm.tagState,
+                tagState = tagState,
                 updateTagTextFieldValue = vm::updateTagTextFieldValue,
                 saveNewTag = vm::saveNewTag,
                 deleteTag = vm::deleteTag

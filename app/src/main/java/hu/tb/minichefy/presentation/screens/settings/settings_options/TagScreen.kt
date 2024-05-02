@@ -3,7 +3,7 @@ package hu.tb.minichefy.presentation.screens.settings.settings_options
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
@@ -25,14 +26,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import hu.tb.minichefy.domain.model.storage.FoodTag
+import hu.tb.minichefy.presentation.screens.settings.SettingsViewModel
 import hu.tb.minichefy.presentation.screens.settings.settings_options.components.AddTagDialog
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
+import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TagScreen(
+    onNavigateBackClick: () -> Unit,
     foodTagList: List<FoodTag>,
-    tagFieldValue: String,
+    tagState: SettingsViewModel.TagState,
     updateTagTextFieldValue: (String) -> Unit,
     saveNewTag: () -> Unit,
     deleteTag: (id: Long) -> Unit
@@ -43,10 +47,12 @@ fun TagScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "back icon"
-                    )
+                    IconButton(onClick = onNavigateBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = "back icon"
+                        )
+                    }
                 },
                 title = {
                     Text(text = "Edit tags")
@@ -55,11 +61,10 @@ fun TagScreen(
     ) { paddingValues ->
         FlowRow(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(paddingValues)
                 .padding(horizontal = SCREEN_HORIZONTAL_PADDING),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS),
         ) {
             BasicInputChip(
                 content = {
@@ -103,8 +108,9 @@ fun TagScreen(
                 saveNewTag()
             },
             onCancelClick = { isTagCreateDialogVisible = false },
-            textFieldValue = tagFieldValue,
-            onValueChange = updateTagTextFieldValue
+            textFieldValue = tagState.tagText,
+            onValueChange = updateTagTextFieldValue,
+            isError = !tagState.isValid
         )
     }
 }
@@ -130,12 +136,15 @@ private fun BasicInputChip(
 @Composable
 private fun TagScreenPreview() {
     TagScreen(
+        onNavigateBackClick = {},
         foodTagList = listOf(
             FoodTag(0, "first"),
             FoodTag(1, "second"),
             FoodTag(2, "third"),
+            FoodTag(2, "third"),
+            FoodTag(2, "third"),
         ),
-        tagFieldValue = "test",
+        tagState = SettingsViewModel.TagState(),
         updateTagTextFieldValue = {},
         saveNewTag = {},
         deleteTag = {}
