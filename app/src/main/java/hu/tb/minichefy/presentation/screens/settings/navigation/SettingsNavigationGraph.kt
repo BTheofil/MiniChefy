@@ -14,7 +14,7 @@ import hu.tb.minichefy.presentation.screens.settings.settings_options.TagScreen
 
 const val SETTINGS_GRAPH = "settings_graph"
 const val TAG_SCREEN = "tag_screen"
-const val THEME_SCREEN = "theme_screen"
+//const val THEME_SCREEN = "theme_screen"
 
 fun NavGraphBuilder.settingsNavigation(navController: NavController) {
     navigation(startDestination = SETTINGS_MAIN_ROUTE, route = SETTINGS_GRAPH) {
@@ -23,7 +23,7 @@ fun NavGraphBuilder.settingsNavigation(navController: NavController) {
             navigateToSpecificSettings = { route ->
                 when (route) {
                     TAG_SCREEN -> navController.navigate(TAG_SCREEN)
-                    THEME_SCREEN -> navController.navigate(THEME_SCREEN)
+                    //THEME_SCREEN -> navController.navigate(THEME_SCREEN)
                 }
             }
         )
@@ -42,10 +42,10 @@ fun NavGraphBuilder.settingsNavigation(navController: NavController) {
                 deleteTag = vm::deleteTag
             )
         }
-        composable(
+        /*composable(
             route = THEME_SCREEN
         ) {
             //todo
-        }
+        }*/
     }
 }

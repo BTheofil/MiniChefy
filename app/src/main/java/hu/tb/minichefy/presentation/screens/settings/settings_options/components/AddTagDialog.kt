@@ -43,7 +43,7 @@ fun AddTagDialog(
         },
         title = {
             Text(
-                text = "Create new tag",
+                text = stringResource(R.string.create_new_tag),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.primary
             )

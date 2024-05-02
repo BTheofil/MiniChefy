@@ -21,12 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.settings.SettingItem
 import hu.tb.minichefy.presentation.screens.settings.navigation.TAG_SCREEN
-import hu.tb.minichefy.presentation.screens.settings.navigation.THEME_SCREEN
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 import hu.tb.minichefy.presentation.util.icons.iconVectorResource
 
@@ -64,7 +64,7 @@ fun SettingsScreen(
                         },
                         headlineContent = {
                             Text(
-                                text = item.title,
+                                text = stringResource(id = item.title),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -90,15 +90,15 @@ fun SettingsScreen(
 
 private val settingsMenuList: List<SettingItem> = listOf(
     SettingItem(
-        "Tag",
+        R.string.tags,
         R.drawable.tag_icon,
         TAG_SCREEN
     ),
-    SettingItem(
-        "Theme",
+    /*SettingItem(
+        R.string.theme,
         R.drawable.theme_icon,
         THEME_SCREEN
-    )
+    )*/
 )
 
 @Preview

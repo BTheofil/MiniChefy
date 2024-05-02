@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,7 +24,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.screens.settings.SettingsViewModel
 import hu.tb.minichefy.presentation.screens.settings.settings_options.components.AddTagDialog
@@ -49,13 +51,13 @@ fun TagScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBackClick) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
                             contentDescription = "back icon"
                         )
                     }
                 },
                 title = {
-                    Text(text = "Edit tags")
+                    Text(text = stringResource(id = R.string.tags))
                 })
         }
     ) { paddingValues ->
