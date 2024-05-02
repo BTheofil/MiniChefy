@@ -62,8 +62,7 @@ fun EditStorageItem(
 ) {
     OutlinedCard(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(max = 250.dp),
+            .fillMaxWidth(),
         colors = CardDefaults.outlinedCardColors(
             contentColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
         )

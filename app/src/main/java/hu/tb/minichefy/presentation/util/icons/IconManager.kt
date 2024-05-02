@@ -7,7 +7,10 @@ import kotlin.random.Random
 
 class IconManager {
 
-    fun getRandomFood(): FoodIcon = FoodIcon.entries[Random.nextInt(0, FoodIcon.entries.size)]
+    fun getRandomFood(): FoodIcon {
+        val size = FoodIcon.entries.size
+        return FoodIcon.entries[Random.nextInt(0, size)]
+    }
 
     fun findFoodIconByInt(iconInt: Int): IconResource? =
         FoodIcon.entries.find { it.resource == iconInt }

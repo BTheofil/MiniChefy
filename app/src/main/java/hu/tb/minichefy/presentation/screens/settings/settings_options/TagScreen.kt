@@ -33,7 +33,7 @@ import hu.tb.minichefy.presentation.screens.settings.settings_options.components
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TagScreen(
     onNavigateBackClick: () -> Unit,
@@ -52,54 +52,28 @@ fun TagScreen(
                     IconButton(onClick = onNavigateBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
-                            contentDescription = "back icon"
+                            contentDescription = "back icon",
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
                 title = {
-                    Text(text = stringResource(id = R.string.tags))
+                    Text(
+                        text = stringResource(id = R.string.tags),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 })
         }
     ) { paddingValues ->
-        FlowRow(
+        TagListContent(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(paddingValues)
-                .padding(horizontal = SCREEN_HORIZONTAL_PADDING),
-            horizontalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS),
-        ) {
-            BasicInputChip(
-                content = {
-                    Icon(
-                        imageVector = Icons.Outlined.Add,
-                        contentDescription = "add new tag icon",
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                },
-                onClick = { isTagCreateDialogVisible = true }
-            )
-            foodTagList.forEach { foodTag ->
-                BasicInputChip(
-                    content = {
-                        Text(
-                            text = foodTag.tag,
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Rounded.Close,
-                            contentDescription = "delete icon",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    },
-                    onClick = {
-                        deleteTag(foodTag.id!!)
-                    }
-                )
-            }
-        }
+                .padding(paddingValues),
+            tagList = foodTagList,
+            onAddTagClick = { isTagCreateDialogVisible = true },
+            onTagClick = { deleteTag(it) }
+        )
     }
 
     if (isTagCreateDialogVisible) {
@@ -114,6 +88,51 @@ fun TagScreen(
             onValueChange = updateTagTextFieldValue,
             isError = !tagState.isValid
         )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun TagListContent(
+    modifier: Modifier = Modifier,
+    tagList: List<FoodTag>,
+    onAddTagClick: () -> Unit,
+    onTagClick: (id: Long) -> Unit
+) {
+    FlowRow(
+        modifier = modifier
+            .padding(horizontal = SCREEN_HORIZONTAL_PADDING),
+        horizontalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS),
+    ) {
+        BasicInputChip(
+            content = {
+                Icon(
+                    imageVector = Icons.Outlined.Add,
+                    contentDescription = "add new tag icon",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            },
+            onClick = onAddTagClick
+        )
+        tagList.forEach { foodTag ->
+            BasicInputChip(
+                content = {
+                    Text(
+                        text = foodTag.tag,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Close,
+                        contentDescription = "delete icon",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                },
+                onClick = { onTagClick(foodTag.id!!) }
+            )
+        }
     }
 }
 
