@@ -8,8 +8,8 @@ import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.domain.use_case.Validators
-import hu.tb.minichefy.presentation.screens.manager.icons.FoodIcon
-import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
+import hu.tb.minichefy.presentation.util.icons.FoodIcon
+import hu.tb.minichefy.presentation.util.icons.IconManager
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,11 +29,12 @@ class StorageCreateViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val tags = storageRepository.getFilterableTagList()
-            _uiState.update {
-                it.copy(
-                    labelFilterTagList = tags
-                )
+            storageRepository.getFoodTagFlow().collect { tagList ->
+                _uiState.update {
+                    it.copy(
+                        labelFilterTagList = tagList
+                    )
+                }
             }
         }
     }

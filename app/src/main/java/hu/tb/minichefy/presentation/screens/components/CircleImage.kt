@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
+import hu.tb.minichefy.presentation.util.icons.iconVectorResource
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 
 @Composable

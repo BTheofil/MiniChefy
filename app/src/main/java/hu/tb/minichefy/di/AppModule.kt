@@ -13,7 +13,7 @@ import hu.tb.minichefy.domain.model.storage.entity.TagEntity
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.CalculateMeasurements
-import hu.tb.minichefy.domain.use_case.DataStoreManager
+import hu.tb.minichefy.presentation.util.DataStoreManager
 import hu.tb.minichefy.domain.use_case.ValidateQuantity
 import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
 import hu.tb.minichefy.domain.use_case.ValidateTextField
@@ -23,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
-const val UNKNOWN_TAG_ID = 4
 const val DISH_TAG_ID = 3
 
 @Module
@@ -52,9 +51,6 @@ object AppModule {
                 )
                 db.storageDao.insertTagEntity(
                     TagEntity(tagId = DISH_TAG_ID.toLong(), tag = "dish")
-                )
-                db.storageDao.insertTagEntity(
-                    TagEntity(tagId = UNKNOWN_TAG_ID.toLong(), tag = "unknown")
                 )
             }
         }

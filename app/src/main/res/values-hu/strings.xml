@@ -7,7 +7,7 @@
     <string name="measurement">Mérték</string>
     <string name="tag">Címke</string>
     <string name="done">Kész</string>
-    <string name="modify_amount">Modify amount count</string>
+    <string name="modify_amount">Változtass mennyiséget</string>
     <string name="serve">Étkezés</string>
     <string name="cancel">Mégse</string>
     <string name="never_show_this_message">Ne mutassa újra</string>
@@ -39,4 +39,8 @@
     <string name="solid">Szilárd</string>
     <string name="dish_added_to_storage">Étel hozzáadva a raktárba</string>
     <string name="can_not_make_the_meal_incompatible_ingredient_s">Nem lehet elkésziteni. Összeegyeztethetetlen hozzávaló</string>
+    <string name="settings">Beállítások</string>
+    <string name="create_new_tag">Új címke létrehozás</string>
+    <string name="tags">Címkék</string>
+    <string name="theme">Téma</string>
 </resources>

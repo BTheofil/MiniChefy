@@ -58,7 +58,7 @@ import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.SimpleQuickRecipeInfo
 import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
-import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
+import hu.tb.minichefy.presentation.util.icons.iconVectorResource
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.ConfirmRecipeAddToStorageDialog
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.DetailsRecipeStepItem
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.OneColorBackground

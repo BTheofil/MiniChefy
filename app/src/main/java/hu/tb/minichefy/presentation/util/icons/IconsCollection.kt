@@ -1,4 +1,4 @@
-package hu.tb.minichefy.presentation.screens.manager.icons
+package hu.tb.minichefy.presentation.util.icons
 
 import hu.tb.minichefy.R
 

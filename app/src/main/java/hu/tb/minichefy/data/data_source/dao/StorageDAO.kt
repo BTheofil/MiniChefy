@@ -5,12 +5,11 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import hu.tb.minichefy.di.UNKNOWN_TAG_ID
 import hu.tb.minichefy.domain.model.storage.entity.FoodAndTagsCrossRef
 import hu.tb.minichefy.domain.model.storage.entity.TagEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
-import hu.tb.minichefy.domain.model.storage.entity.SimplerFoodEntity
+import hu.tb.minichefy.domain.model.storage.entity.SimpleFoodEntity
 import kotlinx.coroutines.flow.Flow
 
 typealias FoodId = Long
@@ -21,23 +20,15 @@ interface StorageDAO {
     //food
     @Transaction
     @Query("SELECT foodId, title FROM FoodEntity")
-    suspend fun getAllStorageFoodName(): List<SimplerFoodEntity>
+    suspend fun getSimpleFoodList(): List<SimpleFoodEntity>
 
     @Transaction
-    @Query(
-        "SELECT * FROM FoodEntity f " +
-                "WHERE NOT EXISTS (SELECT 1 FROM FoodAndTagsCrossRef WHERE f.foodId = foodId AND tagId = ($UNKNOWN_TAG_ID)) " +
-                "OR f.foodId NOT IN (SELECT foodId FROM FoodAndTagsCrossRef)"
-    )
-    fun getKnownFoodsFlow(): Flow<List<FoodWithTags>>
+    @Query("SELECT * FROM FoodEntity")
+    fun getFoodWithTagsFlow(): Flow<List<FoodWithTags>>
 
     @Transaction
-    @Query(
-        "SELECT * FROM FoodEntity f " +
-                "WHERE NOT EXISTS (SELECT 1 FROM FoodAndTagsCrossRef WHERE f.foodId = foodId AND tagId = ($UNKNOWN_TAG_ID)) " +
-                "OR f.foodId NOT IN (SELECT foodId FROM FoodAndTagsCrossRef)"
-    )
-    suspend fun getKnownFoodsList(): List<FoodWithTags>
+    @Query("SELECT * FROM FoodEntity")
+    suspend fun getFoodWithTagsList(): List<FoodWithTags>
 
     @Transaction
     @Query("SELECT * FROM FoodEntity WHERE title = :title")
@@ -45,24 +36,11 @@ interface StorageDAO {
 
     @Transaction
     @Query("SELECT foodId, title FROM FoodEntity WHERE title LIKE :searchTitle")
-    suspend fun searchSimpleFoodsByTitle(searchTitle: String): List<SimplerFoodEntity>
+    suspend fun searchSimpleFoodsByTitle(searchTitle: String): List<SimpleFoodEntity>
 
     @Transaction
     @Query("SELECT * FROM FoodEntity WHERE foodId IN (SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId IN (:tagIds))")
     suspend fun searchFoodsByTag(tagIds: List<Long>): List<FoodWithTags>
-
-    @Transaction
-    @Query(
-        "SELECT *\n" +
-                "FROM FoodEntity f\n" +
-                "WHERE f.title LIKE :foodTitle\n" +
-                "AND NOT EXISTS (\n" +
-                "    SELECT 1\n" +
-                "    FROM FoodAndTagsCrossRef\n" +
-                "    WHERE f.foodId = foodId AND tagId = ($UNKNOWN_TAG_ID)\n" +
-                ")"
-    )
-    suspend fun searchKnownFoodByTitle(foodTitle: String): List<FoodWithTags>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFoodEntity(foodEntity: FoodEntity): FoodId
@@ -85,9 +63,6 @@ interface StorageDAO {
     //tag
     @Query("SELECT * FROM TagEntity")
     fun getAllFoodTagFlow(): Flow<List<TagEntity>>
-
-    @Query("SELECT * FROM TagEntity WHERE tagId NOT IN ($UNKNOWN_TAG_ID)")
-    suspend fun getTagsExceptUnknown(): List<TagEntity>
 
     @Query("SELECT * FROM TagEntity WHERE tagId = :id")
     suspend fun getTagById(id: Long): TagEntity

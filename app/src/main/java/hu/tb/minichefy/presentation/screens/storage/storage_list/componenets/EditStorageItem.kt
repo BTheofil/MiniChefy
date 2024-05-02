@@ -44,7 +44,7 @@ import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.preview.FoodPreviewParameterProvider
-import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
+import hu.tb.minichefy.presentation.util.icons.iconVectorResource
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
@@ -62,8 +62,7 @@ fun EditStorageItem(
 ) {
     OutlinedCard(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(max = 250.dp),
+            .fillMaxWidth(),
         colors = CardDefaults.outlinedCardColors(
             contentColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
         )

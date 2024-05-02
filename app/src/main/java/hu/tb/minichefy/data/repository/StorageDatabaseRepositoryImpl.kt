@@ -20,7 +20,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
 
     //food
     override fun getKnownFoodsFlow(): Flow<List<Food>> {
-        val entities = dao.getKnownFoodsFlow()
+        val entities = dao.getFoodWithTagsFlow()
         return entities.map {
             it.map { foodWithTags ->
                 FoodEntityToFood().map(foodWithTags)
@@ -29,14 +29,14 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getKnownFoodList(): List<Food> {
-        val entities = dao.getKnownFoodsList()
+        val entities = dao.getFoodWithTagsList()
         return entities.map {
             FoodEntityToFood().map(it)
         }
     }
 
     override suspend fun getStorageFoodSummary(): List<FoodSummary> {
-        val entities = dao.getAllStorageFoodName()
+        val entities = dao.getSimpleFoodList()
         return entities.map {
             FoodSummary(
                 id = it.foodId,
@@ -65,20 +65,6 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
     override suspend fun searchFoodsByTag(tagIds: List<Long>): List<Food> {
         val foodEntity = dao.searchFoodsByTag(tagIds)
         return foodEntity.map {
-            FoodEntityToFood().map(it)
-        }
-    }
-
-    override suspend fun searchKnownFoodByTitle(title: String): List<Food> {
-        val entities = dao.searchKnownFoodByTitle(title)
-        return entities.map {
-            FoodEntityToFood().map(it)
-        }
-    }
-
-    override suspend fun searchKnownFoodLikelyByTitle(title: String): List<Food> {
-        val entities = dao.searchKnownFoodByTitle("%$title%")
-        return entities.map {
             FoodEntityToFood().map(it)
         }
     }
@@ -114,7 +100,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         dao.deleteFoodEntity(id)
 
     //tag
-    override fun getAllFoodTag(): Flow<List<FoodTag>> {
+    override fun getFoodTagFlow(): Flow<List<FoodTag>> {
         val tagEntities = dao.getAllFoodTagFlow()
         return tagEntities.map { entities ->
             entities.map {
@@ -122,11 +108,6 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
             }
         }
     }
-
-    override suspend fun getFilterableTagList(): List<FoodTag> =
-        dao.getTagsExceptUnknown().map {
-            TagEntityToTag().map(it)
-        }
 
     override suspend fun getTagById(id: Long): FoodTag {
         val tagEntity = dao.getTagById(id)
