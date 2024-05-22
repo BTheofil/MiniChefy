@@ -49,14 +49,15 @@ import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.preview.FoodPreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
-import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.MultiTopAppBar
+import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SettingsPanel
 import hu.tb.minichefy.presentation.screens.components.TopAppBarType
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditQuantityDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditStorageItem
+import hu.tb.minichefy.presentation.ui.theme.MiniChefyTheme
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 import hu.tb.minichefy.presentation.util.icons.IconManager
@@ -329,13 +330,15 @@ fun StorageScreenContent(
 fun StorageScreenContentPreview(
     @PreviewParameter(FoodPreviewParameterProvider::class) mockProductList: List<Food>
 ) {
-    StorageScreenContent(
-        uiState = StorageListViewModel.UiState(
-            foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
-            foodList = mockProductList,
-        ),
-        uiEvent = flow { },
-        onAction = {},
-        onFABClick = {}
-    )
+    MiniChefyTheme {
+        StorageScreenContent(
+            uiState = StorageListViewModel.UiState(
+                foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
+                foodList = mockProductList,
+            ),
+            uiEvent = flow { },
+            onAction = {},
+            onFABClick = {}
+        )
+    }
 }

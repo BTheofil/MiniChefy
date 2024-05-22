@@ -1,6 +1,6 @@
 package hu.tb.minichefy.presentation.ui
 
 import androidx.compose.material3.DrawerState
-import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.staticCompositionLocalOf
 
-val LocalModalDrawerState = compositionLocalOf<DrawerState> { error("No DrawerState provided") }
+val LocalModalDrawerState = staticCompositionLocalOf<DrawerState> { error("No DrawerState provided") }
