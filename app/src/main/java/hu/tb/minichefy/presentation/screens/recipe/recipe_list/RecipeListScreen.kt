@@ -30,6 +30,7 @@ import hu.tb.minichefy.presentation.screens.components.SettingsPanel
 import hu.tb.minichefy.presentation.screens.components.TopAppBarType
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
+import hu.tb.minichefy.presentation.ui.theme.MiniChefyTheme
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 
@@ -137,12 +138,14 @@ fun RecipeListScreenContent(
 fun RecipeListScreenPreview(
     @PreviewParameter(RecipePreviewParameterProvider::class) recipe: Recipe
 ) {
-    RecipeListScreenContent(
-        uiState = RecipeListViewModel.UiState(
-            recipeList = listOf(recipe)
-        ),
-        onEvent = {},
-        onFloatingButtonClick = {},
-        onRecipeItemClick = {}
-    )
+    MiniChefyTheme {
+        RecipeListScreenContent(
+            uiState = RecipeListViewModel.UiState(
+                recipeList = listOf(recipe)
+            ),
+            onEvent = {},
+            onFloatingButtonClick = {},
+            onRecipeItemClick = {}
+        )
+    }
 }

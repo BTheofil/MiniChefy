@@ -14,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import hu.tb.minichefy.presentation.ui.LocalModalDrawerState
+import hu.tb.minichefy.presentation.ui.theme.MiniChefyTheme
 import kotlinx.coroutines.launch
 
 sealed class TopAppBarType {
@@ -71,11 +72,13 @@ fun MultiTopAppBar(
 @Preview
 @Composable
 private fun MultiTopAppBarPreview() {
-    MultiTopAppBar(
-        appBarType = TopAppBarType.SearchAppBar(
-            queryText = "apple",
-            onQueryChange = {},
-            clearButtonClick = {}
+    MiniChefyTheme {
+        MultiTopAppBar(
+            appBarType = TopAppBarType.SearchAppBar(
+                queryText = "apple",
+                onQueryChange = {},
+                clearButtonClick = {}
+            )
         )
-    )
+    }
 }

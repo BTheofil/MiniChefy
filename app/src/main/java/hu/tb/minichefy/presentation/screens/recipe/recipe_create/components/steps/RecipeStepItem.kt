@@ -1,9 +1,14 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.steps
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,17 +18,24 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
@@ -45,12 +57,31 @@ fun RecipeStepItem(
     onRecipeStepTextFieldChange: (text: String) -> Unit,
     onDeleteItemClick: (Int) -> Unit = {},
     onRecipeItemClick: (Int) -> Unit,
+    showContentAnimation: Boolean = true,
+    showLineAnimation: Boolean = true,
 ) {
+    val lineHeightAnimation = remember {
+        Animatable(0f)
+    }
+
+    val alpha: Float by animateFloatAsState(if (showContentAnimation) 1f else 0f, label = "content appear/disappear animation")
+
+    LaunchedEffect(showLineAnimation) {
+        lineHeightAnimation.animateTo(
+            targetValue = if (showLineAnimation) 1f else 0f,
+            animationSpec = tween(
+                durationMillis = 600,
+                easing = LinearEasing
+            )
+        )
+    }
+
     ConstraintLayout(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        val (counterBox,
+        val (
+            counterBox,
             textCard,
             closeIcon,
             line,
@@ -60,6 +91,7 @@ fun RecipeStepItem(
 
         Box(
             modifier = Modifier
+                .graphicsLayer(alpha = alpha)
                 .constrainAs(counterBox, constrainBlock = {
                     start.linkTo(parent.start)
                     top.linkTo(parent.top)
@@ -91,13 +123,14 @@ fun RecipeStepItem(
                 drawLine(
                     color = primaryColorLine,
                     start = Offset(0f, 0f),
-                    end = Offset(0f, size.height * 1f),
+                    end = Offset(0f, size.height * lineHeightAnimation.value),
                     strokeWidth = 12f
                 )
             })
 
-        ElevatedCard(
+        Card(
             modifier = Modifier
+                .graphicsLayer(alpha = alpha)
                 .padding(bottom = 18.dp)
                 .constrainAs(textCard, constrainBlock = {
                     start.linkTo(counterBox.end)
@@ -157,13 +190,34 @@ fun RecipeStepItem(
 @Composable
 fun RecipeStepItemPreview() {
     val keyboardController = LocalSoftwareKeyboardController.current
-    RecipeStepItem(
-        index = 1,
-        displayText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer sed elit ligula. Sed pharetra luctus maximus. Donec vestibulum purus nec vestibulum bibendum. Nunc sapien ligula, dictum at lacus ut, tempus finibus lacus. Vivamus et augue ut quam rutrum sagittis ac at sem. Vivamus in libero ut nisi malesuada imperdiet.",
-        onDeleteItemClick = {},
-        onRecipeStepTextFieldChange = {},
-        onRecipeItemClick = {},
-        isTextEditable = true,
-        keyboardController = keyboardController,
-    )
+    var lineAnimation by remember {
+        mutableStateOf(false)
+    }
+    var contentAnimation by remember {
+        mutableStateOf(false)
+    }
+
+    Column {
+        RecipeStepItem(
+            index = 1,
+            displayText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer sed elit ligula. Sed pharetra luctus maximus. Donec vestibulum purus nec vestibulum bibendum. Nunc sapien ligula, dictum at lacus ut, tempus finibus lacus. Vivamus et augue ut quam rutrum sagittis ac at sem. Vivamus in libero ut nisi malesuada imperdiet.",
+            onDeleteItemClick = {},
+            onRecipeStepTextFieldChange = {},
+            onRecipeItemClick = {},
+            isTextEditable = true,
+            keyboardController = keyboardController,
+            showContentAnimation = contentAnimation,
+            showLineAnimation = lineAnimation
+        )
+        Button(onClick = {
+            lineAnimation = !lineAnimation
+        }) {
+            Text(text = "Start animation line")
+        }
+        Button(onClick = {
+            contentAnimation = !contentAnimation
+        }) {
+            Text(text = "Start animation content")
+        }
+    }
 }

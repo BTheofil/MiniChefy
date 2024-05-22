@@ -17,8 +17,12 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -33,6 +37,8 @@ import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.step
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +82,19 @@ fun StepsPage(
                     .weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                itemsIndexed(items = uiState.recipeSteps) { index, item ->
+                itemsIndexed(
+                    items = uiState.recipeSteps,
+                    key = { index, _ -> index }
+                ) { index, item ->
+
+                    var appearContent by remember {
+                        mutableStateOf(false)
+                    }
+                    LaunchedEffect(Unit) {
+                        delay(50.milliseconds)
+                        appearContent = true
+                    }
+
                     RecipeStepItem(
                         index = index,
                         displayText = item.step,
@@ -86,7 +104,9 @@ fun StepsPage(
                         },
                         onDeleteItemClick = onDeleteItemClick,
                         onRecipeItemClick = onRecipeItemClick,
-                        keyboardController = keyBoardController
+                        keyboardController = keyBoardController,
+                        showContentAnimation = appearContent,
+                        showLineAnimation = uiState.recipeSteps.last() !== item
                     )
                 }
                 item {
