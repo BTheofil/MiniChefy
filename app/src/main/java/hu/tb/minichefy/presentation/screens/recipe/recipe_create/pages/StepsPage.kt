@@ -1,5 +1,7 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages
 
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.rememberTransition
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,12 +19,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -37,8 +35,6 @@ import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.step
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
-import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,16 +80,12 @@ fun StepsPage(
             ) {
                 itemsIndexed(
                     items = uiState.recipeSteps,
-                    key = { index, _ -> index }
                 ) { index, item ->
 
-                    var appearContent by remember {
-                        mutableStateOf(false)
+                    val appearContent = remember {
+                        MutableTransitionState(false)
                     }
-                    LaunchedEffect(Unit) {
-                        delay(50.milliseconds)
-                        appearContent = true
-                    }
+                    appearContent.targetState = true
 
                     RecipeStepItem(
                         index = index,
@@ -105,7 +97,7 @@ fun StepsPage(
                         onDeleteItemClick = onDeleteItemClick,
                         onRecipeItemClick = onRecipeItemClick,
                         keyboardController = keyBoardController,
-                        showContentAnimation = appearContent,
+                        showContentAnimation = rememberTransition(transitionState = appearContent),
                         showLineAnimation = uiState.recipeSteps.last() !== item
                     )
                 }

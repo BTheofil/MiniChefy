@@ -2,7 +2,10 @@ package hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.ste
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -57,14 +60,25 @@ fun RecipeStepItem(
     onRecipeStepTextFieldChange: (text: String) -> Unit,
     onDeleteItemClick: (Int) -> Unit = {},
     onRecipeItemClick: (Int) -> Unit,
-    showContentAnimation: Boolean = true,
+    showContentAnimation: Transition<Boolean> = rememberTransition(
+        transitionState = MutableTransitionState(
+            false
+        )
+    ),
     showLineAnimation: Boolean = true,
 ) {
     val lineHeightAnimation = remember {
         Animatable(0f)
     }
 
-    val alpha: Float by animateFloatAsState(if (showContentAnimation) 1f else 0f, label = "content appear/disappear animation")
+    val alpha = showContentAnimation.animateFloat(
+        label = "content appear/disappear animation",
+        transitionSpec = {
+            tween(durationMillis = 400, easing = LinearEasing)
+        }
+    ) { isVisible ->
+        if (isVisible) 1f else 0f
+    }
 
     LaunchedEffect(showLineAnimation) {
         lineHeightAnimation.animateTo(
@@ -91,7 +105,7 @@ fun RecipeStepItem(
 
         Box(
             modifier = Modifier
-                .graphicsLayer(alpha = alpha)
+                .graphicsLayer(alpha = alpha.value)
                 .constrainAs(counterBox, constrainBlock = {
                     start.linkTo(parent.start)
                     top.linkTo(parent.top)
@@ -130,7 +144,7 @@ fun RecipeStepItem(
 
         Card(
             modifier = Modifier
-                .graphicsLayer(alpha = alpha)
+                .graphicsLayer(alpha = alpha.value)
                 .padding(bottom = 18.dp)
                 .constrainAs(textCard, constrainBlock = {
                     start.linkTo(counterBox.end)
@@ -206,7 +220,6 @@ fun RecipeStepItemPreview() {
             onRecipeItemClick = {},
             isTextEditable = true,
             keyboardController = keyboardController,
-            showContentAnimation = contentAnimation,
             showLineAnimation = lineAnimation
         )
         Button(onClick = {
