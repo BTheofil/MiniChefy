@@ -26,6 +26,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.settings.SettingItem
+import hu.tb.minichefy.presentation.screens.components.MultiTopAppBar
+import hu.tb.minichefy.presentation.screens.components.TopAppBarType
 import hu.tb.minichefy.presentation.screens.settings.navigation.TAG_SCREEN
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 import hu.tb.minichefy.presentation.util.icons.iconVectorResource
@@ -34,7 +36,15 @@ import hu.tb.minichefy.presentation.util.icons.iconVectorResource
 fun SettingsScreen(
     onSettingsClick: (route: String) -> Unit,
 ) {
-    Scaffold { paddingValues ->
+    Scaffold(
+        topBar = {
+            MultiTopAppBar(
+                appBarType = TopAppBarType.BasicAppBar(
+                    stringResource(id = R.string.settings)
+                )
+            )
+        }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()

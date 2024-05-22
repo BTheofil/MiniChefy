@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import hu.tb.minichefy.domain.model.bottom_navigation.BottomNavigationItem
+import hu.tb.minichefy.domain.model.navigation.NavigationScreenItem
 
 //related docs: https://developer.android.com/jetpack/compose/navigation#bottom-nav
 @Composable
@@ -50,7 +50,7 @@ fun BottomBarNavigation(
 }
 
 val menuItems = listOf(
-    BottomNavigationItem.Storage,
-    BottomNavigationItem.Recipe,
-    BottomNavigationItem.Settings
+    NavigationScreenItem.Storage,
+    NavigationScreenItem.Recipe,
+    NavigationScreenItem.Settings
 )

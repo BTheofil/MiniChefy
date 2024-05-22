@@ -4,10 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -28,11 +25,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
-import hu.tb.minichefy.presentation.screens.components.SearchItemBar
+import hu.tb.minichefy.presentation.screens.components.MultiTopAppBar
 import hu.tb.minichefy.presentation.screens.components.SettingsPanel
-import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
+import hu.tb.minichefy.presentation.screens.components.TopAppBarType
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
-import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
+import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 
@@ -67,6 +64,15 @@ fun RecipeListScreenContent(
     val focusManager = LocalFocusManager.current
 
     Scaffold(
+        topBar = {
+            MultiTopAppBar(
+                appBarType = TopAppBarType.SearchAppBar(
+                    queryText = uiState.searchRecipeText,
+                    onQueryChange = { onEvent(RecipeListViewModel.OnEvent.SearchTextChange(it)) },
+                    clearButtonClick = { onEvent(RecipeListViewModel.OnEvent.SearchTextChange("")) }
+                ),
+            )
+        },
         floatingActionButton = {
             PlusFAB { onFloatingButtonClick() }
         },
@@ -76,21 +82,9 @@ fun RecipeListScreenContent(
                     .padding(paddingValues)
                     .padding(
                         horizontal = SCREEN_HORIZONTAL_PADDING,
-                        vertical = SCREEN_VERTICAL_PADDING
+                        vertical = SCREEN_VERTICAL_PADDING * 4
                     )
             ) {
-                SearchItemBar(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    queryText = uiState.searchRecipeText,
-                    onQueryChange = {
-                        onEvent(RecipeListViewModel.OnEvent.SearchTextChange(it))
-                    },
-                    clearIconButtonClick = {
-                        onEvent(RecipeListViewModel.OnEvent.SearchTextChange(""))
-                    }
-                )
-                Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                 LazyVerticalGrid(
                     modifier = Modifier
                         .fillMaxSize()
