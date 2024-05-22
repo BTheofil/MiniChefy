@@ -3,6 +3,7 @@ package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.recipe.RecipeIngredient
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
@@ -99,6 +100,7 @@ class CreateRecipeViewModel @Inject constructor(
 
     sealed class UiEvent {
         data object RecipeSaved : UiEvent()
+        data class EmptyStepField(val messageResource: Int): UiEvent()
         data class ErrorInRecipeFields(
             val isIngredientHasError: Boolean,
             val isStepsHasError: Boolean
@@ -174,7 +176,7 @@ class CreateRecipeViewModel @Inject constructor(
     fun onIngredientPageEvent(event: OnIngredientEvent) {
         when (event) {
             OnIngredientEvent.IngredientAdd -> {
-                if(checkAddedIngredientValid()){
+                if (checkAddedIngredientValid()) {
                     return
                 }
 
@@ -281,6 +283,17 @@ class CreateRecipeViewModel @Inject constructor(
             }
 
             is OnStepsPageEvent.OnAddRecipeStepToList -> {
+                stepsPageState.value.recipeSteps.forEach {
+                    if (validators.validateTextField(it.step) == ValidationResult.ERROR) {
+                        viewModelScope.launch {
+                            _uiEvent.send(UiEvent.EmptyStepField(
+                                messageResource = R.string.one_or_more_step_fields_are_empty
+                            ))
+                        }
+                        return
+                    }
+                }
+
                 val recipeStepsPlusEmptyField =
                     stepsPageState.value.recipeSteps.toMutableList().apply {
                         add(RecipeStep(step = ""))

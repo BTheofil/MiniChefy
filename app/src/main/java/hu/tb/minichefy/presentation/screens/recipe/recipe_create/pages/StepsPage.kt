@@ -1,5 +1,7 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages
 
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.rememberTransition
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -76,7 +78,15 @@ fun StepsPage(
                     .weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                itemsIndexed(items = uiState.recipeSteps) { index, item ->
+                itemsIndexed(
+                    items = uiState.recipeSteps,
+                ) { index, item ->
+
+                    val appearContent = remember {
+                        MutableTransitionState(false)
+                    }
+                    appearContent.targetState = true
+
                     RecipeStepItem(
                         index = index,
                         displayText = item.step,
@@ -86,7 +96,9 @@ fun StepsPage(
                         },
                         onDeleteItemClick = onDeleteItemClick,
                         onRecipeItemClick = onRecipeItemClick,
-                        keyboardController = keyBoardController
+                        keyboardController = keyBoardController,
+                        showContentAnimation = rememberTransition(transitionState = appearContent),
+                        showLineAnimation = uiState.recipeSteps.last() !== item
                     )
                 }
                 item {
