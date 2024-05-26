@@ -83,9 +83,8 @@ fun StepsPage(
                 ) { index, item ->
 
                     val appearContent = remember {
-                        MutableTransitionState(false)
+                        MutableTransitionState(false).apply { targetState = true }
                     }
-                    appearContent.targetState = true
 
                     RecipeStepItem(
                         index = index,
