@@ -72,7 +72,7 @@ class CreateRecipeViewModel @Inject constructor(
             val quantityCounter: Int = 1,
             val isQuantityHasError: Boolean = false,
             val defaultIconCollection: List<MealIcon> = MealIcon.entries,
-            val selectedMealIcon: MealIcon = MealIcon.entries[Random.nextInt(
+            val selectedMealIcon: Any = MealIcon.entries[Random.nextInt(
                 0,
                 defaultIconCollection.size
             )],
@@ -100,7 +100,7 @@ class CreateRecipeViewModel @Inject constructor(
 
     sealed class UiEvent {
         data object RecipeSaved : UiEvent()
-        data class EmptyStepField(val messageResource: Int): UiEvent()
+        data class EmptyStepField(val messageResource: Int) : UiEvent()
         data class ErrorInRecipeFields(
             val isIngredientHasError: Boolean,
             val isStepsHasError: Boolean
@@ -110,7 +110,7 @@ class CreateRecipeViewModel @Inject constructor(
     sealed class OnBasicInformationPageEvent {
         data class OnQuantityChange(val value: Int) : OnBasicInformationPageEvent()
         data class OnRecipeTitleChange(val text: String) : OnBasicInformationPageEvent()
-        data class OnSelectedIconChange(val icon: MealIcon) : OnBasicInformationPageEvent()
+        data class OnSelectedIconChange(val icon: Any) : OnBasicInformationPageEvent()
         data class OnTimeChange(val text: String) : OnBasicInformationPageEvent()
         data class OnTimeUnitChange(val unit: TimeUnit) : OnBasicInformationPageEvent()
     }
@@ -286,9 +286,11 @@ class CreateRecipeViewModel @Inject constructor(
                 stepsPageState.value.recipeSteps.forEach {
                     if (validators.validateTextField(it.step) == ValidationResult.ERROR) {
                         viewModelScope.launch {
-                            _uiEvent.send(UiEvent.EmptyStepField(
-                                messageResource = R.string.one_or_more_step_fields_are_empty
-                            ))
+                            _uiEvent.send(
+                                UiEvent.EmptyStepField(
+                                    messageResource = R.string.one_or_more_step_fields_are_empty
+                                )
+                            )
                         }
                         return
                     }
@@ -323,7 +325,7 @@ class CreateRecipeViewModel @Inject constructor(
 
     private suspend fun saveRecipe(): Long =
         recipeRepository.saveRecipe(
-            icon = basicPageState.value.selectedMealIcon.resource,
+            icon = 5,
             title = basicPageState.value.recipeTitle,
             quantity = basicPageState.value.quantityCounter,
             timeToCreate = basicPageState.value.timeField.toInt(),

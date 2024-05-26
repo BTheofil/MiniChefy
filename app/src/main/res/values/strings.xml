@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">MiniChefy</string>
+    <string name="app_name" translatable="false">Cookbook</string>
     <string name="title">Title</string>
     <string name="save">Save</string>
     <string name="type">Type</string>

@@ -10,7 +10,7 @@ enum class MealIcon(override val resource: Int): IconResource {
     STEAK(R.drawable.steak_icon),
     JUNK_FOOD(R.drawable.junk_food_icon),
     NOODLES(R.drawable.cup_noodles_icon),
-    SWEETS(R.drawable.sweets_icon)
+    SWEETS(R.drawable.sweets_icon),
 }
 
 enum class FoodIcon(override val resource: Int): IconResource {
@@ -33,9 +33,9 @@ enum class FoodIcon(override val resource: Int): IconResource {
     SALT(R.drawable.salt_icon),
     SAUSAGE(R.drawable.sausage_icon),
     SHRIMP(R.drawable.shrimp_seafood_food_icon)
-
 }
 
 enum class AppWideIcon(override val resource: Int): IconResource {
     DEFAULT_EMPTY_ICON(R.drawable.default_empty_icon),
+    GALLERY(R.drawable.gallery_icon)
 }

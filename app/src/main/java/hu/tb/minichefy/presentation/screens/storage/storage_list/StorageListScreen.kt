@@ -61,6 +61,7 @@ import hu.tb.minichefy.presentation.ui.theme.MiniChefyTheme
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 import hu.tb.minichefy.presentation.util.icons.IconManager
+import hu.tb.minichefy.presentation.util.icons.IconResource
 import hu.tb.minichefy.presentation.util.icons.iconVectorResource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -292,7 +293,7 @@ fun StorageScreenContent(
         IconSelectorSheet(
             allIconList = uiState.allFoodIconList,
             selectedIcon = IconManager().findFoodIconByInt(uiState.foodList[uiState.modifyFoodListPositionIndex].icon),
-            onItemClick = { onAction(StorageListViewModel.OnAction.ModifyFoodIcon(it)) },
+            onItemClick = { onAction(StorageListViewModel.OnAction.ModifyFoodIcon(it as IconResource)) },
             onDismissRequest = { isIconSelectorOpen = false }
         )
     }
