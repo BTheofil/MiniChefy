@@ -27,6 +27,7 @@ import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
+import hu.tb.minichefy.domain.model.IconResource
 
 @Composable
 fun BasicInformationPage(
@@ -35,7 +36,7 @@ fun BasicInformationPage(
     onRemoveQuantityClick: () -> Unit,
     onAddQuantityClick: () -> Unit,
     onNextPageClick: () -> Unit,
-    onSelectedIconClick: (icon: Any) -> Unit,
+    onSelectedIconClick: (icon: IconResource) -> Unit,
     onTimeFieldValueChange: (String) -> Unit,
     onTimeUnitValueChange: (TimeUnit) -> Unit,
 ) {
@@ -59,7 +60,7 @@ fun BasicInformationPage(
             )
     ) {
         CircleImage(
-            image = uiState.selectedMealIcon,
+            image = uiState.selectedRecipeIcon,
             onClick = { showIconPicker = true }
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
@@ -100,7 +101,7 @@ fun BasicInformationPage(
         if (showIconPicker) {
             IconSelectorSheet(
                 allIconList = uiState.defaultIconCollection,
-                selectedIcon = uiState.selectedMealIcon,
+                selectedIcon = uiState.selectedRecipeIcon,
                 onItemClick = { onSelectedIconClick(it) },
                 onDismissRequest = { showIconPicker = false }
             )

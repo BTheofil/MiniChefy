@@ -24,7 +24,7 @@ interface StorageRepository {
     suspend fun saveOrModifyFood(
         id: Long? = null,
         title: String,
-        icon: Int,
+        icon: String,
         quantity: Float,
         unitOfMeasurement: UnitOfMeasurement
     ): Long

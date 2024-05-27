@@ -38,22 +38,22 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.presentation.util.icons.AppWideIcon
-import hu.tb.minichefy.presentation.util.icons.IconResource
+import hu.tb.minichefy.domain.model.IconResource
 import hu.tb.minichefy.presentation.util.icons.MealIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IconSelectorSheet(
-    allIconList: List<IconResource>,
-    selectedIcon: Any?,
-    onItemClick: (icon: Any) -> Unit,
+    allIconList: List<IconResource.DrawableIcon>,
+    selectedIcon: IconResource?,
+    onItemClick: (icon: IconResource) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             uri?.let {
-                onItemClick(it)
+                onItemClick(IconResource.GalleryIconImpl(it))
             }
         }
     )
@@ -90,7 +90,7 @@ fun IconSelectorSheet(
                             )
                         )
                     },
-                    isSelected = selectedIcon is Uri
+                    isSelected = selectedIcon?.resource is Uri
                 )
             }
         }
@@ -103,7 +103,7 @@ private fun IconSelectorButton(
     modifier: Modifier = Modifier,
     onItemClick: () -> Unit,
     isSelected: Boolean = false,
-    foodIcon: IconResource
+    foodIcon: IconResource.DrawableIcon
 ) {
     ElevatedButton(
         modifier = modifier
@@ -132,7 +132,7 @@ fun IconSelectorSheetPreview() {
         mutableStateOf(false)
     }
     var selectedIcon by remember {
-        mutableStateOf<IconResource>(MealIcon.JUNK_FOOD)
+        mutableStateOf<IconResource.DrawableIcon>(MealIcon.JUNK_FOOD)
     }
 
     Box(
@@ -151,9 +151,8 @@ fun IconSelectorSheetPreview() {
                 selectedIcon = selectedIcon,
                 onItemClick = { item ->
                     when (item) {
-                        item as IconResource -> {
-                            selectedIcon = item
-                        }
+                        is IconResource.DrawableIcon -> selectedIcon = item
+                        is IconResource.GalleryIcon -> {}
                     }
                 },
                 onDismissRequest = { isSheetVisible = false }

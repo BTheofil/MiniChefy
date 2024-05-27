@@ -1,7 +1,6 @@
 package hu.tb.minichefy.presentation.screens.storage.storage_list.componenets
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,7 +42,7 @@ import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.preview.FoodPreviewParameterProvider
-import hu.tb.minichefy.presentation.util.icons.iconVectorResource
+import hu.tb.minichefy.presentation.screens.components.ImageWidget
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
@@ -87,11 +86,7 @@ fun EditStorageItem(
                     .padding(12.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    modifier = Modifier,
-                    imageVector = iconVectorResource(iconResource = food.icon),
-                    contentDescription = "Store icon"
-                )
+                ImageWidget(image = food.icon)
             }
 
             Column(

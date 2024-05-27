@@ -72,14 +72,14 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
     override suspend fun saveOrModifyFood(
         id: Long?,
         title: String,
-        icon: Int,
+        icon: String,
         quantity: Float,
         unitOfMeasurement: UnitOfMeasurement
     ): Long {
         val temp = FoodEntity(
             foodId = id,
             title = title,
-            icon = icon,
+            image = icon,
             quantity = quantity,
             unitOfMeasurement = unitOfMeasurement
         )

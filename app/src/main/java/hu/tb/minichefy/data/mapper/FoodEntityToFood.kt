@@ -8,7 +8,7 @@ class FoodEntityToFood {
     fun map(from: FoodWithTags): Food = from.run {
         Food(
             id = foodEntity.foodId,
-            icon = foodEntity.icon,
+            icon = ImageToIconResource().map(foodEntity.image),
             title = foodEntity.title,
             quantity = foodEntity.quantity,
             unitOfMeasurement = foodEntity.unitOfMeasurement,

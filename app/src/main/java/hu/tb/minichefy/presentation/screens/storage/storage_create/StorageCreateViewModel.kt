@@ -93,7 +93,7 @@ class StorageCreateViewModel @Inject constructor(
                 viewModelScope.launch {
                     uiState.value.also {
                         val foodId = storageRepository.saveOrModifyFood(
-                            icon = it.selectedFoodIcon.resource,
+                            icon = it.selectedFoodIcon.resource.toString(),
                             title = it.foodTitleText,
                             quantity = it.quantity.toFloat(),
                             unitOfMeasurement = it.foodUnitOfMeasurement

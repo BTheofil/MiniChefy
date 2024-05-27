@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_list.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -21,7 +21,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
-import hu.tb.minichefy.presentation.util.icons.iconVectorResource
+import hu.tb.minichefy.presentation.screens.components.ImageWidget
+import hu.tb.minichefy.presentation.ui.theme.RECIPE_LIST_IMAGE_SIZE
 
 @Composable
 fun RecipeItem(
@@ -38,12 +39,13 @@ fun RecipeItem(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .size(RECIPE_LIST_IMAGE_SIZE)
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.8f))
                     .padding(22.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Image(imageVector = iconVectorResource(recipe.icon), contentDescription = "recipe icon")
+                ImageWidget(image = recipe.icon)
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(

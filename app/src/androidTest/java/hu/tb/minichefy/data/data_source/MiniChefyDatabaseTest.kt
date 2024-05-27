@@ -58,7 +58,7 @@ class MiniChefyDatabaseTest {
     fun insertAndRetrieveRecipe() = runBlocking {
         val recipeEntity = RecipeEntity(
             recipeId = null,
-            icon = 1,
+            image = "1",
             title = "Pasta",
             quantity = 2,
             timeUnit = TimeUnit.MINUTES,
@@ -75,7 +75,7 @@ class MiniChefyDatabaseTest {
     fun insertAndRetrieveFood() = runBlocking {
         val foodEntity = FoodEntity(
             foodId = 1,
-            icon = 2,
+            image = "2",
             title = "Tomato",
             quantity = 1f,
             unitOfMeasurement = UnitOfMeasurement.KG
@@ -85,7 +85,7 @@ class MiniChefyDatabaseTest {
 
         val foodWithTags = storageDao.searchFoodByTitle("Tomato").first()
 
-        assertEquals(2, foodWithTags.foodEntity.icon)
+        assertEquals("2", foodWithTags.foodEntity.image)
         assertEquals("Tomato", foodWithTags.foodEntity.title)
         assertEquals(1f, foodWithTags.foodEntity.quantity)
         assertEquals(UnitOfMeasurement.KG, foodWithTags.foodEntity.unitOfMeasurement)
@@ -95,7 +95,7 @@ class MiniChefyDatabaseTest {
     fun deleteFood() = runBlocking {
         val foodEntity = FoodEntity(
             foodId = 1,
-            icon = 2,
+            image = "2",
             title = "Tomato",
             quantity = 1f,
             unitOfMeasurement = UnitOfMeasurement.KG
@@ -113,7 +113,7 @@ class MiniChefyDatabaseTest {
     fun insertTagWithFoodAndReturn() = runBlocking {
         val foodEntity = FoodEntity(
             foodId = 1,
-            icon = 2,
+            image = "2",
             title = "Tomato",
             quantity = 1f,
             unitOfMeasurement = UnitOfMeasurement.KG
