@@ -1,5 +1,6 @@
 package hu.tb.minichefy.presentation.screens.components
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -34,11 +35,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hu.tb.minichefy.presentation.util.icons.AppWideIcon
 import hu.tb.minichefy.domain.model.IconResource
+import hu.tb.minichefy.presentation.util.icons.AppWideIcon
 import hu.tb.minichefy.presentation.util.icons.MealIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,10 +51,13 @@ fun IconSelectorSheet(
     onItemClick: (icon: IconResource) -> Unit,
     onDismissRequest: () -> Unit
 ) {
+    val context = LocalContext.current
+
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             uri?.let {
+                context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 onItemClick(IconResource.GalleryIconImpl(it))
             }
         }
