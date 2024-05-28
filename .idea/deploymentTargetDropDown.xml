@@ -2,20 +2,23 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="MiniChefyDatabaseTest">
+        <State />
+      </entry>
       <entry key="app">
         <State>
-          <runningDeviceTargetSelectedWithDropDown>
+          <targetSelectedWithDropDown>
             <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
+              <type value="QUICK_BOOT_TARGET" />
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\user\.android\avd\Pixel_7a_API_34.avd" />
+                  <value value="C:\Users\user\.android\avd\Pixel_6a_API_30.avd" />
                 </Key>
               </deviceKey>
             </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-04-23T12:52:59.349276500Z" />
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-04-29T13:50:25.392086200Z" />
         </State>
       </entry>
     </value>

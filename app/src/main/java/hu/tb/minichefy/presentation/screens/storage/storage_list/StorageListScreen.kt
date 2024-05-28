@@ -44,9 +44,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.preview.FoodPreviewParameterProvider
+import hu.tb.minichefy.presentation.screens.components.BaseListScreen
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.components.ImageWidget
 import hu.tb.minichefy.presentation.screens.components.MultiTopAppBar
@@ -58,7 +60,6 @@ import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelecto
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditQuantityDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditStorageItem
 import hu.tb.minichefy.presentation.ui.theme.MiniChefyTheme
-import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -136,14 +137,10 @@ fun StorageScreenContent(
             PlusFAB(onClick = onFABClick)
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(
-                    horizontal = SCREEN_HORIZONTAL_PADDING,
-                    vertical = SCREEN_VERTICAL_PADDING * 4
-                )
+        BaseListScreen(
+            paddingValues = paddingValues,
+            isShowEmptyContent = uiState.foodList.isEmpty(),
+            emptyContentDescriptionResource = R.string.let_s_create_recipes
         ) {
             LazyRow(
                 modifier = Modifier

@@ -48,4 +48,5 @@
     <string name="missing_ingredients_steps">Hiányzó hozzávalók és lépések></string>
     <string name="you_haven_t_added_any_ingredients_yet">Még nem adtál hozzávalókat</string>
     <string name="you_re_missing_some_recipe_steps">Hiányoznak a recept lépései</string>
+    <string name="let_s_create_recipes">Készíts receptet!</string>
 </resources>

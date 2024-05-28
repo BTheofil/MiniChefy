@@ -1,29 +1,18 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_list
 
-import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,13 +20,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.rememberLottieComposition
 import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
+import hu.tb.minichefy.presentation.screens.components.BaseListScreen
 import hu.tb.minichefy.presentation.screens.components.MultiTopAppBar
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SettingsPanel
@@ -45,8 +31,6 @@ import hu.tb.minichefy.presentation.screens.components.TopAppBarType
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
 import hu.tb.minichefy.presentation.ui.theme.MiniChefyTheme
-import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
-import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 
 @Composable
 fun RecipeListScreen(
@@ -85,59 +69,21 @@ fun RecipeListScreenContent(
             PlusFAB { onFloatingButtonClick() }
         },
         content = { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(
-                        horizontal = SCREEN_HORIZONTAL_PADDING,
-                        vertical = SCREEN_VERTICAL_PADDING * 4
-                    )
-            ) {
-                when (uiState.recipeList.isEmpty()) {
-                    true -> EmptyContent()
-                    false -> RecipeListContent(
+            BaseListScreen(
+                paddingValues = paddingValues,
+                isShowEmptyContent = uiState.recipeList.isEmpty(),
+                emptyContentDescriptionResource = R.string.let_s_create_recipes,
+                content = {
+                    RecipeListContent(
                         uiState = uiState,
                         onEvent = onEvent,
                         onRecipeItemClick = onRecipeItemClick
                     )
                 }
-            }
+
+            )
         }
     )
-}
-
-@Composable
-private fun EmptyContent() {
-    val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
-    val animatedColor by infiniteTransition.animateColor(
-        initialValue = MaterialTheme.colorScheme.primary,
-        targetValue = MaterialTheme.colorScheme.secondary,
-        animationSpec = infiniteRepeatable(tween(1000), RepeatMode.Reverse),
-        label = "color animation"
-    )
-
-    val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(
-            R.raw.book
-        )
-    )
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        LottieAnimation(
-            composition = composition,
-            modifier = Modifier
-                .size(120.dp),
-            iterations = LottieConstants.IterateForever
-        )
-        Text(
-            text = "Let's create recipes!",
-            style = MaterialTheme.typography.bodyLarge,
-            color = animatedColor
-        )
-    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
