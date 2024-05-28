@@ -33,7 +33,7 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
 
     override suspend fun saveRecipe(
         id: Long?,
-        icon: Int,
+        icon: String,
         title: String,
         quantity: Int,
         timeToCreate: Int,
@@ -41,7 +41,7 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
     ): RecipeId {
         val temp = RecipeEntity(
             recipeId = id,
-            icon = icon,
+            image = icon,
             title = title,
             quantity = quantity,
             timeToCreate = timeToCreate,

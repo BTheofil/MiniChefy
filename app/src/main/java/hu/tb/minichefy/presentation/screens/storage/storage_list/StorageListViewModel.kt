@@ -10,7 +10,7 @@ import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.domain.use_case.Validators
 import hu.tb.minichefy.presentation.util.icons.FoodIcon
-import hu.tb.minichefy.presentation.util.icons.IconResource
+import hu.tb.minichefy.domain.model.IconResource
 import hu.tb.minichefy.presentation.ui.theme.SEARCH_BAR_WAIT_AFTER_CHARACTER
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -210,8 +210,8 @@ class StorageListViewModel @Inject constructor(
             }
 
             is OnAction.ModifyFoodIcon -> saveEditedFood(
-                uiState.value.foodList[uiState.value.modifyFoodListPositionIndex].copy(
-                    icon = action.icon.resource
+                updatedFood = uiState.value.foodList[uiState.value.modifyFoodListPositionIndex].copy(
+                    icon = action.icon
                 )
             )
 
@@ -238,7 +238,7 @@ class StorageListViewModel @Inject constructor(
             val foodId = storageRepository.saveOrModifyFood(
                 id = updatedFood.id,
                 title = updatedFood.title,
-                icon = updatedFood.icon,
+                icon = updatedFood.icon.resource.toString(),
                 quantity = updatedFood.quantity,
                 unitOfMeasurement = updatedFood.unitOfMeasurement,
             )

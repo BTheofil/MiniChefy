@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,17 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
-import hu.tb.minichefy.presentation.util.icons.MealIcon
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.PageNextButton
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.info.QuestionForm
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
+import hu.tb.minichefy.domain.model.IconResource
 
 @Composable
 fun BasicInformationPage(
@@ -39,7 +36,7 @@ fun BasicInformationPage(
     onRemoveQuantityClick: () -> Unit,
     onAddQuantityClick: () -> Unit,
     onNextPageClick: () -> Unit,
-    onSelectedIconClick: (icon: MealIcon) -> Unit,
+    onSelectedIconClick: (icon: IconResource) -> Unit,
     onTimeFieldValueChange: (String) -> Unit,
     onTimeUnitValueChange: (TimeUnit) -> Unit,
 ) {
@@ -63,10 +60,7 @@ fun BasicInformationPage(
             )
     ) {
         CircleImage(
-            image = uiState.selectedMealIcon.resource,
-            borderWidth = 2.dp,
-            borderColor = MaterialTheme.colorScheme.primary,
-            borderShape = CircleShape,
+            image = uiState.selectedRecipeIcon,
             onClick = { showIconPicker = true }
         )
         Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
@@ -107,10 +101,8 @@ fun BasicInformationPage(
         if (showIconPicker) {
             IconSelectorSheet(
                 allIconList = uiState.defaultIconCollection,
-                selectedIcon = uiState.selectedMealIcon,
-                onItemClick = {
-                    onSelectedIconClick(it as MealIcon)
-                },
+                selectedIcon = uiState.selectedRecipeIcon,
+                onItemClick = { onSelectedIconClick(it) },
                 onDismissRequest = { showIconPicker = false }
             )
         }

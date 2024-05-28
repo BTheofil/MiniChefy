@@ -10,7 +10,7 @@ import hu.tb.minichefy.domain.model.recipe.TimeUnit
 data class RecipeEntity(
     @PrimaryKey(autoGenerate = true)
     val recipeId: Long?,
-    val icon: Int,
+    val image: String,
     val title: String,
     val quantity: Int,
     val timeToCreate: Int,

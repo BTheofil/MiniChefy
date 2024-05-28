@@ -1,6 +1,5 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_details
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,7 +57,7 @@ import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.SimpleQuickRecipeInfo
 import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
-import hu.tb.minichefy.presentation.util.icons.iconVectorResource
+import hu.tb.minichefy.presentation.screens.components.ImageWidget
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.ConfirmRecipeAddToStorageDialog
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.DetailsRecipeStepItem
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.OneColorBackground
@@ -199,9 +198,8 @@ private fun DetailsTopContent(
                 .weight(1f),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                imageVector = iconVectorResource(iconResource = recipe.icon),
-                contentDescription = "recipe image"
+            ImageWidget(
+                image = recipe.icon
             )
         }
         Spacer(modifier = Modifier.height(SMALL_SPACE_BETWEEN_ELEMENTS))

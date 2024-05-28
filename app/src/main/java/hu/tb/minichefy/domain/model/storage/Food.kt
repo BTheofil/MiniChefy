@@ -1,6 +1,7 @@
 package hu.tb.minichefy.domain.model.storage
 
 import hu.tb.minichefy.R
+import hu.tb.minichefy.domain.model.IconResource
 
 data class FoodSummary(
     val id: Long,
@@ -9,7 +10,7 @@ data class FoodSummary(
 
 data class Food(
     val id: Long? = null,
-    val icon: Int,
+    val icon: IconResource,
     val title: String,
     val quantity: Float,
     val unitOfMeasurement: UnitOfMeasurement,

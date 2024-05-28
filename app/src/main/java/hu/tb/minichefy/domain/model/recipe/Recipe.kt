@@ -1,10 +1,11 @@
 package hu.tb.minichefy.domain.model.recipe
 
 import hu.tb.minichefy.R
+import hu.tb.minichefy.domain.model.IconResource
 
 data class Recipe(
     val id: Long? = null,
-    val icon: Int,
+    val icon: IconResource,
     val title: String,
     val quantity: Int,
     val timeToCreate: Int,

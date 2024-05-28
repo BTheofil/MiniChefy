@@ -10,7 +10,7 @@ class RecipeEntityToRecipe {
     fun map(from: RecipeBlock): Recipe = from.run {
         Recipe(
             id = recipeEntity.recipeId,
-            icon = recipeEntity.icon,
+            icon = ImageToIconResource().map(recipeEntity.image),
             title = recipeEntity.title,
             quantity = recipeEntity.quantity,
             howToSteps = stepList.map {

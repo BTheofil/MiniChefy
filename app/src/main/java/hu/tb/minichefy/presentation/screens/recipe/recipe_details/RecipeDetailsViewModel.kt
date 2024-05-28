@@ -120,10 +120,9 @@ class RecipeDetailsViewModel @Inject constructor(
 
         val savedDishId = storageRepository.saveOrModifyFood(
             id = result?.id,
-            icon = uiState.value.recipe!!.icon,
+            icon = uiState.value.recipe!!.icon.resource.toString(),
             title = uiState.value.recipe!!.title,
-            quantity = uiState.value.recipe!!.quantity + (result?.quantity
-                ?: 0f),
+            quantity = uiState.value.recipe!!.quantity + (result?.quantity ?: 0f),
             unitOfMeasurement = UnitOfMeasurement.PIECE,
         )
 
@@ -146,7 +145,7 @@ class RecipeDetailsViewModel @Inject constructor(
                 storageRepository.saveOrModifyFood(
                     id = storageFood.id,
                     title = storageFood.title,
-                    icon = storageFood.icon,
+                    icon = storageFood.icon.toString(),
                     quantity = result.quantity,
                     unitOfMeasurement = result.unitOfMeasurement
                 )

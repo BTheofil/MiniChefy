@@ -15,6 +15,7 @@ import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.domain.use_case.Validators
 import hu.tb.minichefy.presentation.util.icons.MealIcon
 import hu.tb.minichefy.presentation.ui.theme.SEARCH_BAR_WAIT_AFTER_CHARACTER
+import hu.tb.minichefy.domain.model.IconResource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,7 +73,7 @@ class CreateRecipeViewModel @Inject constructor(
             val quantityCounter: Int = 1,
             val isQuantityHasError: Boolean = false,
             val defaultIconCollection: List<MealIcon> = MealIcon.entries,
-            val selectedMealIcon: MealIcon = MealIcon.entries[Random.nextInt(
+            val selectedRecipeIcon: IconResource = MealIcon.entries[Random.nextInt(
                 0,
                 defaultIconCollection.size
             )],
@@ -100,7 +101,7 @@ class CreateRecipeViewModel @Inject constructor(
 
     sealed class UiEvent {
         data object RecipeSaved : UiEvent()
-        data class EmptyStepField(val messageResource: Int): UiEvent()
+        data class EmptyStepField(val messageResource: Int) : UiEvent()
         data class ErrorInRecipeFields(
             val isIngredientHasError: Boolean,
             val isStepsHasError: Boolean
@@ -110,7 +111,7 @@ class CreateRecipeViewModel @Inject constructor(
     sealed class OnBasicInformationPageEvent {
         data class OnQuantityChange(val value: Int) : OnBasicInformationPageEvent()
         data class OnRecipeTitleChange(val text: String) : OnBasicInformationPageEvent()
-        data class OnSelectedIconChange(val icon: MealIcon) : OnBasicInformationPageEvent()
+        data class OnSelectedIconChange(val icon: IconResource) : OnBasicInformationPageEvent()
         data class OnTimeChange(val text: String) : OnBasicInformationPageEvent()
         data class OnTimeUnitChange(val unit: TimeUnit) : OnBasicInformationPageEvent()
     }
@@ -157,7 +158,7 @@ class CreateRecipeViewModel @Inject constructor(
             }
 
             is OnBasicInformationPageEvent.OnSelectedIconChange -> _basicPageState.update {
-                it.copy(selectedMealIcon = event.icon)
+                it.copy(selectedRecipeIcon = event.icon)
             }
 
             is OnBasicInformationPageEvent.OnTimeChange -> {
@@ -286,9 +287,11 @@ class CreateRecipeViewModel @Inject constructor(
                 stepsPageState.value.recipeSteps.forEach {
                     if (validators.validateTextField(it.step) == ValidationResult.ERROR) {
                         viewModelScope.launch {
-                            _uiEvent.send(UiEvent.EmptyStepField(
-                                messageResource = R.string.one_or_more_step_fields_are_empty
-                            ))
+                            _uiEvent.send(
+                                UiEvent.EmptyStepField(
+                                    messageResource = R.string.one_or_more_step_fields_are_empty
+                                )
+                            )
                         }
                         return
                     }
@@ -323,7 +326,7 @@ class CreateRecipeViewModel @Inject constructor(
 
     private suspend fun saveRecipe(): Long =
         recipeRepository.saveRecipe(
-            icon = basicPageState.value.selectedMealIcon.resource,
+            icon = basicPageState.value.selectedRecipeIcon.resource.toString(),
             title = basicPageState.value.recipeTitle,
             quantity = basicPageState.value.quantityCounter,
             timeToCreate = basicPageState.value.timeField.toInt(),

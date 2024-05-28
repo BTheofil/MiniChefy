@@ -1,6 +1,7 @@
 package hu.tb.minichefy.presentation.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import hu.tb.minichefy.domain.model.IconResource
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeIngredient
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
@@ -18,7 +19,7 @@ private object MockRecipeDomain {
 
     val mockRecipe = Recipe(
         id = 0,
-        icon = IconManager().getRandomFood().resource,
+        icon = IconResource.DrawableIconImpl(resource = IconManager().getRandomFood().resource),
         title = "Apple pie",
         quantity = 4,
         howToSteps = listOf(

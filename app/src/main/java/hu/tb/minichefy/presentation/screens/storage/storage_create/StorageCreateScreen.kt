@@ -84,7 +84,7 @@ fun StorageCreateContent(
             .clickableWithoutRipple { focusManager.clearFocus() }
     ) {
         CircleImage(
-            image = uiState.selectedFoodIcon.resource,
+            image = uiState.selectedFoodIcon,
             onClick = { showIconPicker = true }
         )
 

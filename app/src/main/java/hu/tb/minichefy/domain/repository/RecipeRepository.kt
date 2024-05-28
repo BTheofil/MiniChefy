@@ -18,7 +18,7 @@ interface RecipeRepository {
 
     suspend fun saveRecipe(
         id: Long? = null,
-        icon: Int,
+        icon: String,
         title: String,
         quantity: Int,
         timeToCreate: Int,
