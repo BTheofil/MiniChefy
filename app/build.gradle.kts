@@ -93,6 +93,8 @@ dependencies {
 
     implementation(libs.coil.compose)
 
+    implementation(libs.lottie.compose)
+
 }
 
 kapt {

@@ -48,4 +48,5 @@
     <string name="missing_ingredients_steps"><![CDATA[Missing ingredients & steps!]]></string>
     <string name="you_haven_t_added_any_ingredients_yet">You haven\'t added any ingredients yet.</string>
     <string name="you_re_missing_some_recipe_steps">You\'re missing some recipe steps.</string>
+    <string name="let_s_create_recipes">Let\'s create recipes!</string>
 </resources>
