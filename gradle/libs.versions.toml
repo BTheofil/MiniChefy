@@ -15,6 +15,7 @@ junit = "4.13.2"
 junitKtx = "1.1.5"
 ktx = "1.13.1"
 lifecycleRuntimeKtx = "2.8.0"
+lottieCompose = "6.4.0"
 material3 = "1.2.1"
 navigationCompose = "2.7.7"
 roomRuntime = "2.6.1"
@@ -57,6 +58,7 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx"
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { module = "junit:junit", version.ref = "junit" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

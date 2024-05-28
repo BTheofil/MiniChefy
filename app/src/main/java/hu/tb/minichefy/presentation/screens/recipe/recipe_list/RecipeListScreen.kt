@@ -1,20 +1,29 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_list
 
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,6 +31,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
 import hu.tb.minichefy.presentation.screens.components.MultiTopAppBar
@@ -50,7 +64,6 @@ fun RecipeListScreen(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecipeListScreenContent(
     uiState: RecipeListViewModel.UiState,
@@ -58,12 +71,6 @@ fun RecipeListScreenContent(
     onFloatingButtonClick: () -> Unit,
     onRecipeItemClick: (Long) -> Unit
 ) {
-    var settingPanelVisible by remember {
-        mutableStateOf(false)
-    }
-
-    val focusManager = LocalFocusManager.current
-
     Scaffold(
         topBar = {
             MultiTopAppBar(
@@ -86,51 +93,109 @@ fun RecipeListScreenContent(
                         vertical = SCREEN_VERTICAL_PADDING * 4
                     )
             ) {
-                LazyVerticalGrid(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickableWithoutRipple {
-                            focusManager.clearFocus()
-                        },
-                    columns = GridCells.Fixed(2),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(
-                        items = uiState.recipeList,
-                        key = { item -> item.id!! }
-                    ) { recipe ->
-                        RecipeItem(
-                            modifier = Modifier
-                                .combinedClickable(
-                                    onClick = { onRecipeItemClick(recipe.id!!) },
-                                    onLongClick = {
-                                        onEvent(
-                                            RecipeListViewModel.OnEvent.OpenRecipeSettingsPanel(
-                                                recipe.id!!
-                                            )
-                                        )
-                                        settingPanelVisible = true
-                                    }
-                                ),
-                            recipe = recipe
-                        )
-                    }
+                when (uiState.recipeList.isEmpty()) {
+                    true -> EmptyContent()
+                    false -> RecipeListContent(
+                        uiState = uiState,
+                        onEvent = onEvent,
+                        onRecipeItemClick = onRecipeItemClick
+                    )
                 }
             }
+        }
+    )
+}
 
-            if (settingPanelVisible) {
-                SettingsPanel(
-                    dismissSettingPanel = {
-                        settingPanelVisible = false
-                    },
-                    onDeleteItemClick = {
-                        onEvent(RecipeListViewModel.OnEvent.DeleteRecipe)
-                        settingPanelVisible = false
-                    }
-                )
+@Composable
+private fun EmptyContent() {
+    val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
+    val animatedColor by infiniteTransition.animateColor(
+        initialValue = MaterialTheme.colorScheme.primary,
+        targetValue = MaterialTheme.colorScheme.secondary,
+        animationSpec = infiniteRepeatable(tween(1000), RepeatMode.Reverse),
+        label = "color animation"
+    )
+
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(
+            R.raw.book
+        )
+    )
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        LottieAnimation(
+            composition = composition,
+            modifier = Modifier
+                .size(120.dp),
+            iterations = LottieConstants.IterateForever
+        )
+        Text(
+            text = "Let's create recipes!",
+            style = MaterialTheme.typography.bodyLarge,
+            color = animatedColor
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun RecipeListContent(
+    uiState: RecipeListViewModel.UiState,
+    onEvent: (RecipeListViewModel.OnEvent) -> Unit,
+    onRecipeItemClick: (Long) -> Unit,
+) {
+    var settingPanelVisible by remember {
+        mutableStateOf(false)
+    }
+
+    val focusManager = LocalFocusManager.current
+
+    LazyVerticalGrid(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickableWithoutRipple {
+                focusManager.clearFocus()
+            },
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(
+            items = uiState.recipeList,
+            key = { item -> item.id!! }
+        ) { recipe ->
+            RecipeItem(
+                modifier = Modifier
+                    .combinedClickable(
+                        onClick = { onRecipeItemClick(recipe.id!!) },
+                        onLongClick = {
+                            onEvent(
+                                RecipeListViewModel.OnEvent.OpenRecipeSettingsPanel(
+                                    recipe.id!!
+                                )
+                            )
+                            settingPanelVisible = true
+                        }
+                    ),
+                recipe = recipe
+            )
+        }
+    }
+
+    if (settingPanelVisible) {
+        SettingsPanel(
+            dismissSettingPanel = {
+                settingPanelVisible = false
+            },
+            onDeleteItemClick = {
+                onEvent(RecipeListViewModel.OnEvent.DeleteRecipe)
+                settingPanelVisible = false
             }
-        })
+        )
+    }
 }
 
 @Preview
