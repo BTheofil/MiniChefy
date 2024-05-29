@@ -51,7 +51,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchIngredientsLByLikelyTitle(searchText: String): List<FoodSummary> {
+    override suspend fun searchIngredientsByLikelyTitle(searchText: String): List<FoodSummary> {
         val entities = dao.searchSimpleFoodsByTitle("%$searchText%", DISH_TAG_ID.toLong())
         return entities.map {
             SimpleFoodEntityToFoodSummery().map(it)

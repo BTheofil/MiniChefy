@@ -17,7 +17,7 @@ interface StorageRepository {
 
     suspend fun searchFoodByTitle(title: String): List<Food>
 
-    suspend fun searchIngredientsLByLikelyTitle(searchText: String): List<FoodSummary>
+    suspend fun searchIngredientsByLikelyTitle(searchText: String): List<FoodSummary>
 
     suspend fun searchFoodsByTag(tagIds: List<Long>): List<Food>
 

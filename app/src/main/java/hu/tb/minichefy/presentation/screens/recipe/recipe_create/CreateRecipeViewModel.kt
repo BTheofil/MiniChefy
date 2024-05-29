@@ -229,7 +229,7 @@ class CreateRecipeViewModel @Inject constructor(
 
                     _ingredientsPageState.update { ingredientsPage ->
                         ingredientsPage.copy(
-                            unSelectedIngredientList = storageRepository.searchIngredientsLByLikelyTitle(
+                            unSelectedIngredientList = storageRepository.searchIngredientsByLikelyTitle(
                                 event.text
                             )
                         )
