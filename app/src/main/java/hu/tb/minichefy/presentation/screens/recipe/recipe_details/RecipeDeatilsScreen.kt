@@ -18,6 +18,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,7 +33,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
@@ -57,12 +58,15 @@ import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.SimpleQuickRecipeInfo
 import hu.tb.minichefy.presentation.preview.RecipePreviewParameterProvider
+import hu.tb.minichefy.presentation.screens.components.AppBarType
 import hu.tb.minichefy.presentation.screens.components.ImageWidget
+import hu.tb.minichefy.presentation.screens.components.MultiTopAppBar
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.ConfirmRecipeAddToStorageDialog
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.DetailsRecipeStepItem
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.OneColorBackground
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.components.QuickInfoBox
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
+import hu.tb.minichefy.presentation.ui.theme.MiniChefyTheme
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
 import kotlinx.coroutines.flow.Flow
@@ -71,14 +75,18 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun RecipeDetailsScreen(
-    viewModel: RecipeDetailsViewModel = hiltViewModel()
+    viewModel: RecipeDetailsViewModel = hiltViewModel(),
+    navigateBack: () -> Unit,
+    navigateToEdit: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     RecipeDetailsContent(
         uiState = uiState,
         uiEvent = viewModel.uiEvent,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onBackArrowClick = navigateBack,
+        onEditClick = navigateToEdit
     )
 }
 
@@ -88,6 +96,8 @@ fun RecipeDetailsContent(
     uiState: RecipeDetailsViewModel.UiState,
     uiEvent: Flow<RecipeDetailsViewModel.UiEvent>,
     onAction: (RecipeDetailsViewModel.OnAction) -> Unit,
+    onBackArrowClick: () -> Unit,
+    onEditClick: () -> Unit,
 ) {
     var isConfirmDialogVisible by remember {
         mutableStateOf(false)
@@ -100,7 +110,12 @@ fun RecipeDetailsContent(
         uiEvent.collect { event ->
             when (event) {
                 is RecipeDetailsViewModel.UiEvent.ShowSnackBar -> scope.launch {
-                    snackbarHostState.showSnackbar(context.getString(event.message))
+                    snackbarHostState.showSnackbar(
+                        context.getString(
+                            event.messageResource,
+                            event.argument
+                        )
+                    )
                 }
             }
         }
@@ -109,42 +124,53 @@ fun RecipeDetailsContent(
     uiState.recipe?.let { recipe ->
         Scaffold(
             topBar = {
-                TopAppBar(title = {},
+                MultiTopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer
                     ),
-                    actions = {
-                        TooltipBox(
-                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                            tooltip = {
-                                PlainTooltip(
-                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                ) {
-                                    Text(
-                                        "Cook this recipe",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                                    )
-                                }
-                            },
-                            state = rememberTooltipState(),
-                        ) {
-                            IconButton(
-                                modifier = Modifier,
-                                onClick = {
-                                    isConfirmDialogVisible = uiState.isInformDialogShouldShow
-                                    if (!uiState.isInformDialogShouldShow) {
-                                        onAction(RecipeDetailsViewModel.OnAction.MakeRecipe)
-                                    }
-                                }) {
+                    appBarType = AppBarType.BackNavigationWithActionsAppBar(
+                        actions = {
+                            IconButton(onClick = onEditClick) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.chef_hat),
+                                    imageVector = Icons.Outlined.Edit,
                                     contentDescription = "Make recipe icon",
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
-                        }
-                    })
+                            TooltipBox(
+                                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                                tooltip = {
+                                    PlainTooltip(
+                                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    ) {
+                                        Text(
+                                            "Cook this recipe",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                                        )
+                                    }
+                                },
+                                state = rememberTooltipState(),
+                            ) {
+                                IconButton(
+                                    modifier = Modifier,
+                                    onClick = {
+                                        isConfirmDialogVisible = uiState.isInformDialogShouldShow
+                                        if (!uiState.isInformDialogShouldShow) {
+                                            onAction(RecipeDetailsViewModel.OnAction.MakeRecipe)
+                                        }
+                                    }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.chef_hat),
+                                        contentDescription = "Make recipe icon",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        },
+                        onBackButtonClick = onBackArrowClick
+                    )
+                )
             },
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
@@ -360,11 +386,15 @@ fun DetailsBottomContent(
 fun RecipeDetailsContentPreview(
     @PreviewParameter(RecipePreviewParameterProvider::class) mockRecipe: Recipe
 ) {
-    RecipeDetailsContent(
-        uiState = RecipeDetailsViewModel.UiState(
-            recipe = mockRecipe
-        ),
-        uiEvent = flow {  },
-        onAction = {}
-    )
+    MiniChefyTheme {
+        RecipeDetailsContent(
+            uiState = RecipeDetailsViewModel.UiState(
+                recipe = mockRecipe
+            ),
+            uiEvent = flow { },
+            onAction = {},
+            onBackArrowClick = {},
+            onEditClick = {}
+        )
+    }
 }

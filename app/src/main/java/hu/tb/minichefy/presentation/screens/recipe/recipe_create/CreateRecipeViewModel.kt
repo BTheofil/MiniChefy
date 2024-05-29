@@ -52,7 +52,7 @@ class CreateRecipeViewModel @Inject constructor(
         viewModelScope.launch {
             _ingredientsPageState.update { ingredientsPage ->
                 ingredientsPage.copy(
-                    unSelectedIngredientList = storageRepository.getStorageFoodSummary()
+                    unSelectedIngredientList = storageRepository.getStorageIngredients()
                 )
             }
         }
@@ -122,6 +122,7 @@ class CreateRecipeViewModel @Inject constructor(
         data class OnIngredientQuantityChange(val quantityString: String) : OnIngredientEvent()
         data class OnIngredientUnitOfMeasurementChange(val unitOfMeasurement: UnitOfMeasurement) :
             OnIngredientEvent()
+        data class OnPreMadeIngredientClick(val title: String, val unitOfMeasurement: UnitOfMeasurement): OnIngredientEvent()
 
         data class IngredientRemove(val itemPos: Int) : OnIngredientEvent()
         data object IngredientAdd : OnIngredientEvent()
@@ -202,6 +203,13 @@ class CreateRecipeViewModel @Inject constructor(
                 )
             }
 
+            is OnIngredientEvent.OnPreMadeIngredientClick -> {
+                _ingredientsPageState.update { it.copy(
+                    ingredientTitleDraft = event.title,
+                    ingredientUnitOfMeasurementDraft = event.unitOfMeasurement
+                ) }
+            }
+
             is OnIngredientEvent.IngredientRemove -> {
                 val updatedList = ingredientsPageState.value.selectedIngredientList.toMutableList()
                 updatedList.removeAt(event.itemPos)
@@ -221,7 +229,7 @@ class CreateRecipeViewModel @Inject constructor(
 
                     _ingredientsPageState.update { ingredientsPage ->
                         ingredientsPage.copy(
-                            unSelectedIngredientList = storageRepository.searchFoodSummaryLikelyByTitle(
+                            unSelectedIngredientList = storageRepository.searchIngredientsByLikelyTitle(
                                 event.text
                             )
                         )

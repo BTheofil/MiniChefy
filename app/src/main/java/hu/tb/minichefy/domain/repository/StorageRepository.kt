@@ -11,13 +11,13 @@ interface StorageRepository {
     //food
     fun getKnownFoodsFlow(): Flow<List<Food>>
 
-    suspend fun getStorageFoodSummary(): List<FoodSummary>
+    suspend fun getStorageIngredients(): List<FoodSummary>
 
     suspend fun getKnownFoodList(): List<Food>
 
     suspend fun searchFoodByTitle(title: String): List<Food>
 
-    suspend fun searchFoodSummaryLikelyByTitle(searchText: String): List<FoodSummary>
+    suspend fun searchIngredientsByLikelyTitle(searchText: String): List<FoodSummary>
 
     suspend fun searchFoodsByTag(tagIds: List<Long>): List<Food>
 

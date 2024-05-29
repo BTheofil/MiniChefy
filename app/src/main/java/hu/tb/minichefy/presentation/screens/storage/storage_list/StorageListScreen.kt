@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -54,7 +55,7 @@ import hu.tb.minichefy.presentation.screens.components.ImageWidget
 import hu.tb.minichefy.presentation.screens.components.MultiTopAppBar
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SettingsPanel
-import hu.tb.minichefy.presentation.screens.components.TopAppBarType
+import hu.tb.minichefy.presentation.screens.components.AppBarType
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditQuantityDialog
@@ -79,7 +80,7 @@ fun StorageListScreen(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun StorageScreenContent(
     uiState: StorageListViewModel.UiState,
@@ -121,7 +122,7 @@ fun StorageScreenContent(
             },
         topBar = {
             MultiTopAppBar(
-                appBarType = TopAppBarType.SearchAppBar(
+                appBarType = AppBarType.SearchAppBar(
                     queryText = uiState.searchText,
                     onQueryChange = { onAction(StorageListViewModel.OnAction.SearchTextChange(it)) },
                     clearButtonClick = {

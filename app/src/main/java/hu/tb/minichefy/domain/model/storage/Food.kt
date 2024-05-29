@@ -5,7 +5,8 @@ import hu.tb.minichefy.domain.model.IconResource
 
 data class FoodSummary(
     val id: Long,
-    val title: String
+    val title: String,
+    val unitOfMeasurement: UnitOfMeasurement
 )
 
 data class Food(

@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.RecipeDetailsScreen
 
 const val RECIPE_DETAILS_ROUTE = "recipe_details_route"
@@ -16,7 +17,10 @@ fun NavController.navigateToRecipeDetails(recipeId: Long) {
     this.navigate(RECIPE_DETAILS_ROUTE + "/${recipeId}")
 }
 
-fun NavGraphBuilder.recipeDetailsNavigation() {
+fun NavGraphBuilder.recipeDetailsNavigation(
+    navigateBack: () -> Unit,
+    navigateToEdit: () -> Unit
+) {
     composable(route = "$RECIPE_DETAILS_ROUTE/{$RECIPE_ID_ARGUMENT_KEY}",
         enterTransition = {
             fadeIn(
@@ -27,6 +31,9 @@ fun NavGraphBuilder.recipeDetailsNavigation() {
             ExitTransition.None
         }
     ) {
-        RecipeDetailsScreen()
+        RecipeDetailsScreen(
+            navigateBack = navigateBack,
+            navigateToEdit = navigateToEdit
+        )
     }
 }

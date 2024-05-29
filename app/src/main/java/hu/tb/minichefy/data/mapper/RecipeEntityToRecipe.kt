@@ -28,7 +28,7 @@ class RecipeEntityToRecipe {
                     quantity = it.quantity,
                     unitOfMeasurement = it.unitOfMeasurement
                 )
-            }
+            }.sortedBy { it.title }
         )
     }
 }

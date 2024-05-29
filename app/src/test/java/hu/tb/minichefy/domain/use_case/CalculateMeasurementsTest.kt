@@ -1,5 +1,6 @@
 package hu.tb.minichefy.domain.use_case
 
+import hu.tb.minichefy.domain.exceptions.NotCompatibleCalculation
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import org.junit.Assert
 import org.junit.Test
@@ -53,7 +54,7 @@ class CalculateMeasurementsTest {
         Assert.assertEquals(CalculationFood(1f, UnitOfMeasurement.KG), result)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test(expected = NotCompatibleCalculation::class)
     fun `MASS Not compatible unit of measurements`() {
         val testS1 = CalculationFood(3f, UnitOfMeasurement.KG)
         val testS2 = CalculationFood(-2f, UnitOfMeasurement.L)

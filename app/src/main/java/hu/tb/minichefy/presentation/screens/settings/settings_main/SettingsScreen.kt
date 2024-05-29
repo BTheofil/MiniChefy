@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -27,11 +28,12 @@ import androidx.compose.ui.unit.dp
 import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.settings.SettingItem
 import hu.tb.minichefy.presentation.screens.components.MultiTopAppBar
-import hu.tb.minichefy.presentation.screens.components.TopAppBarType
+import hu.tb.minichefy.presentation.screens.components.AppBarType
 import hu.tb.minichefy.presentation.screens.settings.navigation.TAG_SCREEN
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 import hu.tb.minichefy.presentation.util.icons.iconVectorResource
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onSettingsClick: (route: String) -> Unit,
@@ -39,7 +41,7 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             MultiTopAppBar(
-                appBarType = TopAppBarType.BasicAppBar(
+                appBarType = AppBarType.BasicAppBar(
                     stringResource(id = R.string.settings)
                 )
             )
