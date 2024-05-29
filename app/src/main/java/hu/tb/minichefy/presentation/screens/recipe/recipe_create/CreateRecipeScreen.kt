@@ -71,6 +71,7 @@ fun CreateRecipeScreen(
                 is UiEvent.EmptyStepField -> {
                     snackBarHostState.showSnackbar(context.getString(event.messageResource))
                 }
+
                 UiEvent.RecipeSaved -> onFinishRecipeButtonClick()
             }
         }
@@ -188,6 +189,14 @@ fun CreateRecipeScreen(
                         },
                         onNextButtonClick = {
                             scope.launch { pager.animateScrollToPage(RECIPE_STEPS_PAGE_INDEX) }
+                        },
+                        onPreMadeIngredientClick = { title, uom ->
+                            viewModel.onIngredientPageEvent(
+                                OnIngredientEvent.OnPreMadeIngredientClick(
+                                    title = title,
+                                    unitOfMeasurement = uom
+                                )
+                            )
                         }
                     )
 

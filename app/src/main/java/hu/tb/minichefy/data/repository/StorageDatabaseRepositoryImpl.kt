@@ -2,7 +2,9 @@ package hu.tb.minichefy.data.repository
 
 import hu.tb.minichefy.data.data_source.dao.StorageDAO
 import hu.tb.minichefy.data.mapper.FoodEntityToFood
+import hu.tb.minichefy.data.mapper.SimpleFoodEntityToFoodSummery
 import hu.tb.minichefy.data.mapper.TagEntityToTag
+import hu.tb.minichefy.di.DISH_TAG_ID
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.FoodTag
@@ -35,30 +37,24 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getStorageFoodSummary(): List<FoodSummary> {
-        val entities = dao.getSimpleFoodList()
+    override suspend fun getStorageIngredients(): List<FoodSummary> {
+        val entities = dao.getSimpleFoodExcludedTag(DISH_TAG_ID.toLong())
         return entities.map {
-            FoodSummary(
-                id = it.foodId,
-                title = it.title,
-            )
+            SimpleFoodEntityToFoodSummery().map(it)
         }.sortedBy { it.title }
     }
 
-    override suspend fun searchFoodByTitle(title: String): List<Food>  {
+    override suspend fun searchFoodByTitle(title: String): List<Food> {
         val entities = dao.searchFoodByTitle(title)
         return entities.map {
             FoodEntityToFood().map(it)
         }
     }
 
-    override suspend fun searchFoodSummaryLikelyByTitle(searchText: String): List<FoodSummary> {
-        val products = dao.searchSimpleFoodsByTitle("%$searchText%")
-        return products.map {
-            FoodSummary(
-                id = it.foodId,
-                title = it.title,
-            )
+    override suspend fun searchIngredientsLByLikelyTitle(searchText: String): List<FoodSummary> {
+        val entities = dao.searchSimpleFoodsByTitle("%$searchText%", DISH_TAG_ID.toLong())
+        return entities.map {
+            SimpleFoodEntityToFoodSummery().map(it)
         }.sortedBy { it.title }
     }
 

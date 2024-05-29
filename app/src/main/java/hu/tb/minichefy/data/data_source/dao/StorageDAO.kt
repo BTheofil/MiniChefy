@@ -19,8 +19,8 @@ interface StorageDAO {
 
     //food
     @Transaction
-    @Query("SELECT foodId, title FROM FoodEntity")
-    suspend fun getSimpleFoodList(): List<SimpleFoodEntity>
+    @Query("SELECT foodId, title, unitOfMeasurement FROM FoodEntity WHERE foodId NOT IN (SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId = :excludedTagId)")
+    suspend fun getSimpleFoodExcludedTag(excludedTagId: Long): List<SimpleFoodEntity>
 
     @Transaction
     @Query("SELECT * FROM FoodEntity")
@@ -35,8 +35,8 @@ interface StorageDAO {
     suspend fun searchFoodByTitle(title: String): List<FoodWithTags>
 
     @Transaction
-    @Query("SELECT foodId, title FROM FoodEntity WHERE title LIKE :searchTitle")
-    suspend fun searchSimpleFoodsByTitle(searchTitle: String): List<SimpleFoodEntity>
+    @Query("SELECT foodId, title, unitOfMeasurement FROM FoodEntity WHERE title LIKE :searchTitle AND foodId NOT IN (SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId = :excludedTagId)")
+    suspend fun searchSimpleFoodsByTitle(searchTitle: String, excludedTagId: Long): List<SimpleFoodEntity>
 
     @Transaction
     @Query("SELECT * FROM FoodEntity WHERE foodId IN (SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId IN (:tagIds))")
