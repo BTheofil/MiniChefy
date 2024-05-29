@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,7 +28,7 @@ import hu.tb.minichefy.presentation.screens.components.BaseListScreen
 import hu.tb.minichefy.presentation.screens.components.MultiTopAppBar
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
 import hu.tb.minichefy.presentation.screens.components.SettingsPanel
-import hu.tb.minichefy.presentation.screens.components.TopAppBarType
+import hu.tb.minichefy.presentation.screens.components.AppBarType
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.screens.recipe.recipe_list.components.RecipeItem
 import hu.tb.minichefy.presentation.ui.theme.MiniChefyTheme
@@ -48,6 +49,7 @@ fun RecipeListScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeListScreenContent(
     uiState: RecipeListViewModel.UiState,
@@ -58,7 +60,7 @@ fun RecipeListScreenContent(
     Scaffold(
         topBar = {
             MultiTopAppBar(
-                appBarType = TopAppBarType.SearchAppBar(
+                appBarType = AppBarType.SearchAppBar(
                     queryText = uiState.searchRecipeText,
                     onQueryChange = { onEvent(RecipeListViewModel.OnEvent.SearchTextChange(it)) },
                     clearButtonClick = { onEvent(RecipeListViewModel.OnEvent.SearchTextChange("")) }
