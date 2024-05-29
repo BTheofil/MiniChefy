@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.R
 import hu.tb.minichefy.di.DISH_TAG_ID
+import hu.tb.minichefy.domain.exceptions.NotCompatibleCalculation
 import hu.tb.minichefy.domain.model.recipe.Recipe
+import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
@@ -48,7 +50,7 @@ class RecipeDetailsViewModel @Inject constructor(
     )
 
     sealed class UiEvent {
-        data class ShowSnackBar(val message: Int) : UiEvent()
+        data class ShowSnackBar(val messageResource: Int, val argument: String? = null) : UiEvent()
     }
 
     sealed class OnAction {
@@ -63,9 +65,14 @@ class RecipeDetailsViewModel @Inject constructor(
                     try {
                         modifyStorageFoodBasedOnIngredients()
                         addRecipeToStorage()
-                        _uiEvent.send(UiEvent.ShowSnackBar(message = R.string.dish_added_to_storage))
-                    } catch (e: IllegalArgumentException) {
-                        _uiEvent.send(UiEvent.ShowSnackBar(message = R.string.can_not_make_the_meal_incompatible_ingredient_s))
+                        _uiEvent.send(UiEvent.ShowSnackBar(messageResource = R.string.dish_added_to_storage))
+                    } catch (e: NotCompatibleCalculation) {
+                        _uiEvent.send(
+                            UiEvent.ShowSnackBar(
+                                messageResource = R.string.can_not_make_the_meal_incompatible_ingredient_s,
+                                argument = e.argument
+                            )
+                        )
                         return@launch
                     }
                 }
@@ -131,25 +138,39 @@ class RecipeDetailsViewModel @Inject constructor(
     }
 
     private suspend fun modifyStorageFoodBasedOnIngredients() {
+        val validCalculationFoodList = mutableListOf<Food>()
+
         uiState.value.recipe!!.ingredientList.forEach { food ->
             val storageFood = storageRepository.searchFoodByTitle(food.title).firstOrNull()
             if (storageFood != null) {
-                val result = calculateMeasurements.simpleProductCalculations(
-                    productBase = CalculationFood(
-                        storageFood.quantity,
-                        storageFood.unitOfMeasurement
-                    ),
-                    productChanger = CalculationFood(food.quantity * (-1), food.unitOfMeasurement)
-                )
+                val result = try {
+                    calculateMeasurements.simpleProductCalculations(
+                        productBase = CalculationFood(
+                            storageFood.quantity,
+                            storageFood.unitOfMeasurement
+                        ),
+                        productChanger = CalculationFood(
+                            food.quantity * (-1),
+                            food.unitOfMeasurement
+                        )
+                    )
+                } catch (e: NotCompatibleCalculation) {
+                    throw NotCompatibleCalculation(message = e.message, argument = food.title)
+                }
 
-                storageRepository.saveOrModifyFood(
-                    id = storageFood.id,
-                    title = storageFood.title,
-                    icon = storageFood.icon.toString(),
-                    quantity = result.quantity,
-                    unitOfMeasurement = result.unitOfMeasurement
-                )
+                validCalculationFoodList.add(storageFood.copy(quantity = result.quantity,
+                    unitOfMeasurement = result.unitOfMeasurement))
             }
+        }
+
+        validCalculationFoodList.forEach { food: Food ->
+            storageRepository.saveOrModifyFood(
+                id = food.id,
+                title = food.title,
+                icon = food.icon.resource.toString(),
+                quantity = food.quantity,
+                unitOfMeasurement = food.unitOfMeasurement
+            )
         }
     }
 }

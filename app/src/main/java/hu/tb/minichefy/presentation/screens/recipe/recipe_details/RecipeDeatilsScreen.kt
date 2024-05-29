@@ -100,7 +100,7 @@ fun RecipeDetailsContent(
         uiEvent.collect { event ->
             when (event) {
                 is RecipeDetailsViewModel.UiEvent.ShowSnackBar -> scope.launch {
-                    snackbarHostState.showSnackbar(context.getString(event.message))
+                    snackbarHostState.showSnackbar(context.getString(event.messageResource, event.argument))
                 }
             }
         }

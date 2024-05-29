@@ -1,5 +1,6 @@
 package hu.tb.minichefy.domain.use_case
 
+import hu.tb.minichefy.domain.exceptions.NotCompatibleCalculation
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 
 class CalculateMeasurements {
@@ -18,7 +19,7 @@ class CalculateMeasurements {
         val isPiece =
             productBase.unitOfMeasurement.ordinal == 0 && productChanger.unitOfMeasurement.ordinal == 0
 
-        if (!isLiquid && !isMass && !isPiece) throw IllegalArgumentException("Not compatible unit of measurements")
+        if (!isLiquid && !isMass && !isPiece) throw NotCompatibleCalculation(message = "Not compatible unit of measurements")
 
         val result = performCalculation(
             productBase.convertToSmallestUnit(),
