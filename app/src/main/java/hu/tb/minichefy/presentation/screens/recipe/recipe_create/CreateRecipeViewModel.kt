@@ -1,5 +1,6 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,7 @@ import hu.tb.minichefy.domain.use_case.Validators
 import hu.tb.minichefy.presentation.util.icons.MealIcon
 import hu.tb.minichefy.presentation.ui.theme.SEARCH_BAR_WAIT_AFTER_CHARACTER
 import hu.tb.minichefy.domain.model.IconResource
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.navigation.EDIT_RECIPE_ARGUMENT_KEY
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +30,7 @@ import kotlin.random.Random
 
 @HiltViewModel
 class CreateRecipeViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val recipeRepository: RecipeRepository,
     private val storageRepository: StorageRepository,
     private val validators: Validators,
@@ -48,7 +51,10 @@ class CreateRecipeViewModel @Inject constructor(
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
+    private var editRecipeId: Long? = null
+
     init {
+        loadEditRecipe()
         viewModelScope.launch {
             _ingredientsPageState.update { ingredientsPage ->
                 ingredientsPage.copy(
@@ -122,7 +128,11 @@ class CreateRecipeViewModel @Inject constructor(
         data class OnIngredientQuantityChange(val quantityString: String) : OnIngredientEvent()
         data class OnIngredientUnitOfMeasurementChange(val unitOfMeasurement: UnitOfMeasurement) :
             OnIngredientEvent()
-        data class OnPreMadeIngredientClick(val title: String, val unitOfMeasurement: UnitOfMeasurement): OnIngredientEvent()
+
+        data class OnPreMadeIngredientClick(
+            val title: String,
+            val unitOfMeasurement: UnitOfMeasurement
+        ) : OnIngredientEvent()
 
         data class IngredientRemove(val itemPos: Int) : OnIngredientEvent()
         data object IngredientAdd : OnIngredientEvent()
@@ -204,10 +214,12 @@ class CreateRecipeViewModel @Inject constructor(
             }
 
             is OnIngredientEvent.OnPreMadeIngredientClick -> {
-                _ingredientsPageState.update { it.copy(
-                    ingredientTitleDraft = event.title,
-                    ingredientUnitOfMeasurementDraft = event.unitOfMeasurement
-                ) }
+                _ingredientsPageState.update {
+                    it.copy(
+                        ingredientTitleDraft = event.title,
+                        ingredientUnitOfMeasurementDraft = event.unitOfMeasurement
+                    )
+                }
             }
 
             is OnIngredientEvent.IngredientRemove -> {
@@ -332,8 +344,41 @@ class CreateRecipeViewModel @Inject constructor(
         }
     }
 
+    private fun loadEditRecipe() {
+        try {
+            val recipeId: String = checkNotNull(savedStateHandle[EDIT_RECIPE_ARGUMENT_KEY])
+            editRecipeId = recipeId.toLong()
+            viewModelScope.launch {
+                val recipe = recipeRepository.getRecipeById(editRecipeId!!)
+
+                _basicPageState.update {
+                    it.copy(
+                        recipeTitle = recipe.title,
+                        quantityCounter = recipe.quantity,
+                        selectedRecipeIcon = recipe.icon,
+                        timeField = recipe.timeToCreate.toString(),
+                        timeUnit = recipe.timeUnit
+                    )
+                }
+
+                _ingredientsPageState.update {
+                    it.copy(
+                        selectedIngredientList = recipe.ingredientList,
+                    )
+                }
+
+                _stepsPageState.update { it.copy(
+                    recipeSteps = recipe.howToSteps
+                ) }
+            }
+        } catch (_: IllegalStateException){
+            //not came for edit recipe click
+        }
+    }
+
     private suspend fun saveRecipe(): Long =
         recipeRepository.saveRecipe(
+            id = editRecipeId,
             icon = basicPageState.value.selectedRecipeIcon.resource.toString(),
             title = basicPageState.value.recipeTitle,
             quantity = basicPageState.value.quantityCounter,
