@@ -77,7 +77,7 @@ import kotlinx.coroutines.launch
 fun RecipeDetailsScreen(
     viewModel: RecipeDetailsViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
-    navigateToEdit: () -> Unit,
+    navigateToEdit: (recipeId: Long) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -86,7 +86,11 @@ fun RecipeDetailsScreen(
         uiEvent = viewModel.uiEvent,
         onAction = viewModel::onAction,
         onBackArrowClick = navigateBack,
-        onEditClick = navigateToEdit
+        onEditClick = {
+            uiState.recipe?.let {
+                navigateToEdit(it.id!!)
+            }
+        }
     )
 }
 
