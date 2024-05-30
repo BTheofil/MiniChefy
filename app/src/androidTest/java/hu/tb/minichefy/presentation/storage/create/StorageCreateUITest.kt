@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
 import hu.tb.minichefy.R
+import hu.tb.minichefy.domain.model.IconResource
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.presentation.screens.storage.storage_create.StorageCreateContent
@@ -55,7 +56,7 @@ class StorageCreateUITest {
                                 title = "Milk",
                                 quantity = 1f,
                                 unitOfMeasurement = UnitOfMeasurement.L,
-                                icon = 1,
+                                icon = IconResource.DrawableIconImpl(1),
                                 foodTagList = emptyList()
                             )
 

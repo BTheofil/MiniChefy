@@ -56,6 +56,7 @@ fun IngredientsPage(
     onIngredientTitleChange: (String) -> Unit,
     onIngredientQuantityChange: (String) -> Unit,
     onIngredientUnitOfMeasurementChange: (UnitOfMeasurement) -> Unit,
+    onPreMadeIngredientClick: (title: String, unitOfMeasurement: UnitOfMeasurement) -> Unit,
     onAddIngredientClick: () -> Unit,
     onRemoveIngredientClick: (Int) -> Unit,
     onQueryChange: (text: String) -> Unit,
@@ -94,7 +95,7 @@ fun IngredientsPage(
                     modifier = Modifier
                         .weight(1f),
                     uiState = uiState,
-                    onIngredientTitleChange = onIngredientTitleChange,
+                    onPreMadeIngredientClick = onPreMadeIngredientClick,
                     onRemoveIngredientClick = onRemoveIngredientClick
                 )
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
@@ -116,7 +117,7 @@ fun IngredientsPage(
 fun IngredientList(
     modifier: Modifier = Modifier,
     uiState: CreateRecipeViewModel.Pages.IngredientsPage,
-    onIngredientTitleChange: (String) -> Unit,
+    onPreMadeIngredientClick: (title: String, unitOfMeasurement: UnitOfMeasurement) -> Unit,
     onRemoveIngredientClick: (Int) -> Unit
 ) {
     LazyColumn(
@@ -215,7 +216,7 @@ fun IngredientList(
                 },
                 trailingContent = {
                     IconButton(onClick = {
-                        onIngredientTitleChange(ingredient.title)
+                        onPreMadeIngredientClick(ingredient.title, ingredient.unitOfMeasurement)
                     }) {
                         Icon(
                             imageVector = Icons.Outlined.AddCircle,
@@ -307,6 +308,7 @@ private fun IngredientsPagePreview(
         onRemoveIngredientClick = {},
         onIngredientQuantityChange = {},
         onIngredientTitleChange = {},
-        onIngredientUnitOfMeasurementChange = {}
+        onIngredientUnitOfMeasurementChange = {},
+        onPreMadeIngredientClick = { _, _ -> }
     )
 }

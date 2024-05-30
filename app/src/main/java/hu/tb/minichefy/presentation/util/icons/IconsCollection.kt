@@ -1,8 +1,9 @@
-package hu.tb.minichefy.presentation.screens.manager.icons
+package hu.tb.minichefy.presentation.util.icons
 
 import hu.tb.minichefy.R
+import hu.tb.minichefy.domain.model.IconResource
 
-enum class MealIcon(override val resource: Int): IconResource {
+enum class MealIcon(override val resource: Int): IconResource.DrawableIcon {
     FRIED_EGG(R.drawable.fried_egg_icon),
     HOT_DOG(R.drawable.hot_dog_icon),
     HOT_SOUP(R.drawable.hotsoup_icon),
@@ -10,10 +11,10 @@ enum class MealIcon(override val resource: Int): IconResource {
     STEAK(R.drawable.steak_icon),
     JUNK_FOOD(R.drawable.junk_food_icon),
     NOODLES(R.drawable.cup_noodles_icon),
-    SWEETS(R.drawable.sweets_icon)
+    SWEETS(R.drawable.sweets_icon),
 }
 
-enum class FoodIcon(override val resource: Int): IconResource {
+enum class FoodIcon(override val resource: Int): IconResource.DrawableIcon {
     APPLE(R.drawable.apple_icon),
     AVOCADO(R.drawable.avocado_icon),
     BREAD(R.drawable.bread_icon),
@@ -33,9 +34,9 @@ enum class FoodIcon(override val resource: Int): IconResource {
     SALT(R.drawable.salt_icon),
     SAUSAGE(R.drawable.sausage_icon),
     SHRIMP(R.drawable.shrimp_seafood_food_icon)
-
 }
 
-enum class AppWideIcon(override val resource: Int): IconResource {
+enum class AppWideIcon(override val resource: Int): IconResource.DrawableIcon {
     DEFAULT_EMPTY_ICON(R.drawable.default_empty_icon),
+    GALLERY(R.drawable.gallery_icon)
 }

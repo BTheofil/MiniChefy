@@ -1,5 +1,8 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_details.navigation
 
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -12,8 +15,23 @@ fun NavController.navigateToRecipeDetails(recipeId: Long) {
     this.navigate(RECIPE_DETAILS_ROUTE + "/${recipeId}")
 }
 
-fun NavGraphBuilder.recipeDetailsNavigation() {
-    composable(route = "$RECIPE_DETAILS_ROUTE/{$RECIPE_ID_ARGUMENT_KEY}") {
-        RecipeDetailsScreen()
+fun NavGraphBuilder.recipeDetailsNavigation(
+    navigateBack: () -> Unit,
+    navigateToEdit: (recipeId: Long) -> Unit
+) {
+    composable(route = "$RECIPE_DETAILS_ROUTE/{$RECIPE_ID_ARGUMENT_KEY}",
+        enterTransition = {
+            fadeIn(
+                animationSpec = tween(durationMillis = 700)
+            )
+        },
+        exitTransition = {
+            ExitTransition.None
+        }
+    ) {
+        RecipeDetailsScreen(
+            navigateBack = navigateBack,
+            navigateToEdit = navigateToEdit
+        )
     }
 }

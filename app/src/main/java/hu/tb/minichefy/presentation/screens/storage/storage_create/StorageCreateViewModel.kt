@@ -6,12 +6,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.StorageRepository
-import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
-import hu.tb.minichefy.domain.use_case.ValidateQuantity
-import hu.tb.minichefy.domain.use_case.ValidateTextField
 import hu.tb.minichefy.domain.use_case.ValidationResult
-import hu.tb.minichefy.presentation.screens.manager.icons.FoodIcon
-import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
+import hu.tb.minichefy.domain.use_case.Validators
+import hu.tb.minichefy.presentation.util.icons.FoodIcon
+import hu.tb.minichefy.presentation.util.icons.IconManager
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,9 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StorageCreateViewModel @Inject constructor(
     private val storageRepository: StorageRepository,
-    private val textValidator: ValidateTextField,
-    private val quantityValidator: ValidateQuantity,
-    private val validateNumberKeyboard: ValidateNumberKeyboard
+    private val validators: Validators,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -33,11 +29,12 @@ class StorageCreateViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val tags = storageRepository.getFilterableTagList()
-            _uiState.update {
-                it.copy(
-                    labelFilterTagList = tags
-                )
+            storageRepository.getFoodTagFlow().collect { tagList ->
+                _uiState.update {
+                    it.copy(
+                        labelFilterTagList = tagList
+                    )
+                }
             }
         }
     }
@@ -96,7 +93,7 @@ class StorageCreateViewModel @Inject constructor(
                 viewModelScope.launch {
                     uiState.value.also {
                         val foodId = storageRepository.saveOrModifyFood(
-                            icon = it.selectedFoodIcon.resource,
+                            icon = it.selectedFoodIcon.resource.toString(),
                             title = it.foodTitleText,
                             quantity = it.quantity.toFloat(),
                             unitOfMeasurement = it.foodUnitOfMeasurement
@@ -119,7 +116,7 @@ class StorageCreateViewModel @Inject constructor(
             }
 
             is OnEvent.FoodQuantityChange -> {
-                if (validateNumberKeyboard(event.quantityString) == ValidationResult.ERROR) return
+                if (validators.validateNumberKeyboard(event.quantityString) == ValidationResult.ERROR) return
 
                 _uiState.update {
                     it.copy(
@@ -135,9 +132,9 @@ class StorageCreateViewModel @Inject constructor(
     }
 
     private fun checkFoodDraftHasError(): Boolean {
-        val titleResult = textValidator(uiState.value.foodTitleText)
+        val titleResult = validators.validateTextField(uiState.value.foodTitleText)
         val quantityResult = try {
-            quantityValidator(uiState.value.quantity.toFloat())
+            validators.validateQuantity(uiState.value.quantity.toFloat())
         } catch (e: Exception) {
             ValidationResult.ERROR
         }

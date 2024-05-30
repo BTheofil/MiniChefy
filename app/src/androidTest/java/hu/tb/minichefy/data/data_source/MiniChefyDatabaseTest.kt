@@ -6,15 +6,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import hu.tb.minichefy.data.data_source.dao.RecipeDAO
 import hu.tb.minichefy.data.data_source.dao.StorageDAO
 import hu.tb.minichefy.data.data_source.db.MiniChefyDatabase
+import hu.tb.minichefy.di.DISH_TAG_ID
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeEntity
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.domain.model.storage.entity.DISH_TAG_ID
 import hu.tb.minichefy.domain.model.storage.entity.FoodAndTagsCrossRef
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
 import hu.tb.minichefy.domain.model.storage.entity.TagEntity
-import hu.tb.minichefy.domain.model.storage.entity.UNKNOWN_TAG_ID
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -42,7 +41,6 @@ class MiniChefyDatabaseTest {
             TagEntity(tagId = 1, tag = "fruit"),
             TagEntity(tagId = 2, tag = "vegetable"),
             TagEntity(tagId = DISH_TAG_ID.toLong(), tag = "dish"),
-            TagEntity(tagId = UNKNOWN_TAG_ID.toLong(), tag = "unknown"),
         )
         runBlocking {
             tagList.forEach {
@@ -60,7 +58,7 @@ class MiniChefyDatabaseTest {
     fun insertAndRetrieveRecipe() = runBlocking {
         val recipeEntity = RecipeEntity(
             recipeId = null,
-            icon = 1,
+            image = "1",
             title = "Pasta",
             quantity = 2,
             timeUnit = TimeUnit.MINUTES,
@@ -77,7 +75,7 @@ class MiniChefyDatabaseTest {
     fun insertAndRetrieveFood() = runBlocking {
         val foodEntity = FoodEntity(
             foodId = 1,
-            icon = 2,
+            image = "2",
             title = "Tomato",
             quantity = 1f,
             unitOfMeasurement = UnitOfMeasurement.KG
@@ -87,7 +85,7 @@ class MiniChefyDatabaseTest {
 
         val foodWithTags = storageDao.searchFoodByTitle("Tomato").first()
 
-        assertEquals(2, foodWithTags.foodEntity.icon)
+        assertEquals("2", foodWithTags.foodEntity.image)
         assertEquals("Tomato", foodWithTags.foodEntity.title)
         assertEquals(1f, foodWithTags.foodEntity.quantity)
         assertEquals(UnitOfMeasurement.KG, foodWithTags.foodEntity.unitOfMeasurement)
@@ -97,7 +95,7 @@ class MiniChefyDatabaseTest {
     fun deleteFood() = runBlocking {
         val foodEntity = FoodEntity(
             foodId = 1,
-            icon = 2,
+            image = "2",
             title = "Tomato",
             quantity = 1f,
             unitOfMeasurement = UnitOfMeasurement.KG
@@ -115,7 +113,7 @@ class MiniChefyDatabaseTest {
     fun insertTagWithFoodAndReturn() = runBlocking {
         val foodEntity = FoodEntity(
             foodId = 1,
-            icon = 2,
+            image = "2",
             title = "Tomato",
             quantity = 1f,
             unitOfMeasurement = UnitOfMeasurement.KG
@@ -128,7 +126,7 @@ class MiniChefyDatabaseTest {
                 tagId = 1
             )
         )
-        val result2 = storageDao.getKnownFoodsList()
+        val result2 = storageDao.getFoodWithTagsList()
         assertEquals(1, result2[0].tags.size)
     }
 }

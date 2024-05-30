@@ -1,7 +1,6 @@
 package hu.tb.minichefy.presentation.screens.storage.storage_list.componenets
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,7 +42,7 @@ import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.preview.FoodPreviewParameterProvider
-import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
+import hu.tb.minichefy.presentation.screens.components.ImageWidget
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SMALL_SPACE_BETWEEN_ELEMENTS
@@ -62,8 +60,7 @@ fun EditStorageItem(
 ) {
     OutlinedCard(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(max = 250.dp),
+            .fillMaxWidth(),
         colors = CardDefaults.outlinedCardColors(
             contentColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
         )
@@ -89,11 +86,7 @@ fun EditStorageItem(
                     .padding(12.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    modifier = Modifier,
-                    imageVector = iconVectorResource(iconResource = food.icon),
-                    contentDescription = "Store icon"
-                )
+                ImageWidget(image = food.icon)
             }
 
             Column(
@@ -117,7 +110,7 @@ fun EditStorageItem(
                 )
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                 FlowRow(
-                    maxItemsInEachRow = 3,
+                    maxItemsInEachRow = 5,
                     horizontalArrangement = Arrangement.spacedBy(SMALL_SPACE_BETWEEN_ELEMENTS),
                 ) {
                     AssistChip(
@@ -156,7 +149,7 @@ fun EditStorageItem(
                                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
                                 label = {
                                     Text(
-                                        text = "More...",
+                                        text = "+" + (tags.size - 3),
                                         style = MaterialTheme.typography.labelLarge,
                                         color = MaterialTheme.colorScheme.primary
                                     )

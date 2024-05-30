@@ -8,30 +8,14 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 
-const val UNKNOWN_TAG_ID = 4
-const val DISH_TAG_ID = 3
-
 @Entity
 data class FoodEntity(
     @PrimaryKey(autoGenerate = true)
     val foodId: Long?,
-    val icon: Int,
+    val image: String,
     val title: String,
     val quantity: Float,
     val unitOfMeasurement: UnitOfMeasurement
-)
-
-@Entity
-data class SimplerFoodEntity(
-    val foodId: Long,
-    val title: String,
-)
-
-@Entity
-data class TagEntity(
-    @PrimaryKey(autoGenerate = true)
-    val tagId: Long?,
-    val tag: String
 )
 
 @Entity(primaryKeys = ["foodId", "tagId"])
@@ -51,4 +35,3 @@ data class FoodWithTags(
     )
     val tags: List<TagEntity>
 )
-

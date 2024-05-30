@@ -1,7 +1,6 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -14,8 +13,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import hu.tb.minichefy.R
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.OnBasicInformationPageEvent
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.OnIngredientEvent
 import hu.tb.minichefy.presentation.screens.recipe.recipe_create.CreateRecipeViewModel.OnStepsPageEvent
@@ -29,9 +30,8 @@ private const val BASIC_INFORMATION_PAGE_INDEX = 0
 private const val INGREDIENTS_PAGE_INDEX = 1
 private const val RECIPE_STEPS_PAGE_INDEX = 2
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CreateRecipe(
+fun CreateRecipeScreen(
     viewModel: CreateRecipeViewModel = hiltViewModel(),
     onFinishRecipeButtonClick: () -> Unit
 ) {
@@ -45,7 +45,7 @@ fun CreateRecipe(
     }
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
-
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -53,7 +53,23 @@ fun CreateRecipe(
                     if (basicPageState.isTitleHasError || basicPageState.isTimeFieldHasError) {
                         pager.animateScrollToPage(BASIC_INFORMATION_PAGE_INDEX)
                     }
-                    showAppropriateSnackBar(event, snackBarHostState)
+                    when {
+                        event.isIngredientHasError && event.isStepsHasError -> {
+                            snackBarHostState.showSnackbar(context.getString(R.string.missing_ingredients_steps))
+                        }
+
+                        event.isIngredientHasError -> {
+                            snackBarHostState.showSnackbar(context.getString(R.string.you_haven_t_added_any_ingredients_yet))
+                        }
+
+                        event.isStepsHasError -> {
+                            snackBarHostState.showSnackbar(context.getString(R.string.you_re_missing_some_recipe_steps))
+                        }
+                    }
+                }
+
+                is UiEvent.EmptyStepField -> {
+                    snackBarHostState.showSnackbar(context.getString(event.messageResource))
                 }
 
                 UiEvent.RecipeSaved -> onFinishRecipeButtonClick()
@@ -83,7 +99,8 @@ fun CreateRecipe(
         HorizontalPager(
             modifier = Modifier
                 .padding(paddingValues),
-            state = pager
+            state = pager,
+            beyondViewportPageCount = uiState.pages.size
         ) { pageIndex ->
             when (uiState.pages[pageIndex]) {
                 is CreateRecipeViewModel.Pages.BasicInformationPage ->
@@ -172,6 +189,14 @@ fun CreateRecipe(
                         },
                         onNextButtonClick = {
                             scope.launch { pager.animateScrollToPage(RECIPE_STEPS_PAGE_INDEX) }
+                        },
+                        onPreMadeIngredientClick = { title, uom ->
+                            viewModel.onIngredientPageEvent(
+                                OnIngredientEvent.OnPreMadeIngredientClick(
+                                    title = title,
+                                    unitOfMeasurement = uom
+                                )
+                            )
                         }
                     )
 
@@ -216,23 +241,3 @@ fun CreateRecipe(
         }
     }
 }
-
-private suspend fun showAppropriateSnackBar(
-    event: UiEvent.ErrorInRecipeFields,
-    snackBarHostState: SnackbarHostState
-) {
-    when {
-        event.isIngredientHasError && event.isStepsHasError -> {
-            snackBarHostState.showSnackbar("Missing ingredients & steps! Add them to get cooking.")
-        }
-
-        event.isIngredientHasError -> {
-            snackBarHostState.showSnackbar("You haven't added any ingredients yet.")
-        }
-
-        event.isStepsHasError -> {
-            snackBarHostState.showSnackbar("You're missing some recipe steps.")
-        }
-    }
-}
-

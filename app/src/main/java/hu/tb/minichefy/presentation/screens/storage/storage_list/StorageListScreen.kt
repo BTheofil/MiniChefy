@@ -5,7 +5,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -45,20 +45,22 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.presentation.preview.FoodPreviewParameterProvider
+import hu.tb.minichefy.presentation.screens.components.BaseListScreen
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
+import hu.tb.minichefy.presentation.screens.components.ImageWidget
+import hu.tb.minichefy.presentation.screens.components.MultiTopAppBar
 import hu.tb.minichefy.presentation.screens.components.PlusFAB
-import hu.tb.minichefy.presentation.screens.components.SearchItemBar
 import hu.tb.minichefy.presentation.screens.components.SettingsPanel
+import hu.tb.minichefy.presentation.screens.components.AppBarType
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
-import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
-import hu.tb.minichefy.presentation.screens.manager.icons.iconVectorResource
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditQuantityDialog
 import hu.tb.minichefy.presentation.screens.storage.storage_list.componenets.EditStorageItem
-import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
+import hu.tb.minichefy.presentation.ui.theme.MiniChefyTheme
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -74,17 +76,17 @@ fun StorageListScreen(
         uiState = uiState,
         uiEvent = viewModel.uiEvent,
         onFABClick = onFABClick,
-        onEvent = viewModel::onEvent
+        onAction = viewModel::onAction
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun StorageScreenContent(
     uiState: StorageListViewModel.UiState,
     uiEvent: Flow<StorageListViewModel.UiEvent>,
     onFABClick: () -> Unit,
-    onEvent: (StorageListViewModel.OnEvent) -> Unit
+    onAction: (StorageListViewModel.OnAction) -> Unit
 ) {
     var isEditProductTagSelectorOpen by remember {
         mutableStateOf(false)
@@ -118,27 +120,29 @@ fun StorageScreenContent(
             .clickableWithoutRipple {
                 focusManager.clearFocus()
             },
+        topBar = {
+            MultiTopAppBar(
+                appBarType = AppBarType.SearchAppBar(
+                    queryText = uiState.searchText,
+                    onQueryChange = { onAction(StorageListViewModel.OnAction.SearchTextChange(it)) },
+                    clearButtonClick = {
+                        onAction(
+                            StorageListViewModel.OnAction.SearchTextChange(
+                                ""
+                            )
+                        )
+                    })
+            )
+        },
         floatingActionButton = {
             PlusFAB(onClick = onFABClick)
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(
-                    horizontal = SCREEN_HORIZONTAL_PADDING,
-                    vertical = SCREEN_VERTICAL_PADDING
-                )
+        BaseListScreen(
+            paddingValues = paddingValues,
+            isShowEmptyContent = uiState.foodList.isEmpty(),
+            emptyContentDescriptionResource = R.string.let_s_create_recipes
         ) {
-            SearchItemBar(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                queryText = uiState.searchText,
-                onQueryChange = { onEvent(StorageListViewModel.OnEvent.SearchTextChange(it)) },
-                clearIconButtonClick = { onEvent(StorageListViewModel.OnEvent.SearchTextChange("")) }
-            )
-            Spacer(modifier = Modifier.height(22.dp))
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -149,7 +153,7 @@ fun StorageScreenContent(
                 ) { filter ->
                     FilterChip(
                         selected = uiState.activeFilter.contains(filter),
-                        onClick = { onEvent(StorageListViewModel.OnEvent.FilterChipClicked(filter)) },
+                        onClick = { onAction(StorageListViewModel.OnAction.FilterChipClicked(filter)) },
                         label = {
                             Text(
                                 text = filter.tag,
@@ -181,17 +185,17 @@ fun StorageScreenContent(
                             true -> EditStorageItem(
                                 food = food,
                                 onFoodIconClick = { isIconSelectorOpen = true },
-                                onCloseClick = { onEvent(StorageListViewModel.OnEvent.ClearSelectedFoodIndex) },
+                                onCloseClick = { onAction(StorageListViewModel.OnAction.ClearSelectedFoodIndex) },
                                 onDeleteTagClick = { tag ->
-                                    onEvent(
-                                        StorageListViewModel.OnEvent.ModifyFoodTags(tag)
+                                    onAction(
+                                        StorageListViewModel.OnAction.ModifyFoodTags(tag)
                                     )
                                 },
                                 onAddTagClick = {
                                     isEditProductTagSelectorOpen = true
                                 },
                                 onQuantityClick = {
-                                    onEvent(StorageListViewModel.OnEvent.SetupEditFoodQuantityDialog)
+                                    onAction(StorageListViewModel.OnAction.SetupEditFoodQuantityDialog)
                                 }
                             )
 
@@ -206,8 +210,8 @@ fun StorageScreenContent(
                                         modifier = Modifier
                                             .combinedClickable(
                                                 onClick = {
-                                                    onEvent(
-                                                        StorageListViewModel.OnEvent.FoodEditButtonClick(
+                                                    onAction(
+                                                        StorageListViewModel.OnAction.FoodEditButtonClick(
                                                             index
                                                         )
                                                     )
@@ -218,11 +222,10 @@ fun StorageScreenContent(
                                                 }
                                             ),
                                         leadingContent = {
-                                            Image(
+                                            ImageWidget(
                                                 modifier = Modifier
                                                     .size(64.dp),
-                                                imageVector = iconVectorResource(iconResource = food.icon),
-                                                contentDescription = "Store icon"
+                                                image = food.icon
                                             )
                                         },
                                         headlineContent = {
@@ -265,16 +268,16 @@ fun StorageScreenContent(
         EditQuantityDialog(
             quantityValue = uiState.quantityModifyValue,
             onQuantityChange = { quantityString ->
-                onEvent(StorageListViewModel.OnEvent.ModifyFoodDialogQuantityChange(quantityString))
+                onAction(StorageListViewModel.OnAction.ModifyFoodDialogQuantityChange(quantityString))
             },
             isQuantityHasError = uiState.isQuantityModifyDialogHasError,
             measurementValue = uiState.unitOfMeasurementModifyValue,
             onMeasurementChange = { uof ->
-                onEvent(StorageListViewModel.OnEvent.EditFoodDialogUnitChange(uof))
+                onAction(StorageListViewModel.OnAction.EditFoodDialogUnitChange(uof))
             },
             onCancelButtonClick = { isEditQuantityDialogOpen = false },
             onConfirmButtonClick = {
-                onEvent(StorageListViewModel.OnEvent.SaveEditFoodQuantities)
+                onAction(StorageListViewModel.OnAction.SaveEditFoodQuantities)
             },
             onDismissRequest = { isEditQuantityDialogOpen = false }
         )
@@ -283,8 +286,8 @@ fun StorageScreenContent(
     if (isIconSelectorOpen) {
         IconSelectorSheet(
             allIconList = uiState.allFoodIconList,
-            selectedIcon = IconManager().findFoodIconByInt(uiState.foodList[uiState.modifyFoodListPositionIndex].icon),
-            onItemClick = { onEvent(StorageListViewModel.OnEvent.ModifyFoodIcon(it)) },
+            selectedIcon = uiState.foodList[uiState.modifyFoodListPositionIndex].icon,
+            onItemClick = { onAction(StorageListViewModel.OnAction.ModifyFoodIcon(it)) },
             onDismissRequest = { isIconSelectorOpen = false }
         )
     }
@@ -293,7 +296,7 @@ fun StorageScreenContent(
         SettingsPanel(
             dismissSettingPanel = { isSettingPanelOpen = false },
             onDeleteItemClick = {
-                onEvent(StorageListViewModel.OnEvent.DeleteFood(settingPanelFoodId!!))
+                onAction(StorageListViewModel.OnAction.DeleteFood(settingPanelFoodId!!))
                 isSettingPanelOpen = false
                 settingPanelFoodId = null
             }
@@ -306,8 +309,8 @@ fun StorageScreenContent(
                 isEditProductTagSelectorOpen = false
             },
             onTagClick = {
-                onEvent(
-                    StorageListViewModel.OnEvent.ModifyFoodTags(it)
+                onAction(
+                    StorageListViewModel.OnAction.ModifyFoodTags(it)
                 )
             },
             allTagList = uiState.foodTagList,
@@ -322,13 +325,15 @@ fun StorageScreenContent(
 fun StorageScreenContentPreview(
     @PreviewParameter(FoodPreviewParameterProvider::class) mockProductList: List<Food>
 ) {
-    StorageScreenContent(
-        uiState = StorageListViewModel.UiState(
-            foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
-            foodList = mockProductList,
-        ),
-        uiEvent = flow { },
-        onEvent = {},
-        onFABClick = {}
-    )
+    MiniChefyTheme {
+        StorageScreenContent(
+            uiState = StorageListViewModel.UiState(
+                foodTagList = listOf(FoodTag(0, "fruit"), FoodTag(1, "vegetable")),
+                foodList = mockProductList,
+            ),
+            uiEvent = flow { },
+            onAction = {},
+            onFABClick = {}
+        )
+    }
 }

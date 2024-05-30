@@ -7,7 +7,7 @@
     <string name="measurement">Mérték</string>
     <string name="tag">Címke</string>
     <string name="done">Kész</string>
-    <string name="modify_amount">Modify amount count</string>
+    <string name="modify_amount">Változtass mennyiséget</string>
     <string name="serve">Étkezés</string>
     <string name="cancel">Mégse</string>
     <string name="never_show_this_message">Ne mutassa újra</string>
@@ -38,5 +38,15 @@
     <string name="liquid">Folyékony</string>
     <string name="solid">Szilárd</string>
     <string name="dish_added_to_storage">Étel hozzáadva a raktárba</string>
-    <string name="can_not_make_the_meal_incompatible_ingredient_s">Nem lehet elkésziteni. Összeegyeztethetetlen hozzávaló</string>
+    <string name="can_not_make_the_meal_incompatible_ingredient_s">Nem lehet elkésziteni. Összeegyeztethetetlen hozzávaló: %1$s</string>
+    <string name="settings">Beállítások</string>
+    <string name="create_new_tag">Új címke létrehozás</string>
+    <string name="tags">Címkék</string>
+    <string name="theme">Téma</string>
+    <string name="menu">Menü</string>
+    <string name="one_or_more_step_fields_are_empty">Egy vagy több mező üres</string>
+    <string name="missing_ingredients_steps">Hiányzó hozzávalók és lépések></string>
+    <string name="you_haven_t_added_any_ingredients_yet">Még nem adtál hozzávalókat</string>
+    <string name="you_re_missing_some_recipe_steps">Hiányoznak a recept lépései</string>
+    <string name="let_s_create_recipes">Készíts receptet!</string>
 </resources>

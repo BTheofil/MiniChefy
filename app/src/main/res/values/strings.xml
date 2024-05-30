@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">MiniChefy</string>
+    <string name="app_name" translatable="false">Cookbook</string>
     <string name="title">Title</string>
     <string name="save">Save</string>
     <string name="type">Type</string>
@@ -38,5 +38,15 @@
     <string name="liquid">Liquid</string>
     <string name="solid">Solid</string>
     <string name="dish_added_to_storage">Dish added to storage</string>
-    <string name="can_not_make_the_meal_incompatible_ingredient_s">Can not make the meal. Incompatible ingredient(s).</string>
+    <string name="can_not_make_the_meal_incompatible_ingredient_s">Can not make the meal. Incompatible ingredient: %1$s</string>
+    <string name="settings">Settings</string>
+    <string name="create_new_tag">Create new tag</string>
+    <string name="tags">Tags</string>
+    <string name="theme">Theme</string>
+    <string name="menu">Menu</string>
+    <string name="one_or_more_step_fields_are_empty">One or more step fields are empty.</string>
+    <string name="missing_ingredients_steps"><![CDATA[Missing ingredients & steps!]]></string>
+    <string name="you_haven_t_added_any_ingredients_yet">You haven\'t added any ingredients yet.</string>
+    <string name="you_re_missing_some_recipe_steps">You\'re missing some recipe steps.</string>
+    <string name="let_s_create_recipes">Let\'s create recipes!</string>
 </resources>

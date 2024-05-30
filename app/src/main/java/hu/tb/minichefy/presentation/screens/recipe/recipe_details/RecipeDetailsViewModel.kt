@@ -5,14 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.R
+import hu.tb.minichefy.di.DISH_TAG_ID
+import hu.tb.minichefy.domain.exceptions.NotCompatibleCalculation
 import hu.tb.minichefy.domain.model.recipe.Recipe
+import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.domain.model.storage.entity.DISH_TAG_ID
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.CalculateMeasurements
 import hu.tb.minichefy.domain.use_case.CalculationFood
-import hu.tb.minichefy.domain.use_case.DataStoreManager
+import hu.tb.minichefy.presentation.util.DataStoreManager
 import hu.tb.minichefy.presentation.screens.recipe.recipe_details.navigation.RECIPE_ID_ARGUMENT_KEY
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,30 +50,35 @@ class RecipeDetailsViewModel @Inject constructor(
     )
 
     sealed class UiEvent {
-        data class ShowSnackBar(val message: Int) : UiEvent()
+        data class ShowSnackBar(val messageResource: Int, val argument: String? = null) : UiEvent()
     }
 
-    sealed class OnEvent {
-        data object MakeRecipe : OnEvent()
-        data class ShouldDialogAppear(val isDialogNeverShow: Boolean) : OnEvent()
+    sealed class OnAction {
+        data object MakeRecipe : OnAction()
+        data class ShouldDialogAppear(val isDialogNeverShow: Boolean) : OnAction()
     }
 
-    fun onAction(event: OnEvent) {
+    fun onAction(event: OnAction) {
         when (event) {
-            is OnEvent.MakeRecipe -> {
+            is OnAction.MakeRecipe -> {
                 viewModelScope.launch {
                     try {
                         modifyStorageFoodBasedOnIngredients()
                         addRecipeToStorage()
-                        _uiEvent.send(UiEvent.ShowSnackBar(message = R.string.dish_added_to_storage))
-                    } catch (e: IllegalArgumentException) {
-                        _uiEvent.send(UiEvent.ShowSnackBar(message = R.string.can_not_make_the_meal_incompatible_ingredient_s))
+                        _uiEvent.send(UiEvent.ShowSnackBar(messageResource = R.string.dish_added_to_storage))
+                    } catch (e: NotCompatibleCalculation) {
+                        _uiEvent.send(
+                            UiEvent.ShowSnackBar(
+                                messageResource = R.string.can_not_make_the_meal_incompatible_ingredient_s,
+                                argument = e.argument
+                            )
+                        )
                         return@launch
                     }
                 }
             }
 
-            is OnEvent.ShouldDialogAppear -> if (event.isDialogNeverShow) {
+            is OnAction.ShouldDialogAppear -> if (event.isDialogNeverShow) {
                 viewModelScope.launch {
                     dataStoreManager.setNeverShowDialogInDetailsScreen()
                 }
@@ -120,10 +127,9 @@ class RecipeDetailsViewModel @Inject constructor(
 
         val savedDishId = storageRepository.saveOrModifyFood(
             id = result?.id,
-            icon = uiState.value.recipe!!.icon,
+            icon = uiState.value.recipe!!.icon.resource.toString(),
             title = uiState.value.recipe!!.title,
-            quantity = uiState.value.recipe!!.quantity + (result?.quantity
-                ?: 0f),
+            quantity = uiState.value.recipe!!.quantity + (result?.quantity ?: 0f),
             unitOfMeasurement = UnitOfMeasurement.PIECE,
         )
 
@@ -132,25 +138,39 @@ class RecipeDetailsViewModel @Inject constructor(
     }
 
     private suspend fun modifyStorageFoodBasedOnIngredients() {
-        uiState.value.recipe!!.ingredientList.forEach { food ->
-            val storageFood = storageRepository.searchKnownFoodByTitle(food.title)
-            if (storageFood.isNotEmpty()) {
-                val result = calculateMeasurements.simpleProductCalculations(
-                    productBase = CalculationFood(
-                        storageFood.first().quantity,
-                        storageFood.first().unitOfMeasurement
-                    ),
-                    productChanger = CalculationFood(food.quantity * (-1), food.unitOfMeasurement)
-                )
+        val validCalculationFoodList = mutableListOf<Food>()
 
-                storageRepository.saveOrModifyFood(
-                    id = storageFood.first().id,
-                    title = storageFood.first().title,
-                    icon = storageFood.first().icon,
-                    quantity = result.quantity,
-                    unitOfMeasurement = result.unitOfMeasurement
-                )
+        uiState.value.recipe!!.ingredientList.forEach { food ->
+            val storageFood = storageRepository.searchFoodByTitle(food.title).firstOrNull()
+            if (storageFood != null) {
+                val result = try {
+                    calculateMeasurements.simpleProductCalculations(
+                        productBase = CalculationFood(
+                            storageFood.quantity,
+                            storageFood.unitOfMeasurement
+                        ),
+                        productChanger = CalculationFood(
+                            food.quantity * (-1),
+                            food.unitOfMeasurement
+                        )
+                    )
+                } catch (e: NotCompatibleCalculation) {
+                    throw NotCompatibleCalculation(message = e.message, argument = food.title)
+                }
+
+                validCalculationFoodList.add(storageFood.copy(quantity = result.quantity,
+                    unitOfMeasurement = result.unitOfMeasurement))
             }
+        }
+
+        validCalculationFoodList.forEach { food: Food ->
+            storageRepository.saveOrModifyFood(
+                id = food.id,
+                title = food.title,
+                icon = food.icon.resource.toString(),
+                quantity = food.quantity,
+                unitOfMeasurement = food.unitOfMeasurement
+            )
         }
     }
 }

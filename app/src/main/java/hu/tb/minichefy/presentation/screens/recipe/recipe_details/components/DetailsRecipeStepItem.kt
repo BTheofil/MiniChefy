@@ -26,7 +26,7 @@ fun DetailsRecipeStepItem(
         Text(
             text = stepTextDescription,
             color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.titleLarge
         )
     }
 }

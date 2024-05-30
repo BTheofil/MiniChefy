@@ -11,24 +11,20 @@ interface StorageRepository {
     //food
     fun getKnownFoodsFlow(): Flow<List<Food>>
 
-    suspend fun getStorageFoodSummary(): List<FoodSummary>
+    suspend fun getStorageIngredients(): List<FoodSummary>
 
     suspend fun getKnownFoodList(): List<Food>
 
     suspend fun searchFoodByTitle(title: String): List<Food>
 
-    suspend fun searchFoodSummaryLikelyByTitle(searchText: String): List<FoodSummary>
+    suspend fun searchIngredientsByLikelyTitle(searchText: String): List<FoodSummary>
 
     suspend fun searchFoodsByTag(tagIds: List<Long>): List<Food>
-
-    suspend fun searchKnownFoodByTitle(title: String): List<Food>
-
-    suspend fun searchKnownFoodLikelyByTitle(title: String): List<Food>
 
     suspend fun saveOrModifyFood(
         id: Long? = null,
         title: String,
-        icon: Int,
+        icon: String,
         quantity: Float,
         unitOfMeasurement: UnitOfMeasurement
     ): Long
@@ -42,9 +38,7 @@ interface StorageRepository {
     suspend fun deleteFoodById(id: Long): Int
 
     //tag
-    fun getAllFoodTag(): Flow<List<FoodTag>>
-
-    suspend fun getFilterableTagList(): List<FoodTag>
+    fun getFoodTagFlow(): Flow<List<FoodTag>>
 
     suspend fun getTagById(id: Long): FoodTag
 

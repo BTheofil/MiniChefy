@@ -1,10 +1,11 @@
 package hu.tb.minichefy.presentation.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import hu.tb.minichefy.domain.model.IconResource
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.presentation.screens.manager.icons.IconManager
+import hu.tb.minichefy.presentation.util.icons.IconManager
 
 class FoodPreviewParameterProvider : PreviewParameterProvider<List<Food>> {
 
@@ -18,7 +19,7 @@ object MockFoodDomain {
     val mockFoodLists = listOf(
         Food(
             id = 0,
-            icon = IconManager().getRandomFood().resource,
+            icon = IconResource.DrawableIconImpl(resource = IconManager().getRandomFood().resource),
             title = "Apple",
             quantity = 3f,
             unitOfMeasurement = UnitOfMeasurement.PIECE,
@@ -28,7 +29,7 @@ object MockFoodDomain {
         ),
         Food(
             id = 1,
-            icon = IconManager().getRandomFood().resource,
+            icon = IconResource.DrawableIconImpl(resource = IconManager().getRandomFood().resource),
             title = "Milk",
             quantity = 1f,
             unitOfMeasurement = UnitOfMeasurement.L,
@@ -39,7 +40,7 @@ object MockFoodDomain {
         ),
         Food(
             id = 2,
-            icon = IconManager().getRandomFood().resource,
+            icon = IconResource.DrawableIconImpl(resource = IconManager().getRandomFood().resource),
             title = "Carrot",
             quantity = 2f,
             unitOfMeasurement = UnitOfMeasurement.KG,

@@ -2,7 +2,9 @@ package hu.tb.minichefy.data.repository
 
 import hu.tb.minichefy.data.data_source.dao.StorageDAO
 import hu.tb.minichefy.data.mapper.FoodEntityToFood
+import hu.tb.minichefy.data.mapper.SimpleFoodEntityToFoodSummery
 import hu.tb.minichefy.data.mapper.TagEntityToTag
+import hu.tb.minichefy.di.DISH_TAG_ID
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.FoodTag
@@ -20,7 +22,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
 
     //food
     override fun getKnownFoodsFlow(): Flow<List<Food>> {
-        val entities = dao.getKnownFoodsFlow()
+        val entities = dao.getFoodWithTagsFlow()
         return entities.map {
             it.map { foodWithTags ->
                 FoodEntityToFood().map(foodWithTags)
@@ -28,37 +30,31 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getStorageFoodSummary(): List<FoodSummary> {
-        val entities = dao.getAllStorageFoodName()
-        return entities.map {
-            FoodSummary(
-                id = it.foodId,
-                title = it.title,
-            )
-        }.sortedBy { it.title }
-    }
-
     override suspend fun getKnownFoodList(): List<Food> {
-        val entities = dao.getKnownFoodsList()
+        val entities = dao.getFoodWithTagsList()
         return entities.map {
             FoodEntityToFood().map(it)
         }
     }
 
-    override suspend fun searchFoodByTitle(title: String): List<Food>  {
+    override suspend fun getStorageIngredients(): List<FoodSummary> {
+        val entities = dao.getSimpleFoodExcludedTag(DISH_TAG_ID.toLong())
+        return entities.map {
+            SimpleFoodEntityToFoodSummery().map(it)
+        }.sortedBy { it.title }
+    }
+
+    override suspend fun searchFoodByTitle(title: String): List<Food> {
         val entities = dao.searchFoodByTitle(title)
         return entities.map {
             FoodEntityToFood().map(it)
         }
     }
 
-    override suspend fun searchFoodSummaryLikelyByTitle(searchText: String): List<FoodSummary> {
-        val products = dao.searchSimpleFoodsByTitle("%$searchText%")
-        return products.map {
-            FoodSummary(
-                id = it.foodId,
-                title = it.title,
-            )
+    override suspend fun searchIngredientsByLikelyTitle(searchText: String): List<FoodSummary> {
+        val entities = dao.searchSimpleFoodsByTitle("%$searchText%", DISH_TAG_ID.toLong())
+        return entities.map {
+            SimpleFoodEntityToFoodSummery().map(it)
         }.sortedBy { it.title }
     }
 
@@ -69,31 +65,17 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchKnownFoodByTitle(title: String): List<Food> {
-        val entities = dao.searchKnownFoodByTitle(title)
-        return entities.map {
-            FoodEntityToFood().map(it)
-        }
-    }
-
-    override suspend fun searchKnownFoodLikelyByTitle(title: String): List<Food> {
-        val entities = dao.searchKnownFoodByTitle("%$title%")
-        return entities.map {
-            FoodEntityToFood().map(it)
-        }
-    }
-
     override suspend fun saveOrModifyFood(
         id: Long?,
         title: String,
-        icon: Int,
+        icon: String,
         quantity: Float,
         unitOfMeasurement: UnitOfMeasurement
     ): Long {
         val temp = FoodEntity(
             foodId = id,
             title = title,
-            icon = icon,
+            image = icon,
             quantity = quantity,
             unitOfMeasurement = unitOfMeasurement
         )
@@ -114,7 +96,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         dao.deleteFoodEntity(id)
 
     //tag
-    override fun getAllFoodTag(): Flow<List<FoodTag>> {
+    override fun getFoodTagFlow(): Flow<List<FoodTag>> {
         val tagEntities = dao.getAllFoodTagFlow()
         return tagEntities.map { entities ->
             entities.map {
@@ -122,11 +104,6 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
             }
         }
     }
-
-    override suspend fun getFilterableTagList(): List<FoodTag> =
-        dao.getTagsExceptUnknown().map {
-            TagEntityToTag().map(it)
-        }
 
     override suspend fun getTagById(id: Long): FoodTag {
         val tagEntity = dao.getTagById(id)

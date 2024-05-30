@@ -1,15 +1,19 @@
 package hu.tb.minichefy.domain.use_case
 
-class ValidateCountInteger {
+data class Validators(
+    val validateQuantity: ValidateQuantity,
+    val validateNumberKeyboard: ValidateNumberKeyboard,
+    val validateTextField: ValidateTextField
+)
+
+class ValidateQuantity {
     operator fun invoke(integer: Int): ValidationResult =
         if (integer <= 0) {
             ValidationResult.ERROR
         } else {
             ValidationResult.SUCCESS
         }
-}
 
-class ValidateQuantity {
     operator fun invoke(float: Float): ValidationResult =
         if (float.isNaN() || float <= 0f) {
             ValidationResult.ERROR

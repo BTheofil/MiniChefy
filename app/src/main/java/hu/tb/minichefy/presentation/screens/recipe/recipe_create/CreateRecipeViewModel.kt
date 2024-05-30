@@ -1,8 +1,10 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import hu.tb.minichefy.R
 import hu.tb.minichefy.domain.model.recipe.RecipeIngredient
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
 import hu.tb.minichefy.domain.model.recipe.TimeUnit
@@ -10,13 +12,12 @@ import hu.tb.minichefy.domain.model.storage.FoodSummary
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
 import hu.tb.minichefy.domain.repository.RecipeRepository
 import hu.tb.minichefy.domain.repository.StorageRepository
-import hu.tb.minichefy.domain.use_case.ValidateCountInteger
-import hu.tb.minichefy.domain.use_case.ValidateNumberKeyboard
-import hu.tb.minichefy.domain.use_case.ValidateQuantity
-import hu.tb.minichefy.domain.use_case.ValidateTextField
 import hu.tb.minichefy.domain.use_case.ValidationResult
-import hu.tb.minichefy.presentation.screens.manager.icons.MealIcon
+import hu.tb.minichefy.domain.use_case.Validators
+import hu.tb.minichefy.presentation.util.icons.MealIcon
 import hu.tb.minichefy.presentation.ui.theme.SEARCH_BAR_WAIT_AFTER_CHARACTER
+import hu.tb.minichefy.domain.model.IconResource
+import hu.tb.minichefy.presentation.screens.recipe.recipe_create.navigation.EDIT_RECIPE_ARGUMENT_KEY
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,12 +30,10 @@ import kotlin.random.Random
 
 @HiltViewModel
 class CreateRecipeViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val recipeRepository: RecipeRepository,
     private val storageRepository: StorageRepository,
-    private val validateCountInteger: ValidateCountInteger,
-    private val validateQuantity: ValidateQuantity,
-    private val validateTextField: ValidateTextField,
-    private val validateNumberKeyboard: ValidateNumberKeyboard
+    private val validators: Validators,
 ) : ViewModel() {
 
     private val _basicPageState = MutableStateFlow(Pages.BasicInformationPage())
@@ -52,11 +51,14 @@ class CreateRecipeViewModel @Inject constructor(
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
+    private var editRecipeId: Long? = null
+
     init {
+        loadEditRecipe()
         viewModelScope.launch {
             _ingredientsPageState.update { ingredientsPage ->
                 ingredientsPage.copy(
-                    unSelectedIngredientList = storageRepository.getStorageFoodSummary()
+                    unSelectedIngredientList = storageRepository.getStorageIngredients()
                 )
             }
         }
@@ -77,7 +79,7 @@ class CreateRecipeViewModel @Inject constructor(
             val quantityCounter: Int = 1,
             val isQuantityHasError: Boolean = false,
             val defaultIconCollection: List<MealIcon> = MealIcon.entries,
-            val selectedMealIcon: MealIcon = MealIcon.entries[Random.nextInt(
+            val selectedRecipeIcon: IconResource = MealIcon.entries[Random.nextInt(
                 0,
                 defaultIconCollection.size
             )],
@@ -105,6 +107,7 @@ class CreateRecipeViewModel @Inject constructor(
 
     sealed class UiEvent {
         data object RecipeSaved : UiEvent()
+        data class EmptyStepField(val messageResource: Int) : UiEvent()
         data class ErrorInRecipeFields(
             val isIngredientHasError: Boolean,
             val isStepsHasError: Boolean
@@ -114,7 +117,7 @@ class CreateRecipeViewModel @Inject constructor(
     sealed class OnBasicInformationPageEvent {
         data class OnQuantityChange(val value: Int) : OnBasicInformationPageEvent()
         data class OnRecipeTitleChange(val text: String) : OnBasicInformationPageEvent()
-        data class OnSelectedIconChange(val icon: MealIcon) : OnBasicInformationPageEvent()
+        data class OnSelectedIconChange(val icon: IconResource) : OnBasicInformationPageEvent()
         data class OnTimeChange(val text: String) : OnBasicInformationPageEvent()
         data class OnTimeUnitChange(val unit: TimeUnit) : OnBasicInformationPageEvent()
     }
@@ -125,6 +128,11 @@ class CreateRecipeViewModel @Inject constructor(
         data class OnIngredientQuantityChange(val quantityString: String) : OnIngredientEvent()
         data class OnIngredientUnitOfMeasurementChange(val unitOfMeasurement: UnitOfMeasurement) :
             OnIngredientEvent()
+
+        data class OnPreMadeIngredientClick(
+            val title: String,
+            val unitOfMeasurement: UnitOfMeasurement
+        ) : OnIngredientEvent()
 
         data class IngredientRemove(val itemPos: Int) : OnIngredientEvent()
         data object IngredientAdd : OnIngredientEvent()
@@ -142,7 +150,7 @@ class CreateRecipeViewModel @Inject constructor(
     fun onBasicInformationPageEvent(event: OnBasicInformationPageEvent) {
         when (event) {
             is OnBasicInformationPageEvent.OnQuantityChange -> {
-                when (validateCountInteger((basicPageState.value.quantityCounter + event.value))) {
+                when (validators.validateQuantity((basicPageState.value.quantityCounter + event.value))) {
                     ValidationResult.SUCCESS -> _basicPageState.update {
                         it.copy(
                             quantityCounter = it.quantityCounter + event.value,
@@ -161,11 +169,11 @@ class CreateRecipeViewModel @Inject constructor(
             }
 
             is OnBasicInformationPageEvent.OnSelectedIconChange -> _basicPageState.update {
-                it.copy(selectedMealIcon = event.icon)
+                it.copy(selectedRecipeIcon = event.icon)
             }
 
             is OnBasicInformationPageEvent.OnTimeChange -> {
-                if (validateNumberKeyboard(event.text) == ValidationResult.ERROR) return
+                if (validators.validateNumberKeyboard(event.text) == ValidationResult.ERROR) return
                 _basicPageState.update {
                     it.copy(timeField = event.text)
                 }
@@ -180,7 +188,7 @@ class CreateRecipeViewModel @Inject constructor(
     fun onIngredientPageEvent(event: OnIngredientEvent) {
         when (event) {
             OnIngredientEvent.IngredientAdd -> {
-                if(checkAddedIngredientValid()){
+                if (checkAddedIngredientValid()) {
                     return
                 }
 
@@ -205,6 +213,15 @@ class CreateRecipeViewModel @Inject constructor(
                 )
             }
 
+            is OnIngredientEvent.OnPreMadeIngredientClick -> {
+                _ingredientsPageState.update {
+                    it.copy(
+                        ingredientTitleDraft = event.title,
+                        ingredientUnitOfMeasurementDraft = event.unitOfMeasurement
+                    )
+                }
+            }
+
             is OnIngredientEvent.IngredientRemove -> {
                 val updatedList = ingredientsPageState.value.selectedIngredientList.toMutableList()
                 updatedList.removeAt(event.itemPos)
@@ -224,7 +241,7 @@ class CreateRecipeViewModel @Inject constructor(
 
                     _ingredientsPageState.update { ingredientsPage ->
                         ingredientsPage.copy(
-                            unSelectedIngredientList = storageRepository.searchFoodSummaryLikelyByTitle(
+                            unSelectedIngredientList = storageRepository.searchIngredientsByLikelyTitle(
                                 event.text
                             )
                         )
@@ -233,7 +250,7 @@ class CreateRecipeViewModel @Inject constructor(
             }
 
             is OnIngredientEvent.OnIngredientQuantityChange -> {
-                if (validateNumberKeyboard(event.quantityString) == ValidationResult.ERROR) return
+                if (validators.validateNumberKeyboard(event.quantityString) == ValidationResult.ERROR) return
                 _ingredientsPageState.update {
                     it.copy(
                         ingredientQuantityDraft = event.quantityString
@@ -287,6 +304,19 @@ class CreateRecipeViewModel @Inject constructor(
             }
 
             is OnStepsPageEvent.OnAddRecipeStepToList -> {
+                stepsPageState.value.recipeSteps.forEach {
+                    if (validators.validateTextField(it.step) == ValidationResult.ERROR) {
+                        viewModelScope.launch {
+                            _uiEvent.send(
+                                UiEvent.EmptyStepField(
+                                    messageResource = R.string.one_or_more_step_fields_are_empty
+                                )
+                            )
+                        }
+                        return
+                    }
+                }
+
                 val recipeStepsPlusEmptyField =
                     stepsPageState.value.recipeSteps.toMutableList().apply {
                         add(RecipeStep(step = ""))
@@ -314,9 +344,42 @@ class CreateRecipeViewModel @Inject constructor(
         }
     }
 
+    private fun loadEditRecipe() {
+        try {
+            val recipeId: String = checkNotNull(savedStateHandle[EDIT_RECIPE_ARGUMENT_KEY])
+            editRecipeId = recipeId.toLong()
+            viewModelScope.launch {
+                val recipe = recipeRepository.getRecipeById(editRecipeId!!)
+
+                _basicPageState.update {
+                    it.copy(
+                        recipeTitle = recipe.title,
+                        quantityCounter = recipe.quantity,
+                        selectedRecipeIcon = recipe.icon,
+                        timeField = recipe.timeToCreate.toString(),
+                        timeUnit = recipe.timeUnit
+                    )
+                }
+
+                _ingredientsPageState.update {
+                    it.copy(
+                        selectedIngredientList = recipe.ingredientList,
+                    )
+                }
+
+                _stepsPageState.update { it.copy(
+                    recipeSteps = recipe.howToSteps
+                ) }
+            }
+        } catch (_: IllegalStateException){
+            //not came for edit recipe click
+        }
+    }
+
     private suspend fun saveRecipe(): Long =
         recipeRepository.saveRecipe(
-            icon = basicPageState.value.selectedMealIcon.resource,
+            id = editRecipeId,
+            icon = basicPageState.value.selectedRecipeIcon.resource.toString(),
             title = basicPageState.value.recipeTitle,
             quantity = basicPageState.value.quantityCounter,
             timeToCreate = basicPageState.value.timeField.toInt(),
@@ -331,15 +394,14 @@ class CreateRecipeViewModel @Inject constructor(
     private suspend fun saveSteps(recipeId: Long) =
         stepsPageState.value.recipeSteps.forEach { step ->
             recipeRepository.saveStep(step, recipeId)
-            //Log.i("CreateRecipeVM", "StepId: $stepId")
         }
 
     private fun checkRecipeValid(): Boolean {
-        val titleResult = validateTextField(basicPageState.value.recipeTitle)
+        val titleResult = validators.validateTextField(basicPageState.value.recipeTitle)
         val quantityCounterResult =
-            validateCountInteger(basicPageState.value.quantityCounter)
+            validators.validateQuantity(basicPageState.value.quantityCounter)
         val timeResult = try {
-            validateCountInteger(basicPageState.value.timeField.toInt())
+            validators.validateQuantity(basicPageState.value.timeField.toInt())
         } catch (e: Exception) {
             ValidationResult.ERROR
         }
@@ -383,9 +445,9 @@ class CreateRecipeViewModel @Inject constructor(
         val currentState = ingredientsPageState.value
 
         val titleResult =
-            validateTextField(currentState.ingredientTitleDraft)
+            validators.validateTextField(currentState.ingredientTitleDraft)
         val quantityResult = try {
-            validateQuantity(currentState.ingredientQuantityDraft.toFloat())
+            validators.validateQuantity(currentState.ingredientQuantityDraft.toFloat())
         } catch (e: Exception) {
             ValidationResult.ERROR
         }

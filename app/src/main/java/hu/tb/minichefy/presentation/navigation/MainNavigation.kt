@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import hu.tb.minichefy.presentation.screens.recipe.navigation.RECIPE_GRAPH
 import hu.tb.minichefy.presentation.screens.recipe.navigation.recipeNestedGraph
-import hu.tb.minichefy.presentation.screens.storage.navigation.STORAGE_GRAPH
+import hu.tb.minichefy.presentation.screens.settings.navigation.settingsNavigation
 import hu.tb.minichefy.presentation.screens.storage.navigation.storageNestedGraph
 
 @Composable
@@ -17,5 +17,7 @@ fun MainNavigation(
         storageNestedGraph(navController)
 
         recipeNestedGraph(navController)
+
+        settingsNavigation(navController)
     }
 }

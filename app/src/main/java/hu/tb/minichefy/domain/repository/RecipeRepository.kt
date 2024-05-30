@@ -1,5 +1,9 @@
 package hu.tb.minichefy.domain.repository
 
+import hu.tb.minichefy.data.data_source.dao.DeletedRecipeCount
+import hu.tb.minichefy.data.data_source.dao.IngredientId
+import hu.tb.minichefy.data.data_source.dao.RecipeId
+import hu.tb.minichefy.data.data_source.dao.StepId
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeIngredient
 import hu.tb.minichefy.domain.model.recipe.RecipeStep
@@ -14,21 +18,21 @@ interface RecipeRepository {
 
     suspend fun saveRecipe(
         id: Long? = null,
-        icon: Int,
+        icon: String,
         title: String,
         quantity: Int,
         timeToCreate: Int,
         timeUnit: TimeUnit,
-    ): Long
+    ): RecipeId
 
-    suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long
+    suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): StepId
 
     suspend fun saveIngredient(
         ingredient: RecipeIngredient,
         recipeEntityId: Long
-    ): Long
+    ): IngredientId
 
     suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe>
 
-    suspend fun deleteRecipe(id: Long): Int
+    suspend fun deleteRecipe(id: Long): DeletedRecipeCount
 }

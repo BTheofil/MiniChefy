@@ -11,6 +11,11 @@ import hu.tb.minichefy.domain.model.recipe.entity.RecipeIngredientEntity
 import hu.tb.minichefy.domain.model.recipe.entity.RecipeStepEntity
 import kotlinx.coroutines.flow.Flow
 
+typealias RecipeId = Long
+typealias StepId = Long
+typealias IngredientId = Long
+typealias DeletedRecipeCount = Int
+
 @Dao
 interface RecipeDAO {
 
@@ -27,15 +32,15 @@ interface RecipeDAO {
     suspend fun searchRecipeByTitle(searchTitle: String): List<RecipeBlock>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRecipeEntity(recipeEntity: RecipeEntity): Long
+    suspend fun insertRecipeEntity(recipeEntity: RecipeEntity): RecipeId
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertStepEntity(stepEntity: RecipeStepEntity): Long
+    suspend fun insertStepEntity(stepEntity: RecipeStepEntity): StepId
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertIngredientEntity(ingredientEntity: RecipeIngredientEntity): Long
+    suspend fun insertIngredientEntity(ingredientEntity: RecipeIngredientEntity): IngredientId
 
     @Transaction
     @Query("DELETE FROM RecipeEntity WHERE recipeId = :id")
-    suspend fun deleteRecipe(id: Long): Int
+    suspend fun deleteRecipe(id: Long): DeletedRecipeCount
 }

@@ -39,7 +39,7 @@ import hu.tb.minichefy.presentation.screens.components.CircleImage
 import hu.tb.minichefy.presentation.screens.components.IconSelectorSheet
 import hu.tb.minichefy.presentation.screens.components.QuantityAndMeasurementRow
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
-import hu.tb.minichefy.presentation.screens.manager.icons.FoodIcon
+import hu.tb.minichefy.presentation.util.icons.FoodIcon
 import hu.tb.minichefy.presentation.screens.storage.components.ProductTagSelectorDialog
 import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
@@ -84,7 +84,7 @@ fun StorageCreateContent(
             .clickableWithoutRipple { focusManager.clearFocus() }
     ) {
         CircleImage(
-            image = uiState.selectedFoodIcon.resource,
+            image = uiState.selectedFoodIcon,
             onClick = { showIconPicker = true }
         )
 

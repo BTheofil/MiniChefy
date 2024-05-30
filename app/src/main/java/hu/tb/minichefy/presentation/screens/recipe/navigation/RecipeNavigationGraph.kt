@@ -23,6 +23,9 @@ fun NavGraphBuilder.recipeNestedGraph(navController: NavController){
             navigateToCreateRecipe = navController::navigateToCreateRecipe,
             navigateToRecipeDetails = navController::navigateToRecipeDetails
         )
-        recipeDetailsNavigation()
+        recipeDetailsNavigation(
+            navigateBack = { navController.popBackStack() },
+            navigateToEdit = { navController.navigateToCreateRecipe(it) }
+        )
     }
 }
