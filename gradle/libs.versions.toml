@@ -18,12 +18,11 @@ lifecycleRuntimeKtx = "2.7.0"
 lottieCompose = "6.4.0"
 material3 = "1.2.1"
 navigationCompose = "2.7.7"
-roomRuntime = "2.6.1"
-roomKtx = "2.6.1"
-roomCompiler = "2.6.1"
+roomKtx = "2.5.0"
+roomCompiler = "2.5.0"
 ui = "1.6.6"
 uiToolingPreview = "1.6.6"
-androidGradlePlugin = "8.3.2"
+androidGradlePlugin = "8.4.1"
 jetbrainKotlinPlugin = "1.9.24"
 googleDaggerHiltPlugin = "2.51.1"
 googleDevtoolsKspPlugin = "1.9.20-1.0.14"
@@ -53,7 +52,6 @@ androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }

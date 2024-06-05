@@ -54,13 +54,9 @@ class CreateRecipeViewModel @Inject constructor(
     private var editRecipeId: Long? = null
 
     init {
-        loadEditRecipe()
         viewModelScope.launch {
-            _ingredientsPageState.update { ingredientsPage ->
-                ingredientsPage.copy(
-                    unSelectedIngredientList = storageRepository.getStorageIngredients()
-                )
-            }
+            loadEditRecipe()
+            loadIngredients()
         }
     }
 
@@ -344,35 +340,46 @@ class CreateRecipeViewModel @Inject constructor(
         }
     }
 
-    private fun loadEditRecipe() {
+    private suspend fun loadEditRecipe() {
         try {
             val recipeId: String = checkNotNull(savedStateHandle[EDIT_RECIPE_ARGUMENT_KEY])
             editRecipeId = recipeId.toLong()
-            viewModelScope.launch {
-                val recipe = recipeRepository.getRecipeById(editRecipeId!!)
 
-                _basicPageState.update {
-                    it.copy(
-                        recipeTitle = recipe.title,
-                        quantityCounter = recipe.quantity,
-                        selectedRecipeIcon = recipe.icon,
-                        timeField = recipe.timeToCreate.toString(),
-                        timeUnit = recipe.timeUnit
-                    )
-                }
+            val recipe = recipeRepository.getRecipeById(editRecipeId!!)
 
-                _ingredientsPageState.update {
-                    it.copy(
-                        selectedIngredientList = recipe.ingredientList,
-                    )
-                }
-
-                _stepsPageState.update { it.copy(
-                    recipeSteps = recipe.howToSteps
-                ) }
+            _basicPageState.update {
+                it.copy(
+                    recipeTitle = recipe.title,
+                    quantityCounter = recipe.quantity,
+                    selectedRecipeIcon = recipe.icon,
+                    timeField = recipe.timeToCreate.toString(),
+                    timeUnit = recipe.timeUnit
+                )
             }
-        } catch (_: IllegalStateException){
+
+            _ingredientsPageState.update {
+                it.copy(
+                    selectedIngredientList = recipe.ingredientList,
+                )
+            }
+
+            _stepsPageState.update {
+                it.copy(
+                    recipeSteps = recipe.howToSteps
+                )
+            }
+
+        } catch (_: IllegalStateException) {
             //not came for edit recipe click
+        }
+    }
+
+    private suspend fun loadIngredients() {
+        val ingredientSummaryList = storageRepository.getStorageIngredients()
+        _ingredientsPageState.update { ingredientsPage ->
+            ingredientsPage.copy(
+                unSelectedIngredientList = ingredientSummaryList
+            )
         }
     }
 

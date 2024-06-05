@@ -29,7 +29,7 @@ interface RecipeDAO {
 
     @Transaction
     @Query("SELECT * FROM RecipeEntity WHERE title LIKE :searchTitle")
-    fun getRecipeByTitle(searchTitle: String): List<RecipeBlock>
+    suspend fun getRecipeByTitle(searchTitle: String): List<RecipeBlock>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRecipeEntity(recipeEntity: RecipeEntity): RecipeId
