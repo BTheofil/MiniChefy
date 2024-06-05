@@ -32,7 +32,7 @@ interface RecipeRepository {
         recipeEntityId: Long
     ): IngredientId
 
-    suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe>
+    suspend fun searchRecipeTitle(text: String): List<Recipe>
 
     suspend fun deleteRecipe(id: Long): DeletedRecipeCount
 }

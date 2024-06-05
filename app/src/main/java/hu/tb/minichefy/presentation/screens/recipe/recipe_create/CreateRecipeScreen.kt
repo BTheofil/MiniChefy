@@ -1,6 +1,7 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -30,6 +31,7 @@ private const val BASIC_INFORMATION_PAGE_INDEX = 0
 private const val INGREDIENTS_PAGE_INDEX = 1
 private const val RECIPE_STEPS_PAGE_INDEX = 2
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CreateRecipeScreen(
     viewModel: CreateRecipeViewModel = hiltViewModel(),
@@ -100,7 +102,7 @@ fun CreateRecipeScreen(
             modifier = Modifier
                 .padding(paddingValues),
             state = pager,
-            beyondViewportPageCount = uiState.pages.size
+            beyondBoundsPageCount = uiState.pages.size,
         ) { pageIndex ->
             when (uiState.pages[pageIndex]) {
                 is CreateRecipeViewModel.Pages.BasicInformationPage ->

@@ -60,8 +60,8 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
     ): IngredientId =
         dao.insertIngredientEntity(ingredient.toIngredientEntity(recipeEntityId))
 
-    override suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe> {
-        val recipes = dao.searchRecipeByTitle("%$searchTitle%")
+    override suspend fun searchRecipeTitle(text: String): List<Recipe> {
+        val recipes = dao.getRecipeByTitle("%$text%")
         return recipes.map {
             RecipeEntityToRecipe().map(it)
         }

@@ -1,6 +1,7 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create.components.steps
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Transition
@@ -49,6 +50,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import hu.tb.minichefy.presentation.screens.components.extensions.clickableWithoutRipple
 
+@OptIn(ExperimentalTransitionApi::class)
 @Composable
 fun RecipeStepItem(
     modifier: Modifier = Modifier,

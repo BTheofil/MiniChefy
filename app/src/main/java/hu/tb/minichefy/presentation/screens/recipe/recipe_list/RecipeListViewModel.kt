@@ -66,7 +66,7 @@ class RecipeListViewModel @Inject constructor(
 
                     _uiState.update {
                         it.copy(
-                            recipeList = repository.searchRecipeByTitle(event.text)
+                            recipeList = repository.searchRecipeTitle(event.text)
                         )
                     }
                 }
