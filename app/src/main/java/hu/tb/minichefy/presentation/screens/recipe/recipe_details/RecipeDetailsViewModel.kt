@@ -19,6 +19,7 @@ import hu.tb.minichefy.presentation.screens.recipe.recipe_details.navigation.REC
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -89,7 +90,7 @@ class RecipeDetailsViewModel @Inject constructor(
     private fun loadRecipe() {
         val recipeId: String = checkNotNull(savedStateHandle[RECIPE_ID_ARGUMENT_KEY])
         viewModelScope.launch {
-            val recipe = recipeRepository.getRecipeById(recipeId.toLong())
+            val recipe = recipeRepository.getRecipeById(recipeId.toLong()).first()
 
             _uiState.update {
                 it.copy(
@@ -114,7 +115,7 @@ class RecipeDetailsViewModel @Inject constructor(
 
     private suspend fun addRecipeToStorage() {
         val recipeInStorageMultipleNames =
-            storageRepository.searchFoodByTitle(uiState.value.recipe!!.title)
+            storageRepository.searchFoodByTitle(uiState.value.recipe!!.title).first()
 
         val result = if (recipeInStorageMultipleNames.isNotEmpty()) {
             recipeInStorageMultipleNames.first {
@@ -134,14 +135,14 @@ class RecipeDetailsViewModel @Inject constructor(
         )
 
         val dishTag = storageRepository.getTagById(DISH_TAG_ID.toLong())
-        storageRepository.saveFoodAndTag(savedDishId, dishTag.id!!)
+        storageRepository.saveFoodAndTagConnection(savedDishId, dishTag.id!!)
     }
 
     private suspend fun modifyStorageFoodBasedOnIngredients() {
         val validCalculationFoodList = mutableListOf<Food>()
 
         uiState.value.recipe!!.ingredientList.forEach { food ->
-            val storageFood = storageRepository.searchFoodByTitle(food.title).firstOrNull()
+            val storageFood = storageRepository.searchFoodByTitle(food.title).first().firstOrNull()
             if (storageFood != null) {
                 val result = try {
                     calculateMeasurements.simpleProductCalculations(

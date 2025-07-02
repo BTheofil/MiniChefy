@@ -64,10 +64,12 @@ class RecipeListViewModel @Inject constructor(
 
                     delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
 
-                    _uiState.update {
-                        it.copy(
-                            recipeList = repository.searchRecipeTitle(event.text)
-                        )
+                    repository.searchRecipeTitle(event.text).collect { recipeList ->
+                        _uiState.update {
+                            it.copy(
+                                recipeList = recipeList
+                            )
+                        }
                     }
                 }
             }

@@ -102,7 +102,7 @@ fun CreateRecipeScreen(
             modifier = Modifier
                 .padding(paddingValues),
             state = pager,
-            beyondBoundsPageCount = uiState.pages.size,
+            beyondViewportPageCount = uiState.pages.size,
         ) { pageIndex ->
             when (uiState.pages[pageIndex]) {
                 is CreateRecipeViewModel.Pages.BasicInformationPage ->

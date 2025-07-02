@@ -235,13 +235,14 @@ class CreateRecipeViewModel @Inject constructor(
 
                     delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
 
-                    _ingredientsPageState.update { ingredientsPage ->
-                        ingredientsPage.copy(
-                            unSelectedIngredientList = storageRepository.searchIngredientsByLikelyTitle(
-                                event.text
-                            )
-                        )
-                    }
+                    storageRepository.searchIngredientsByLikelyTitle(event.text)
+                        .collect { summayList ->
+                            _ingredientsPageState.update { ingredientsPage ->
+                                ingredientsPage.copy(
+                                    unSelectedIngredientList = summayList
+                                )
+                            }
+                        }
                 }
             }
 
@@ -345,28 +346,28 @@ class CreateRecipeViewModel @Inject constructor(
             val recipeId: String = checkNotNull(savedStateHandle[EDIT_RECIPE_ARGUMENT_KEY])
             editRecipeId = recipeId.toLong()
 
-            val recipe = recipeRepository.getRecipeById(editRecipeId!!)
+            recipeRepository.getRecipeById(editRecipeId!!).collect { recipe ->
+                _basicPageState.update {
+                    it.copy(
+                        recipeTitle = recipe.title,
+                        quantityCounter = recipe.quantity,
+                        selectedRecipeIcon = recipe.icon,
+                        timeField = recipe.timeToCreate.toString(),
+                        timeUnit = recipe.timeUnit
+                    )
+                }
 
-            _basicPageState.update {
-                it.copy(
-                    recipeTitle = recipe.title,
-                    quantityCounter = recipe.quantity,
-                    selectedRecipeIcon = recipe.icon,
-                    timeField = recipe.timeToCreate.toString(),
-                    timeUnit = recipe.timeUnit
-                )
-            }
+                _ingredientsPageState.update {
+                    it.copy(
+                        selectedIngredientList = recipe.ingredientList,
+                    )
+                }
 
-            _ingredientsPageState.update {
-                it.copy(
-                    selectedIngredientList = recipe.ingredientList,
-                )
-            }
-
-            _stepsPageState.update {
-                it.copy(
-                    recipeSteps = recipe.howToSteps
-                )
+                _stepsPageState.update {
+                    it.copy(
+                        recipeSteps = recipe.howToSteps
+                    )
+                }
             }
 
         } catch (_: IllegalStateException) {
@@ -375,11 +376,12 @@ class CreateRecipeViewModel @Inject constructor(
     }
 
     private suspend fun loadIngredients() {
-        val ingredientSummaryList = storageRepository.getStorageIngredients()
-        _ingredientsPageState.update { ingredientsPage ->
-            ingredientsPage.copy(
-                unSelectedIngredientList = ingredientSummaryList
-            )
+        storageRepository.getStorageIngredients().collect { summaryList ->
+            _ingredientsPageState.update { ingredientsPage ->
+                ingredientsPage.copy(
+                    unSelectedIngredientList = summaryList
+                )
+            }
         }
     }
 
