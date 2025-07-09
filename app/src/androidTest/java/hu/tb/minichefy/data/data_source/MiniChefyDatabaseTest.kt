@@ -14,6 +14,7 @@ import hu.tb.minichefy.domain.model.storage.entity.FoodAndTagsCrossRef
 import hu.tb.minichefy.domain.model.storage.entity.FoodEntity
 import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
 import hu.tb.minichefy.domain.model.storage.entity.TagEntity
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -67,7 +68,7 @@ class MiniChefyDatabaseTest {
 
         val recipeId = recipeDao.insertRecipeEntity(recipeEntity)
 
-        val recipeWithSteps = recipeDao.getRecipeById(recipeId)
+        val recipeWithSteps = recipeDao.getRecipeById(recipeId).first()
         assertEquals("Pasta", recipeWithSteps.recipeEntity.title)
     }
 
@@ -83,7 +84,7 @@ class MiniChefyDatabaseTest {
 
         storageDao.insertFoodEntity(foodEntity)
 
-        val foodWithTags = storageDao.searchFoodByTitle("Tomato").first()
+        val foodWithTags = storageDao.searchFoodByTitle("Tomato").first().first()
 
         assertEquals("2", foodWithTags.foodEntity.image)
         assertEquals("Tomato", foodWithTags.foodEntity.title)
@@ -126,7 +127,7 @@ class MiniChefyDatabaseTest {
                 tagId = 1
             )
         )
-        val result2 = storageDao.getFoodWithTagsList()
-        assertEquals(1, result2[0].tags.size)
+        val result2 = storageDao.getAllFoodEntity().first()
+        assertEquals(1, result2[0]. tags.size)
     }
 }

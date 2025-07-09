@@ -40,7 +40,7 @@ object AppModule {
         )
             .build()
 
-        val dbFile = app.applicationContext.getDatabasePath(MiniChefyDatabase.DATABASE_NAME)
+        /*val dbFile = app.applicationContext.getDatabasePath(MiniChefyDatabase.DATABASE_NAME)
         if (!dbFile.exists()) {
             CoroutineScope(Dispatchers.IO).launch {
                 db.storageDao.insertTagEntity(
@@ -53,7 +53,7 @@ object AppModule {
                     TagEntity(tagId = DISH_TAG_ID.toLong(), tag = "dish")
                 )
             }
-        }
+        }*/
 
         return db
     }

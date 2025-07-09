@@ -2,20 +2,21 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrain.kotlin.android)
     alias(libs.plugins.google.dagger.hilt)
-    alias(libs.plugins.google.devtools.ksp)
-    kotlin("kapt")
+    alias(libs.plugins.devtools.ksp)
+    alias(libs.plugins.room)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "hu.tb.minichefy"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "hu.tb.minichefy"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 5
-        versionName = "1.3.0"
+        targetSdk = 36
+        versionCode = 13
+        versionName = "1.3.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -23,17 +24,21 @@ android {
         }
     }
 
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -45,7 +50,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.13"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
     packaging {
         resources {
@@ -76,14 +81,13 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    implementation("com.google.dagger:hilt-android:2.56.2")
+    ksp("com.google.dagger:hilt-android-compiler:2.56.2")
     implementation (libs.androidx.hilt.navigation.compose)
 
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.gson)
+    ksp(libs.room)
+    implementation(libs.room.runtime)
+    implementation(libs.room.coroutines)
 
     implementation(libs.androidx.constraintlayout.compose)
 
@@ -95,8 +99,4 @@ dependencies {
 
     implementation(libs.lottie.compose)
 
-}
-
-kapt {
-    correctErrorTypes = true
 }

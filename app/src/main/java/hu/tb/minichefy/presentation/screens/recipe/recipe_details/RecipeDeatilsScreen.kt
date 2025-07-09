@@ -1,5 +1,6 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_details
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -256,6 +257,7 @@ private fun DetailsTopContent(
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DetailsBottomContent(
     modifier: Modifier = Modifier,

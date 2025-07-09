@@ -9,17 +9,15 @@ import kotlinx.coroutines.flow.Flow
 interface StorageRepository {
 
     //food
-    fun getKnownFoodsFlow(): Flow<List<Food>>
+    fun getAllFood(): Flow<List<Food>>
 
-    suspend fun getStorageIngredients(): List<FoodSummary>
+    fun getStorageIngredients(): Flow<List<FoodSummary>>
 
-    suspend fun getKnownFoodList(): List<Food>
+    fun searchFoodByTitle(title: String): Flow<List<Food>>
 
-    suspend fun searchFoodByTitle(title: String): List<Food>
+    fun searchIngredientsByLikelyTitle(searchText: String): Flow<List<FoodSummary>>
 
-    suspend fun searchIngredientsByLikelyTitle(searchText: String): List<FoodSummary>
-
-    suspend fun searchFoodsByTag(tagIds: List<Long>): List<Food>
+    fun searchFoodsByTag(tagIds: List<Long>): Flow<List<Food>>
 
     suspend fun saveOrModifyFood(
         id: Long? = null,
@@ -29,13 +27,13 @@ interface StorageRepository {
         unitOfMeasurement: UnitOfMeasurement
     ): Long
 
-    suspend fun saveFoodAndTag(foodId: Long, tagId: Long): Long
+    suspend fun saveFoodAndTagConnection(foodId: Long, tagId: Long): Long
 
-    suspend fun deleteFoodAndTagsByFoodId(foodId: Long): Int
+    suspend fun deleteFoodAndTagsByFoodId(foodId: Long)
 
-    suspend fun deleteFoodAndTag(foodId: Long, tagId: Long): Int
+    suspend fun deleteFoodAndTag(foodId: Long, tagId: Long)
 
-    suspend fun deleteFoodById(id: Long): Int
+    suspend fun deleteFoodById(id: Long)
 
     //tag
     fun getFoodTagFlow(): Flow<List<FoodTag>>
@@ -44,5 +42,5 @@ interface StorageRepository {
 
     suspend fun saveOrModifyFoodTag(tag: FoodTag): Long
 
-    suspend fun deleteFoodTag(id: Long): Int
+    suspend fun deleteFoodTag(id: Long)
 }

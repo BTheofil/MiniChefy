@@ -54,13 +54,9 @@ class CreateRecipeViewModel @Inject constructor(
     private var editRecipeId: Long? = null
 
     init {
-        loadEditRecipe()
         viewModelScope.launch {
-            _ingredientsPageState.update { ingredientsPage ->
-                ingredientsPage.copy(
-                    unSelectedIngredientList = storageRepository.getStorageIngredients()
-                )
-            }
+            loadEditRecipe()
+            loadIngredients()
         }
     }
 
@@ -239,13 +235,14 @@ class CreateRecipeViewModel @Inject constructor(
 
                     delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
 
-                    _ingredientsPageState.update { ingredientsPage ->
-                        ingredientsPage.copy(
-                            unSelectedIngredientList = storageRepository.searchIngredientsByLikelyTitle(
-                                event.text
-                            )
-                        )
-                    }
+                    storageRepository.searchIngredientsByLikelyTitle(event.text)
+                        .collect { summayList ->
+                            _ingredientsPageState.update { ingredientsPage ->
+                                ingredientsPage.copy(
+                                    unSelectedIngredientList = summayList
+                                )
+                            }
+                        }
                 }
             }
 
@@ -344,13 +341,12 @@ class CreateRecipeViewModel @Inject constructor(
         }
     }
 
-    private fun loadEditRecipe() {
+    private suspend fun loadEditRecipe() {
         try {
             val recipeId: String = checkNotNull(savedStateHandle[EDIT_RECIPE_ARGUMENT_KEY])
             editRecipeId = recipeId.toLong()
-            viewModelScope.launch {
-                val recipe = recipeRepository.getRecipeById(editRecipeId!!)
 
+            recipeRepository.getRecipeById(editRecipeId!!).collect { recipe ->
                 _basicPageState.update {
                     it.copy(
                         recipeTitle = recipe.title,
@@ -367,12 +363,25 @@ class CreateRecipeViewModel @Inject constructor(
                     )
                 }
 
-                _stepsPageState.update { it.copy(
-                    recipeSteps = recipe.howToSteps
-                ) }
+                _stepsPageState.update {
+                    it.copy(
+                        recipeSteps = recipe.howToSteps
+                    )
+                }
             }
-        } catch (_: IllegalStateException){
+
+        } catch (_: IllegalStateException) {
             //not came for edit recipe click
+        }
+    }
+
+    private suspend fun loadIngredients() {
+        storageRepository.getStorageIngredients().collect { summaryList ->
+            _ingredientsPageState.update { ingredientsPage ->
+                ingredientsPage.copy(
+                    unSelectedIngredientList = summaryList
+                )
+            }
         }
     }
 

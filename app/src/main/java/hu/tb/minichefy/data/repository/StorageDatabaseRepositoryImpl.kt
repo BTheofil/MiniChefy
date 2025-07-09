@@ -21,8 +21,8 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
 ) : StorageRepository {
 
     //food
-    override fun getKnownFoodsFlow(): Flow<List<Food>> {
-        val entities = dao.getFoodWithTagsFlow()
+    override fun getAllFood(): Flow<List<Food>> {
+        val entities = dao.getAllFoodEntity()
         return entities.map {
             it.map { foodWithTags ->
                 FoodEntityToFood().map(foodWithTags)
@@ -30,38 +30,39 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getKnownFoodList(): List<Food> {
-        val entities = dao.getFoodWithTagsList()
-        return entities.map {
-            FoodEntityToFood().map(it)
-        }
-    }
-
-    override suspend fun getStorageIngredients(): List<FoodSummary> {
+    override fun getStorageIngredients(): Flow<List<FoodSummary>> {
         val entities = dao.getSimpleFoodExcludedTag(DISH_TAG_ID.toLong())
-        return entities.map {
-            SimpleFoodEntityToFoodSummery().map(it)
-        }.sortedBy { it.title }
-    }
-
-    override suspend fun searchFoodByTitle(title: String): List<Food> {
-        val entities = dao.searchFoodByTitle(title)
-        return entities.map {
-            FoodEntityToFood().map(it)
+        return entities.map { simpleFoodEntities ->
+            simpleFoodEntities.map {
+                SimpleFoodEntityToFoodSummery().map(it)
+            }.sortedBy { it.title }
         }
     }
 
-    override suspend fun searchIngredientsByLikelyTitle(searchText: String): List<FoodSummary> {
-        val entities = dao.searchSimpleFoodsByTitle("%$searchText%", DISH_TAG_ID.toLong())
-        return entities.map {
-            SimpleFoodEntityToFoodSummery().map(it)
-        }.sortedBy { it.title }
+    override fun searchFoodByTitle(title: String): Flow<List<Food>> {
+        val entities = dao.searchFoodByTitle(title)
+        return entities.map { foodWithTags ->
+            foodWithTags.map {
+                FoodEntityToFood().map(it)
+            }
+        }
     }
 
-    override suspend fun searchFoodsByTag(tagIds: List<Long>): List<Food> {
+    override fun searchIngredientsByLikelyTitle(searchText: String): Flow<List<FoodSummary>> {
+        val entities = dao.searchSimpleFoodsByTitle("%$searchText%", DISH_TAG_ID.toLong())
+        return entities.map { simpleFoodEntities ->
+            simpleFoodEntities.map {
+                SimpleFoodEntityToFoodSummery().map(it)
+            }.sortedBy { it.title }
+        }
+    }
+
+    override fun searchFoodsByTag(tagIds: List<Long>): Flow<List<Food>> {
         val foodEntity = dao.searchFoodsByTag(tagIds)
-        return foodEntity.map {
-            FoodEntityToFood().map(it)
+        return foodEntity.map { foodWithTags ->
+            foodWithTags.map {
+                FoodEntityToFood().map(it)
+            }
         }
     }
 
@@ -83,16 +84,16 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
         return dao.insertFoodEntity(temp)
     }
 
-    override suspend fun saveFoodAndTag(foodId: Long, tagId: Long): Long =
+    override suspend fun saveFoodAndTagConnection(foodId: Long, tagId: Long): Long =
         dao.insertFoodTagCrossRef(FoodAndTagsCrossRef(foodId, tagId))
 
-    override suspend fun deleteFoodAndTagsByFoodId(foodId: Long): Int =
+    override suspend fun deleteFoodAndTagsByFoodId(foodId: Long) =
         dao.deleteFoodWithTagsConnectionByFoodId(foodId)
 
-    override suspend fun deleteFoodAndTag(foodId: Long, tagId: Long): Int =
+    override suspend fun deleteFoodAndTag(foodId: Long, tagId: Long) =
         dao.deleteFoodTagCrossRef(foodId, tagId)
 
-    override suspend fun deleteFoodById(id: Long): Int =
+    override suspend fun deleteFoodById(id: Long) =
         dao.deleteFoodEntity(id)
 
     //tag
@@ -113,7 +114,7 @@ class StorageDatabaseRepositoryImpl @Inject constructor(
     override suspend fun saveOrModifyFoodTag(tag: FoodTag): Long =
         dao.insertTagEntity(tag.toFoodTagEntity())
 
-    override suspend fun deleteFoodTag(id: Long): Int = dao.deleteFoodTag(id)
+    override suspend fun deleteFoodTag(id: Long) = dao.deleteFoodTag(id)
 }
 
 

@@ -1,10 +1,6 @@
 package hu.tb.minichefy.data.repository
 
-import hu.tb.minichefy.data.data_source.dao.DeletedRecipeCount
-import hu.tb.minichefy.data.data_source.dao.IngredientId
 import hu.tb.minichefy.data.data_source.dao.RecipeDAO
-import hu.tb.minichefy.data.data_source.dao.RecipeId
-import hu.tb.minichefy.data.data_source.dao.StepId
 import hu.tb.minichefy.data.mapper.RecipeEntityToRecipe
 import hu.tb.minichefy.domain.model.recipe.Recipe
 import hu.tb.minichefy.domain.model.recipe.RecipeIngredient
@@ -28,8 +24,12 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
         }
 
 
-    override suspend fun getRecipeById(id: Long): Recipe =
-        RecipeEntityToRecipe().map(dao.getRecipeById(id))
+    override suspend fun getRecipeById(id: Long): Flow<Recipe> {
+        val result = dao.getRecipeById(id)
+        return result.map {
+            RecipeEntityToRecipe().map(it)
+        }
+    }
 
     override suspend fun saveRecipe(
         id: Long?,
@@ -38,7 +38,7 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
         quantity: Int,
         timeToCreate: Int,
         timeUnit: TimeUnit,
-    ): RecipeId {
+    ): Long {
         val temp = RecipeEntity(
             recipeId = id,
             image = icon,
@@ -51,21 +51,23 @@ class RecipeDatabaseRepositoryImpl @Inject constructor(
         return dao.insertRecipeEntity(temp)
     }
 
-    override suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): StepId =
+    override suspend fun saveStep(step: RecipeStep, recipeEntityId: Long): Long =
         dao.insertStepEntity(step.toRecipeStepEntity(recipeEntityId))
 
     override suspend fun saveIngredient(
         ingredient: RecipeIngredient,
         recipeEntityId: Long
-    ): IngredientId =
+    ): Long =
         dao.insertIngredientEntity(ingredient.toIngredientEntity(recipeEntityId))
 
-    override suspend fun searchRecipeByTitle(searchTitle: String): List<Recipe> {
-        val recipes = dao.searchRecipeByTitle("%$searchTitle%")
-        return recipes.map {
-            RecipeEntityToRecipe().map(it)
+    override suspend fun searchRecipeTitle(text: String): Flow<List<Recipe>> {
+        val recipes = dao.getRecipeByTitle("%$text%")
+        return recipes.map { recipeBlocks ->
+            recipeBlocks.map {
+                RecipeEntityToRecipe().map(it)
+            }
         }
     }
 
-    override suspend fun deleteRecipe(id: Long): DeletedRecipeCount = dao.deleteRecipe(id)
+    override suspend fun deleteRecipe(id: Long) = dao.deleteRecipe(id)
 }

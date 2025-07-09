@@ -6,11 +6,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.tb.minichefy.domain.model.storage.Food
 import hu.tb.minichefy.domain.model.storage.FoodTag
 import hu.tb.minichefy.domain.model.storage.UnitOfMeasurement
-import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.domain.use_case.ValidationResult
 import hu.tb.minichefy.domain.use_case.Validators
 import hu.tb.minichefy.presentation.util.icons.FoodIcon
 import hu.tb.minichefy.domain.model.IconResource
+import hu.tb.minichefy.domain.repository.StorageRepository
 import hu.tb.minichefy.presentation.ui.theme.SEARCH_BAR_WAIT_AFTER_CHARACTER
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -35,7 +35,7 @@ class StorageListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            storageRepository.getKnownFoodsFlow().collect { foodList ->
+            storageRepository.getAllFood().collect { foodList ->
                 _uiState.update {
                     it.copy(
                         foodList = foodList,
@@ -94,9 +94,10 @@ class StorageListViewModel @Inject constructor(
 
                     delay(SEARCH_BAR_WAIT_AFTER_CHARACTER)
 
-                    val searchResult = storageRepository.searchFoodByTitle("%$action.text%")
-                    _uiState.update {
-                        it.copy(foodList = searchResult)
+                    storageRepository.searchFoodByTitle("%$action.text%").collect { foodList ->
+                        _uiState.update {
+                            it.copy(foodList = foodList)
+                        }
                     }
                 }
             }
@@ -113,14 +114,16 @@ class StorageListViewModel @Inject constructor(
                     val filteredFoodList = if (temp.isNotEmpty()) {
                         storageRepository.searchFoodsByTag(temp.map { it.id!! })
                     } else {
-                        storageRepository.getKnownFoodList()
+                        storageRepository.getAllFood()
                     }
 
-                    _uiState.update {
-                        it.copy(
-                            activeFilter = temp.toList(),
-                            foodList = filteredFoodList
-                        )
+                    filteredFoodList.collect { foodList ->
+                        _uiState.update {
+                            it.copy(
+                                activeFilter = temp.toList(),
+                                foodList = foodList
+                            )
+                        }
                     }
                 }
             }
@@ -204,7 +207,7 @@ class StorageListViewModel @Inject constructor(
                     if (modifyFood.foodTagList != null && modifyFood.foodTagList.contains(action.tag)) {
                         storageRepository.deleteFoodAndTag(modifyFood.id!!, action.tag.id!!)
                     } else {
-                        storageRepository.saveFoodAndTag(modifyFood.id!!, action.tag.id!!)
+                        storageRepository.saveFoodAndTagConnection(modifyFood.id!!, action.tag.id!!)
                     }
                 }
             }
@@ -244,7 +247,7 @@ class StorageListViewModel @Inject constructor(
             )
 
             updatedFood.foodTagList?.map { tag ->
-                storageRepository.saveFoodAndTag(foodId, tag.id!!)
+                storageRepository.saveFoodAndTagConnection(foodId, tag.id!!)
             }
         }
     }

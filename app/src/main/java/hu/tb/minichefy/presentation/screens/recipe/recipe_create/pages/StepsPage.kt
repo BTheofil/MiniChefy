@@ -1,5 +1,6 @@
 package hu.tb.minichefy.presentation.screens.recipe.recipe_create.pages
 
+import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.rememberTransition
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -36,7 +37,7 @@ import hu.tb.minichefy.presentation.ui.theme.MEDIUM_SPACE_BETWEEN_ELEMENTS
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_HORIZONTAL_PADDING
 import hu.tb.minichefy.presentation.ui.theme.SCREEN_VERTICAL_PADDING
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTransitionApi::class)
 @Composable
 fun StepsPage(
     uiState: CreateRecipeViewModel.Pages.StepsPage,

@@ -99,7 +99,7 @@ class StorageCreateViewModel @Inject constructor(
                             unitOfMeasurement = it.foodUnitOfMeasurement
                         )
                         it.selectedTagList.map { tag ->
-                            storageRepository.saveFoodAndTag(foodId, tag.id!!)
+                            storageRepository.saveFoodAndTagConnection(foodId, tag.id!!)
                         }
                     }
                     _uiEvent.send(UiEvent.SaveSuccess)

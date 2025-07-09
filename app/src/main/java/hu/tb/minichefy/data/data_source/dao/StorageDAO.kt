@@ -12,64 +12,58 @@ import hu.tb.minichefy.domain.model.storage.entity.FoodWithTags
 import hu.tb.minichefy.domain.model.storage.entity.SimpleFoodEntity
 import kotlinx.coroutines.flow.Flow
 
-typealias FoodId = Long
-
 @Dao
 interface StorageDAO {
 
     //food
     @Transaction
     @Query("SELECT foodId, title, unitOfMeasurement FROM FoodEntity WHERE foodId NOT IN (SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId = :excludedTagId)")
-    suspend fun getSimpleFoodExcludedTag(excludedTagId: Long): List<SimpleFoodEntity>
+    fun getSimpleFoodExcludedTag(excludedTagId: Long): Flow<List<SimpleFoodEntity>>
 
     @Transaction
     @Query("SELECT * FROM FoodEntity")
-    fun getFoodWithTagsFlow(): Flow<List<FoodWithTags>>
-
-    @Transaction
-    @Query("SELECT * FROM FoodEntity")
-    suspend fun getFoodWithTagsList(): List<FoodWithTags>
+    fun getAllFoodEntity(): Flow<List<FoodWithTags>>
 
     @Transaction
     @Query("SELECT * FROM FoodEntity WHERE title = :title")
-    suspend fun searchFoodByTitle(title: String): List<FoodWithTags>
+    fun searchFoodByTitle(title: String): Flow<List<FoodWithTags>>
 
     @Transaction
     @Query("SELECT foodId, title, unitOfMeasurement FROM FoodEntity WHERE title LIKE :searchTitle AND foodId NOT IN (SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId = :excludedTagId)")
-    suspend fun searchSimpleFoodsByTitle(searchTitle: String, excludedTagId: Long): List<SimpleFoodEntity>
+    fun searchSimpleFoodsByTitle(searchTitle: String, excludedTagId: Long): Flow<List<SimpleFoodEntity>>
 
     @Transaction
     @Query("SELECT * FROM FoodEntity WHERE foodId IN (SELECT foodId FROM FoodAndTagsCrossRef WHERE tagId IN (:tagIds))")
-    suspend fun searchFoodsByTag(tagIds: List<Long>): List<FoodWithTags>
+    fun searchFoodsByTag(tagIds: List<Long>): Flow<List<FoodWithTags>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFoodEntity(foodEntity: FoodEntity): FoodId
+    suspend fun insertFoodEntity(foodEntity: FoodEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFoodTagCrossRef(crossRef: FoodAndTagsCrossRef): Long
 
     @Transaction
     @Query("DELETE FROM FoodAndTagsCrossRef WHERE foodId = :foodId")
-    suspend fun deleteFoodWithTagsConnectionByFoodId(foodId: Long): Int
+    fun deleteFoodWithTagsConnectionByFoodId(foodId: Long)
 
     @Transaction
     @Query("DELETE FROM FoodAndTagsCrossRef WHERE foodId = :foodId AND tagId = :tagId")
-    suspend fun deleteFoodTagCrossRef(foodId: Long, tagId: Long): Int
+    fun deleteFoodTagCrossRef(foodId: Long, tagId: Long)
 
     @Transaction
     @Query("DELETE FROM FoodEntity WHERE foodId = :id")
-    suspend fun deleteFoodEntity(id: Long): Int
+    fun deleteFoodEntity(id: Long)
 
     //tag
     @Query("SELECT * FROM TagEntity")
     fun getAllFoodTagFlow(): Flow<List<TagEntity>>
 
     @Query("SELECT * FROM TagEntity WHERE tagId = :id")
-    suspend fun getTagById(id: Long): TagEntity
+    fun getTagById(id: Long): TagEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTagEntity(tagEntity: TagEntity): Long
 
     @Query("DELETE FROM TagEntity WHERE tagId = :id")
-    suspend fun deleteFoodTag(id: Long): Int
+    fun deleteFoodTag(id: Long)
 }
