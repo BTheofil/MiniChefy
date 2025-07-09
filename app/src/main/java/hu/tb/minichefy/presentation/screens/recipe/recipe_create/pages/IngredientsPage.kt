@@ -127,7 +127,7 @@ fun IngredientList(
             key = "selected_ingredients_title_key"
         ) {
             Text(
-                modifier = Modifier.animateItem(),
+                modifier = Modifier,
                 text = stringResource(id = R.string.selected_ingredients),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary
@@ -138,7 +138,7 @@ fun IngredientList(
                 key = "empty_ingredient_list_title_key"
             ) {
                 ListItem(
-                    modifier = Modifier.animateItem(),
+                    modifier = Modifier,
                     headlineContent = {
                         Text(
                             text = stringResource(id = R.string.no_ingredients),
@@ -152,7 +152,7 @@ fun IngredientList(
             items = uiState.selectedIngredientList,
         ) { index, product ->
             ListItem(
-                modifier = Modifier.animateItem(),
+                modifier = Modifier,
                 headlineContent = {
                     Text(
                         text = product.title,
@@ -191,7 +191,7 @@ fun IngredientList(
             key = "all_ingredients_title_key"
         ) {
             Column(
-                modifier = Modifier.animateItem()
+                modifier = Modifier
             ) {
                 Spacer(modifier = Modifier.height(MEDIUM_SPACE_BETWEEN_ELEMENTS))
                 Text(
@@ -206,7 +206,7 @@ fun IngredientList(
             key = { item -> item.id }
         ) { ingredient ->
             ListItem(
-                modifier = Modifier.animateItem(),
+                modifier = Modifier,
                 headlineContent = {
                     Text(
                         text = ingredient.title,
